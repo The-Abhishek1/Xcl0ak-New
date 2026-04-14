@@ -1,0 +1,9 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///home/idiot/Projects/Claude/xcloak/src/app/page.tsx"],"sourcesContent":["import { redirect } from 'next/navigation'\nexport default function Home() { redirect('/dashboard') }\n"],"names":[],"mappings":";;;AAAA;AAAA;;AACe,SAAS;IAAS,CAAA,GAAA,qLAAA,CAAA,WAAQ,AAAD,EAAE;AAAc"}},
+    {"offset": {"line": 16, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}},
+    {"offset": {"line": 27, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":""}},
+    {"offset": {"line": 27, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
+}

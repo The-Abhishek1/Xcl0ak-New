@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Exploit {
+  id           String        @id @default(cuid())
+  title        String
+  slug         String        @unique
+  description  String
+  code         String?
+  language     String        @default("other")
+  type         String
+  os           String[]
+  cveId        String?
+  authorAlias  String
+  upvotes      Int           @default(0)
+  downvotes    Int           @default(0)
+  score        Float         @default(0)
+  tags         String[]
+  difficulty   String        @default("intermediate")
+  verified     Boolean       @default(false)
+  views        Int           @default(0)
+  dnaRisk      Float?
+  dnaPayload   String?
+  fileUrl      String?
+  // Approval workflow
+  status       String        @default("pending")   // pending | approved | rejected
+  reviewNote   String?
+  reviewedBy   String?
+  reviewedAt   DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  votes        ExploitVote[]
+  comments     Comment[]
+  @@index([status])
+  @@index([score(sort: Desc)])
+  @@index([type])
+  @@index([cveId])
+}
+
+model ExploitVote {
+  id        String  @id @default(cuid())
+  exploitId String
+  userAlias String
+  direction String
+  exploit   Exploit @relation(fields: [exploitId], references: [id], onDelete: Cascade)
+  @@unique([exploitId, userAlias])
+}
+
+model Comment {
+  id          String    @id @default(cuid())
+  exploitId   String
+  parentId    String?
+  authorAlias String
+  body        String
+  upvotes     Int       @default(0)
+  createdAt   DateTime  @default(now())
+  exploit     Exploit   @relation(fields: [exploitId], references: [id], onDelete: Cascade)
+  parent      Comment?  @relation("Replies", fields: [parentId], references: [id])
+  replies     Comment[] @relation("Replies")
+}
+
+model CVECache {
+  id               String   @id @default(cuid())
+  cveId            String   @unique
+  description      String
+  cvssScore        Float
+  cvssVector       String?
+  severity         String
+  vendor           String?
+  product          String?
+  affectedVersions String[]
+  patchAvailable   Boolean  @default(false)
+  exploitableNow   Boolean  @default(false)
+  publishedAt      DateTime
+  modifiedAt       DateTime
+  syncedAt         DateTime @default(now())
+  @@index([severity])
+  @@index([cvssScore(sort: Desc)])
+}
+
+model ThreatEvent {
+  id         String   @id @default(cuid())
+  type       String
+  srcCountry String
+  dstCountry String
+  srcLat     Float
+  srcLng     Float
+  dstLat     Float
+  dstLng     Float
+  severity   Int
+  details    String?
+  sourceUrl  String?
+  createdAt  DateTime @default(now())
+  @@index([createdAt(sort: Desc)])
+}
+
+model NewsArticle {
+  id          String   @id @default(cuid())
+  title       String
+  url         String   @unique
+  source      String
+  category    String
+  country     String?
+  summary     String?
+  publishedAt DateTime
+  createdAt   DateTime @default(now())
+  @@index([publishedAt(sort: Desc)])
+}
+
+model User {
+  id         String   @id @default(cuid())
+  alias      String   @unique
+  fp         String   @unique
+  reputation Int      @default(0)
+  badges     String[]
+  createdAt  DateTime @default(now())
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  alias        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model CTFChallenge {
+  id          String     @id @default(cuid())
+  title       String
+  category    String
+  difficulty  String     @default("medium")
+  description String
+  flagHash    String
+  points      Int
+  fileUrl     String?
+  hints       String[]
+  expiresAt   DateTime?
+  // Approval workflow
+  status      String     @default("pending")  // pending | approved | rejected
+  authorAlias String     @default("anonymous")
+  reviewNote  String?
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  createdAt   DateTime   @default(now())
+  solves      CTFSolve[]
+  @@index([status])
+}
+
+model CTFSolve {
+  id          String       @id @default(cuid())
+  challengeId String
+  userAlias   String
+  solvedAt    DateTime     @default(now())
+  challenge   CTFChallenge @relation(fields: [challengeId], references: [id])
+  @@unique([challengeId, userAlias])
+}
