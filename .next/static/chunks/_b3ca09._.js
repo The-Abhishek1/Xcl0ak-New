@@ -105,7 +105,7 @@ function CVEPage() {
     const [page, setPage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(1);
     const searchRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
     const [searchVal, setSearchVal] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('');
-    const debounceRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])();
+    const debounceRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
     const fetchCVEs = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "CVEPage.useCallback[fetchCVEs]": async (q, sev, exp, pg)=>{
             setLoading(true);
@@ -131,14 +131,16 @@ function CVEPage() {
     }["CVEPage.useCallback[fetchCVEs]"], []);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "CVEPage.useEffect": ()=>{
-            clearTimeout(debounceRef.current);
+            if (debounceRef.current) clearTimeout(debounceRef.current);
             debounceRef.current = setTimeout({
                 "CVEPage.useEffect": ()=>{
                     fetchCVEs(searchVal, severity, exploitable, page);
                 }
             }["CVEPage.useEffect"], searchVal ? 400 : 0);
             return ({
-                "CVEPage.useEffect": ()=>clearTimeout(debounceRef.current)
+                "CVEPage.useEffect": ()=>{
+                    if (debounceRef.current) clearTimeout(debounceRef.current);
+                }
             })["CVEPage.useEffect"];
         }
     }["CVEPage.useEffect"], [

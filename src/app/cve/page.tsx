@@ -22,7 +22,7 @@ export default function CVEPage() {
   const [page,      setPage]      = useState(1)
   const searchRef = useRef<HTMLInputElement>(null)
   const [searchVal, setSearchVal] = useState('')
-  const debounceRef = useRef<NodeJS.Timeout>()
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const fetchCVEs = useCallback(async (q: string, sev: string, exp: boolean, pg: number) => {
     setLoading(true)
@@ -42,11 +42,11 @@ export default function CVEPage() {
   }, [])
 
   useEffect(() => {
-    clearTimeout(debounceRef.current)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
       fetchCVEs(searchVal, severity, exploitable, page)
     }, searchVal ? 400 : 0)
-    return () => clearTimeout(debounceRef.current)
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [fetchCVEs, searchVal, severity, exploitable, page])
 
   // Severity counts from loaded data
