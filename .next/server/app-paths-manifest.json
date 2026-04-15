@@ -1,3 +1,13 @@
 {
-  "/page": "app/page.js"
+  "/page": "app/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/api/v1/threat/route": "app/api/v1/threat/route.js",
+  "/threat-map/page": "app/threat-map/page.js",
+  "/ctf/page": "app/ctf/page.js",
+  "/api/v1/users/route": "app/api/v1/users/route.js",
+  "/api/v1/ctf/route": "app/api/v1/ctf/route.js",
+  "/ctf/submit/page": "app/ctf/submit/page.js",
+  "/leaderboard/page": "app/leaderboard/page.js",
+  "/ai/page": "app/ai/page.js",
+  "/_not-found/page": "app/_not-found/page.js"
 }

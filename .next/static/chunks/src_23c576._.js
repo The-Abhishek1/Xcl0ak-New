@@ -924,7 +924,7 @@ const ALL_NAV = [
 const S = {
     bar: {
         position: 'fixed',
-        bottom: 0,
+        bottom: 25,
         left: 0,
         right: 0,
         height: '56px',

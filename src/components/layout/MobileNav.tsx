@@ -41,7 +41,7 @@ const ALL_NAV = [
 const S = {
   bar: {
     position: 'fixed' as const,
-    bottom: 0, left: 0, right: 0,
+    bottom: 25, left: 0, right: 0,
     height: '56px',
     zIndex: 100,
     display: 'flex',
