@@ -1,1 +1,21 @@
-{}
+{
+  "/exploits/upload/page": "app/exploits/upload/page.js",
+  "/api/v1/threat/route": "app/api/v1/threat/route.js",
+  "/ctf/page": "app/ctf/page.js",
+  "/api/v1/users/route": "app/api/v1/users/route.js",
+  "/api/v1/ctf/route": "app/api/v1/ctf/route.js",
+  "/ctf/submit/page": "app/ctf/submit/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/api/v1/admin/exploits/route": "app/api/v1/admin/exploits/route.js",
+  "/api/v1/admin/ctf/route": "app/api/v1/admin/ctf/route.js",
+  "/api/v1/admin/ctf/[id]/route": "app/api/v1/admin/ctf/[id]/route.js",
+  "/exploits/page": "app/exploits/page.js",
+  "/api/v1/exploits/route": "app/api/v1/exploits/route.js",
+  "/exploits/[id]/page": "app/exploits/[id]/page.js",
+  "/leaderboard/page": "app/leaderboard/page.js",
+  "/cve/page": "app/cve/page.js",
+  "/api/v1/cve/route": "app/api/v1/cve/route.js",
+  "/threat-map/page": "app/threat-map/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/api/v1/exploits/[id]/vote/route": "app/api/v1/exploits/[id]/vote/route.js"
+}

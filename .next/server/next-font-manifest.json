@@ -1,6 +1,57 @@
 {
-  "app": {},
-  "appUsingSizeAdjust": false,
+  "app": {
+    "[project]/src/app/exploits/upload/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/ctf/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/ctf/submit/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/admin/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/exploits/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/exploits/[id]/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/leaderboard/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/cve/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/threat-map/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/dashboard/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ]
+  },
+  "appUsingSizeAdjust": true,
   "pages": {},
   "pagesUsingSizeAdjust": false
 }

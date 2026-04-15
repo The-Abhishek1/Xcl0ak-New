@@ -22,8 +22,7 @@
       linear-gradient(rgba(0,255,170,0.018) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0,255,170,0.018) 1px, transparent 1px);
     background-size: 48px 48px;
-    pointer-events: none;
-    z-index: 0;
+    pointer-events: none; z-index: 0;
   }
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -63,9 +62,8 @@
 
 .ticker-inner { animation: ticker-move 50s linear infinite; }
 
-/* ─── Layout ─────────────────────────────────────────────── */
-/* Desktop: sidebar visible + main offset */
-.sidebar-el   { display: flex; }          /* sidebar visible */
+/* Main content area — desktop offset, mobile full width */
+/* Desktop: JS adds sidebar, so we set left margin */
 .main-content {
   margin-left: 220px;
   padding-top: 52px;
@@ -75,16 +73,27 @@
   z-index: 1;
 }
 
-/* Mobile bottom nav hidden by default (desktop) */
-.mobile-nav-bar { display: none; }
-
-/* ─── Mobile ≤ 768px ─────────────────────────────────────── */
 @media (max-width: 768px) {
-  .sidebar-el   { display: none !important; }   /* hide sidebar */
-  .main-content { margin-left: 0; padding-bottom: 72px; }
-  .mobile-nav-bar { display: flex; }            /* show bottom tab bar */
+  .main-content {
+    margin-left: 0 !important;
+    padding-bottom: 72px; /* space for bottom tab bar */
+  }
 }
 
-/* Topbar nav scrollable on small screens */
+/* Horizontal scrollable nav */
 .nav-scroll { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
 .nav-scroll::-webkit-scrollbar { display: none; }
+
+/* ─── Mobile-only / Desktop-only utilities ──────────────── */
+.hide-mobile { /* shown by default, hidden ≤768px */ }
+.show-mobile { display: none; } /* hidden by default, shown ≤768px */
+
+@media (max-width: 768px) {
+  .hide-mobile { display: none !important; }
+  .show-mobile { display: flex !important; }
+}
+
+/* Staggered animation helpers */
+.animate-float-in-d1 { animation: float-in 0.4s ease-out 0.05s both; }
+.animate-float-in-d2 { animation: float-in 0.4s ease-out 0.10s both; }
+.animate-float-in-d3 { animation: float-in 0.4s ease-out 0.15s both; }
