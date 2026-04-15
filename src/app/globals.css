@@ -17,11 +17,10 @@
   }
   body::before {
     content: '';
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background-image:
-      linear-gradient(rgba(0,255,170,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,170,0.025) 1px, transparent 1px);
+      linear-gradient(rgba(0,255,170,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,170,0.018) 1px, transparent 1px);
     background-size: 48px 48px;
     pointer-events: none;
     z-index: 0;
@@ -46,8 +45,7 @@
     border-radius: 8px;
   }
   .live-dot {
-    width: 7px; height: 7px;
-    border-radius: 9999px;
+    width: 7px; height: 7px; border-radius: 9999px;
     background: #00ffaa;
     animation: pulse-dot 2s ease-in-out infinite;
     flex-shrink: 0;
@@ -55,37 +53,38 @@
   .live-dot-red { background: #ff3a5c; }
   .text-accent  { color: #00ffaa; }
   .text-accent2 { color: #00aaff; }
-  .text-danger  { color: #ff3a5c; }
-  .text-warn    { color: #ff8c42; }
   .animate-fin  { animation: float-in 0.4s ease-out both; }
 }
 
-@keyframes pulse-dot {
-  0%,100% { opacity:1; transform:scale(1); }
-  50%      { opacity:0.5; transform:scale(0.8); }
-}
-@keyframes float-in {
-  from { opacity:0; transform:translateY(8px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-@keyframes ticker-move {
-  0%   { transform:translateX(100vw); }
-  100% { transform:translateX(-100%); }
-}
-@keyframes ripple {
-  0%   { transform:scale(1); opacity:0.7; }
-  100% { transform:scale(3.5); opacity:0; }
-}
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+@keyframes float-in  { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+@keyframes ticker-move { 0%{transform:translateX(100vw)} 100%{transform:translateX(-100%)} }
+@keyframes slide-up { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
+
 .ticker-inner { animation: ticker-move 50s linear infinite; }
 
-/* ── Responsive: sidebar collapses on mobile ── */
-@media (max-width: 768px) {
-  .sidebar-desktop { display: none; }
-  .main-offset     { margin-left: 0 !important; }
+/* ─── Layout ─────────────────────────────────────────────── */
+/* Desktop: sidebar visible + main offset */
+.sidebar-el   { display: flex; }          /* sidebar visible */
+.main-content {
+  margin-left: 220px;
+  padding-top: 52px;
+  padding-bottom: 40px;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
 }
 
-/* ── Responsive: topbar nav scrolls on small screens ── */
-@media (max-width: 640px) {
-  .nav-scroll { overflow-x: auto; scrollbar-width: none; }
-  .nav-scroll::-webkit-scrollbar { display: none; }
+/* Mobile bottom nav hidden by default (desktop) */
+.mobile-nav-bar { display: none; }
+
+/* ─── Mobile ≤ 768px ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sidebar-el   { display: none !important; }   /* hide sidebar */
+  .main-content { margin-left: 0; padding-bottom: 72px; }
+  .mobile-nav-bar { display: flex; }            /* show bottom tab bar */
 }
+
+/* Topbar nav scrollable on small screens */
+.nav-scroll { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
+.nav-scroll::-webkit-scrollbar { display: none; }

@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST='{"components/map/Globe3D.tsx -> three":{"id":7274,"files":["static/chunks/b536a0f1.1206ff5965d86828.js","static/chunks/bd904a5c.a78fd3231b3618fa.js"]}}';

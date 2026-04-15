@@ -17,8 +17,13 @@ async function getData() {
     fetchRecentCVEs({ daysBack:7, limit:12 }).catch(()=>({ vulns:[], total:0 })),
     getSubscribedPulses(10).catch(()=>[]),
     getLiveThreatPoints().catch(()=>[]),
-    prisma.exploit.findMany({ orderBy:{score:'desc'}, take:4, include:{_count:{select:{comments:true}}} }).catch(()=>[]),
-    prisma.exploit.count().catch(()=>0),
+    prisma.exploit.findMany({
+      where:   { status:'approved' },
+      orderBy: { score:'desc' },
+      take:    4,
+      include: { _count:{ select:{ comments:true } } },
+    }).catch(()=>[]),
+    prisma.exploit.count({ where:{ status:'approved' } }).catch(()=>0),
     prisma.cVECache.count().catch(()=>0),
   ])
   const cves        = nvd.vulns
@@ -32,15 +37,15 @@ export default async function DashboardPage() {
   return (
     <div className="p-3 sm:p-5 space-y-3 sm:space-y-4">
 
-      {/* Stats — 2 cols mobile, 3 cols tablet, 6 cols desktop */}
+      {/* Stats — 2 cols mobile → 3 tablet → 6 desktop */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
         {[
-          { label:'Critical CVEs',   value:d.critical,     color:'#ff3a5c' },
-          { label:'Exploitable Now', value:d.exploitable,  color:'#ff3a5c' },
-          { label:'CVEs in DB',      value:d.cveCount,     color:'#ff8c42' },
-          { label:'Active Exploits', value:d.exploitCount, color:'#ffd700' },
-          { label:'Threat Events',   value:d.threatPoints.length, color:'#00ffaa' },
-          { label:'OTX Pulses',      value:d.pulses.length,color:'#00aaff' },
+          { label:'Critical CVEs',   value:d.critical,              color:'#ff3a5c' },
+          { label:'Exploitable Now', value:d.exploitable,           color:'#ff3a5c' },
+          { label:'CVEs in DB',      value:d.cveCount,              color:'#ff8c42' },
+          { label:'Active Exploits', value:d.exploitCount,          color:'#ffd700' },
+          { label:'Threat Events',   value:d.threatPoints.length,   color:'#00ffaa' },
+          { label:'OTX Pulses',      value:d.pulses.length,         color:'#00aaff' },
         ].map((c,i) => (
           <div key={i} className="glass px-3 sm:px-4 py-3 relative overflow-hidden animate-fin" style={{animationDelay:`${i*0.05}s`}}>
             <div className="absolute top-0 left-0 right-0 h-px" style={{background:`linear-gradient(90deg,transparent,${c.color},transparent)`}}/>
@@ -50,21 +55,27 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* Threat map + live feed — stacked on mobile, side-by-side on lg */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-3 sm:gap-4">
+      {/* Threat map + live feed */}
+      {/* Mobile: stacked. Desktop: side by side */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-3 sm:gap-4">
         <ThreatMapPanel points={d.threatPoints} />
+        <div className="hidden lg:block">
+          <LiveFeed pulses={d.pulses} />
+        </div>
+      </div>
+
+      {/* Live feed on mobile (below map) */}
+      <div className="lg:hidden">
         <LiveFeed pulses={d.pulses} />
       </div>
 
       {/* CVE strip */}
       <CVEStrip cves={d.cves.slice(0,6)} />
 
-      {/* Exploits + sidebar — stacked on mobile, 3-col on xl */}
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_1fr_260px] gap-3 sm:gap-4">
-        <div className="xl:col-span-2">
-          <ExploitGrid exploits={d.exploits} title="Trending Exploits" />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3 sm:gap-4">
+      {/* Exploits + AI + Leaderboard */}
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_240px] gap-3 sm:gap-4">
+        <ExploitGrid exploits={d.exploits} title="Trending Exploits" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-3">
           <AIPanel />
           <Leaderboard />
         </div>

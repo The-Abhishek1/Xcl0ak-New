@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { cvssBg, timeAgo } from '@/lib/utils'
 
 interface CVE {
@@ -18,6 +19,7 @@ interface CVE {
 const SEVERITIES = ['ALL', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW']
 
 export default function CVEPage() {
+  const router = useRouter()
   const [cves, setCves]         = useState<CVE[]>([])
   const [total, setTotal]       = useState(0)
   const [loading, setLoading]   = useState(true)
@@ -195,8 +197,8 @@ export default function CVEPage() {
                 <tbody>
                   {cves.map((cve) => (
                     <tr key={cve.cveId}
-                      onClick={() => setSelected(cve)}
-                      className="border-b border-white/[0.03] cursor-pointer hover:bg-white/[0.03] transition-colors">
+                      onClick={() => router.push(`/cve/${encodeURIComponent(cve.cveId)}`)}
+                      className="border-b border-white/[0.03] cursor-pointer hover:bg-white/[0.03] transition-colors hover:border-accent/10">
                       <td className="px-4 py-3">
                         <span className="font-mono text-[11px] font-bold text-accent2">{cve.cveId}</span>
                       </td>
