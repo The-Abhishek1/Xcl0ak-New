@@ -109,7 +109,7 @@ export default function CVEPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-[260px_1fr] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4">
 
         {/* Filter sidebar */}
         <div className="glass overflow-hidden h-fit sticky top-[72px]">

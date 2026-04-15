@@ -173,7 +173,7 @@ export default function ScannerPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-[1fr_320px] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4">
         {/* Left: config + results */}
         <div className="space-y-4">
 
@@ -198,7 +198,7 @@ export default function ScannerPage() {
             </div>
 
             {/* Module selector */}
-            <div className="grid grid-cols-5 gap-2 mt-4">
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-4">
               {SCAN_MODULES.map(m => (
                 <button key={m.id} onClick={() => toggleModule(m.id)}
                   className={`p-2.5 rounded-lg border text-left transition-all duration-150

@@ -136,7 +136,7 @@ export default function LearnPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-[240px_1fr] gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-4">
         {/* Track selector */}
         <div className="space-y-2">
           {TRACKS.map(t => {

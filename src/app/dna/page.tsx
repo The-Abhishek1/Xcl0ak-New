@@ -49,7 +49,7 @@ export default function DNAPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-[1fr_340px] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-4">
         {/* Code input */}
         <div className="space-y-3">
           <div className="glass overflow-hidden">

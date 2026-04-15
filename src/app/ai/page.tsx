@@ -66,7 +66,7 @@ export default function AIPage() {
   }
 
   return (
-    <div className="p-5 h-[calc(100vh-84px)] flex flex-col">
+    <div className="p-3 sm:p-5 flex flex-col" style={{minHeight:"calc(100vh - 84px)"}}>
       <div className="flex items-center justify-between mb-4 shrink-0">
         <div>
           <h1 className="text-2xl font-black">AI <span className="text-accent">Assistant</span></h1>
@@ -81,7 +81,7 @@ export default function AIPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-[1fr_240px] gap-4 flex-1 min-h-0">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-4 flex-1 min-h-0">
         {/* Chat area */}
         <div className="glass flex flex-col min-h-0">
           {/* Messages */}

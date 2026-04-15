@@ -109,7 +109,7 @@ export default function PayloadsPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-[1fr_260px] gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-4">
         <div className="space-y-3">
           {/* Search */}
           <div className="relative">
