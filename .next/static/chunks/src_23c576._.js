@@ -125,7 +125,6 @@ const SECTIONS = [
 function Sidebar() {
     _s();
     const path = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"])();
-    // null = not yet mounted (suppress SSR render entirely)
     const [mounted, setMounted] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [isDesktop, setIsDesktop] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
@@ -147,146 +146,234 @@ function Sidebar() {
             position: 'fixed',
             left: 0,
             top: '52px',
-            bottom: 0,
+            bottom: 25,
             width: '220px',
             zIndex: 90,
             display: 'flex',
             flexDirection: 'column',
-            padding: '16px 0',
-            overflowY: 'auto',
             background: 'rgba(3,5,10,0.65)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderRight: '1px solid rgba(255,255,255,0.06)'
         },
         children: [
-            SECTIONS.map((sec)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    style: {
-                        marginBottom: '20px',
-                        padding: '0 12px'
-                    },
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            style: {
-                                fontFamily: "'Space Mono',monospace",
-                                fontSize: '9px',
-                                letterSpacing: '0.15em',
-                                color: '#475569',
-                                textTransform: 'uppercase',
-                                padding: '0 8px 6px'
-                            },
-                            children: sec.label
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/layout/Sidebar.tsx",
-                            lineNumber: 60,
-                            columnNumber: 11
-                        }, this),
-                        sec.items.map((item)=>{
-                            const active = path?.startsWith(item.href);
-                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                href: item.href,
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                style: {
+                    flex: 1,
+                    overflowY: 'auto',
+                    padding: '12px 0 8px'
+                },
+                children: SECTIONS.map((sec)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        style: {
+                            marginBottom: '16px',
+                            padding: '0 12px'
+                        },
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                style: {
+                                    fontFamily: "'Space Mono',monospace",
+                                    fontSize: '9px',
+                                    letterSpacing: '0.15em',
+                                    color: '#475569',
+                                    textTransform: 'uppercase',
+                                    padding: '0 8px 6px'
+                                },
+                                children: sec.label
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                lineNumber: 60,
+                                columnNumber: 13
+                            }, this),
+                            sec.items.map((item)=>{
+                                const active = path?.startsWith(item.href);
+                                return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                    href: item.href,
+                                    style: {
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '10px',
+                                        padding: active ? '8px 8px' : '8px 10px',
+                                        borderRadius: '8px',
+                                        marginBottom: '2px',
+                                        fontSize: '13px',
+                                        fontWeight: 600,
+                                        textDecoration: 'none',
+                                        color: active ? '#00ffaa' : '#64748b',
+                                        borderLeft: active ? '2px solid #00ffaa' : '2px solid transparent',
+                                        background: active ? 'linear-gradient(90deg,rgba(0,255,170,0.08),transparent)' : 'transparent',
+                                        transition: 'all 0.15s'
+                                    },
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            style: {
+                                                width: '18px',
+                                                textAlign: 'center',
+                                                fontSize: '14px',
+                                                flexShrink: 0
+                                            },
+                                            children: item.icon
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                            lineNumber: 76,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            style: {
+                                                flex: 1
+                                            },
+                                            children: item.label
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                            lineNumber: 77,
+                                            columnNumber: 19
+                                        }, this),
+                                        item.badge && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            style: {
+                                                fontFamily: "'Space Mono',monospace",
+                                                fontSize: '9px',
+                                                padding: '1px 5px',
+                                                borderRadius: '3px',
+                                                background: item.badge === 'LIVE' ? 'rgba(255,58,92,0.2)' : 'rgba(0,255,170,0.1)',
+                                                color: item.badge === 'LIVE' ? '#ff3a5c' : '#00ffaa'
+                                            },
+                                            children: item.badge
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                            lineNumber: 79,
+                                            columnNumber: 21
+                                        }, this)
+                                    ]
+                                }, item.href, true, {
+                                    fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                    lineNumber: 66,
+                                    columnNumber: 17
+                                }, this);
+                            })
+                        ]
+                    }, sec.label, true, {
+                        fileName: "[project]/src/components/layout/Sidebar.tsx",
+                        lineNumber: 59,
+                        columnNumber: 11
+                    }, this))
+            }, void 0, false, {
+                fileName: "[project]/src/components/layout/Sidebar.tsx",
+                lineNumber: 57,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                style: {
+                    flexShrink: 0,
+                    padding: '8px 12px 12px',
+                    borderTop: '1px solid rgba(255,255,255,0.06)'
+                },
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                        href: "/admin",
+                        style: {
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '8px 10px',
+                            borderRadius: '8px',
+                            marginBottom: '8px',
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            textDecoration: 'none',
+                            color: '#475569',
+                            border: '1px solid rgba(255,255,255,0.06)',
+                            background: 'rgba(255,255,255,0.025)',
+                            transition: 'all 0.15s'
+                        },
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                style: {
+                                    width: '18px',
+                                    textAlign: 'center',
+                                    fontSize: '14px'
+                                },
+                                children: "🔑"
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                lineNumber: 99,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                children: "Admin Panel"
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                lineNumber: 100,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/layout/Sidebar.tsx",
+                        lineNumber: 92,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        style: {
+                            padding: '10px 12px',
+                            borderRadius: '10px',
+                            background: 'rgba(0,255,170,0.04)',
+                            border: '1px solid rgba(0,255,170,0.08)'
+                        },
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                style: {
+                                    fontFamily: "'Space Mono',monospace",
+                                    fontSize: '9px',
+                                    color: '#475569',
+                                    marginBottom: '4px'
+                                },
+                                children: "NVD + OTX LIVE"
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/layout/Sidebar.tsx",
+                                lineNumber: 103,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 style: {
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '10px',
-                                    padding: active ? '8px 8px 8px 8px' : '8px 10px',
-                                    borderRadius: '8px',
-                                    marginBottom: '2px',
-                                    fontSize: '13px',
-                                    fontWeight: 600,
-                                    textDecoration: 'none',
-                                    color: active ? '#00ffaa' : '#64748b',
-                                    borderLeft: active ? '2px solid #00ffaa' : '2px solid transparent',
-                                    background: active ? 'linear-gradient(90deg,rgba(0,255,170,0.08),transparent)' : 'transparent',
-                                    transition: 'all 0.15s'
+                                    gap: '6px'
                                 },
                                 children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         style: {
-                                            width: '18px',
-                                            textAlign: 'center',
-                                            fontSize: '14px',
+                                            width: '7px',
+                                            height: '7px',
+                                            borderRadius: '9999px',
+                                            background: '#00ffaa',
+                                            animation: 'pulse-dot 2s ease-in-out infinite',
                                             flexShrink: 0
-                                        },
-                                        children: item.icon
+                                        }
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                        lineNumber: 76,
-                                        columnNumber: 17
+                                        lineNumber: 105,
+                                        columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        style: {
-                                            flex: 1
-                                        },
-                                        children: item.label
-                                    }, void 0, false, {
-                                        fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                        lineNumber: 77,
-                                        columnNumber: 17
-                                    }, this),
-                                    item.badge && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         style: {
                                             fontFamily: "'Space Mono',monospace",
-                                            fontSize: '9px',
-                                            padding: '1px 5px',
-                                            borderRadius: '3px',
-                                            background: item.badge === 'LIVE' ? 'rgba(255,58,92,0.2)' : 'rgba(0,255,170,0.1)',
-                                            color: item.badge === 'LIVE' ? '#ff3a5c' : '#00ffaa'
+                                            fontSize: '10px',
+                                            color: '#00ffaa'
                                         },
-                                        children: item.badge
+                                        children: "Connected"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                        lineNumber: 79,
-                                        columnNumber: 19
+                                        lineNumber: 106,
+                                        columnNumber: 13
                                     }, this)
                                 ]
-                            }, item.href, true, {
+                            }, void 0, true, {
                                 fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                lineNumber: 66,
-                                columnNumber: 15
-                            }, this);
-                        })
-                    ]
-                }, sec.label, true, {
-                    fileName: "[project]/src/components/layout/Sidebar.tsx",
-                    lineNumber: 59,
-                    columnNumber: 9
-                }, this)),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                href: "/admin",
-                style: {
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    padding: '8px 10px',
-                    margin: '0 12px',
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    textDecoration: 'none',
-                    color: '#475569',
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    background: 'rgba(255,255,255,0.025)',
-                    transition: 'all 0.15s'
-                },
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                        style: {
-                            width: '18px',
-                            textAlign: 'center',
-                            fontSize: '14px'
-                        },
-                        children: "🔑"
-                    }, void 0, false, {
+                                lineNumber: 104,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
                         fileName: "[project]/src/components/layout/Sidebar.tsx",
-                        lineNumber: 98,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                        children: "Admin Panel"
-                    }, void 0, false, {
-                        fileName: "[project]/src/components/layout/Sidebar.tsx",
-                        lineNumber: 99,
+                        lineNumber: 102,
                         columnNumber: 9
                     }, this)
                 ]
@@ -294,83 +381,15 @@ function Sidebar() {
                 fileName: "[project]/src/components/layout/Sidebar.tsx",
                 lineNumber: 91,
                 columnNumber: 7
-            }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                style: {
-                    marginTop: '12px',
-                    margin: '12px 12px 0',
-                    padding: '12px',
-                    borderRadius: '10px',
-                    background: 'rgba(0,255,170,0.04)',
-                    border: '1px solid rgba(0,255,170,0.08)'
-                },
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        style: {
-                            fontFamily: "'Space Mono',monospace",
-                            fontSize: '9px',
-                            color: '#475569',
-                            marginBottom: '4px'
-                        },
-                        children: "NVD + OTX LIVE"
-                    }, void 0, false, {
-                        fileName: "[project]/src/components/layout/Sidebar.tsx",
-                        lineNumber: 103,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        style: {
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px'
-                        },
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                style: {
-                                    width: '7px',
-                                    height: '7px',
-                                    borderRadius: '9999px',
-                                    background: '#00ffaa',
-                                    animation: 'pulse-dot 2s ease-in-out infinite',
-                                    flexShrink: 0
-                                }
-                            }, void 0, false, {
-                                fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                lineNumber: 105,
-                                columnNumber: 11
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                style: {
-                                    fontFamily: "'Space Mono',monospace",
-                                    fontSize: '10px',
-                                    color: '#00ffaa'
-                                },
-                                children: "Connected"
-                            }, void 0, false, {
-                                fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                lineNumber: 106,
-                                columnNumber: 11
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/src/components/layout/Sidebar.tsx",
-                        lineNumber: 104,
-                        columnNumber: 9
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "[project]/src/components/layout/Sidebar.tsx",
-                lineNumber: 102,
-                columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/layout/Sidebar.tsx",
-        lineNumber: 50,
+        lineNumber: 48,
         columnNumber: 5
     }, this);
 }
-_s(Sidebar, "gSBOI+ZlS/brgxTh5KxnT3xsdO4=", false, function() {
+_s(Sidebar, "p0QDOPHBupSzPJJFbJrTRtNFtwg=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"]
     ];
@@ -436,7 +455,6 @@ function Topbar() {
     const inputRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "Topbar.useEffect": ()=>{
-            // Load persistent alias
             let a = localStorage.getItem('xcloak:alias');
             if (!a) {
                 const adj = [
@@ -479,7 +497,7 @@ function Topbar() {
         }
     }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
-        className: "fixed top-0 left-0 right-0 h-[52px] z-[100] flex items-center px-3 sm:px-5 gap-2 sm:gap-4",
+        className: "fixed top-0 left-0 right-0 h-[52px] z-[100] flex items-center px-3 gap-2",
         style: {
             background: 'rgba(3,5,10,0.95)',
             backdropFilter: 'blur(20px)',
@@ -488,7 +506,7 @@ function Topbar() {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                 href: "/dashboard",
-                className: "font-black text-[17px] tracking-tight shrink-0 flex items-center gap-2",
+                className: "font-black text-[16px] tracking-tight shrink-0 flex items-center gap-1.5",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                         className: "w-7 h-7 rounded-md flex items-center justify-center text-sm shrink-0",
@@ -498,7 +516,7 @@ function Topbar() {
                         children: "🛡"
                     }, void 0, false, {
                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                        lineNumber: 56,
+                        lineNumber: 51,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -512,57 +530,77 @@ function Topbar() {
                                 children: "cloak"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                                lineNumber: 58,
+                                lineNumber: 53,
                                 columnNumber: 44
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                        lineNumber: 58,
+                        lineNumber: 53,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                lineNumber: 55,
+                lineNumber: 50,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "nav-scroll flex gap-[2px] p-[3px] rounded-lg hidden sm:flex",
+                className: "flex-1 overflow-x-auto min-w-0",
                 style: {
-                    background: 'rgba(255,255,255,0.04)',
-                    border: '1px solid rgba(255,255,255,0.08)'
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none'
                 },
-                children: NAV.map((n)=>{
-                    const active = path?.startsWith(n.href);
-                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                        href: n.href,
-                        className: "font-mono text-[10px] sm:text-[11px] px-2 sm:px-3 py-[5px] rounded-[5px] transition-all tracking-wider whitespace-nowrap",
-                        style: active ? {
-                            background: 'linear-gradient(135deg,rgba(0,255,170,0.15),rgba(0,170,255,0.1))',
-                            color: '#00ffaa',
-                            border: '1px solid rgba(0,255,170,0.25)'
-                        } : {
-                            color: '#64748b'
-                        },
-                        children: n.label
-                    }, n.href, false, {
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("style", {
+                        children: `.topbar-scroll::-webkit-scrollbar{display:none}`
+                    }, void 0, false, {
                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                        lineNumber: 67,
-                        columnNumber: 13
-                    }, this);
-                })
-            }, void 0, false, {
+                        lineNumber: 58,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "topbar-scroll flex gap-[2px] p-[3px] rounded-lg w-max",
+                        style: {
+                            background: 'rgba(255,255,255,0.04)',
+                            border: '1px solid rgba(255,255,255,0.08)'
+                        },
+                        children: NAV.map((n)=>{
+                            const active = path?.startsWith(n.href);
+                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                href: n.href,
+                                className: "font-mono text-[10px] px-2.5 py-[5px] rounded-[5px] transition-all tracking-wide whitespace-nowrap shrink-0",
+                                style: active ? {
+                                    background: 'linear-gradient(135deg,rgba(0,255,170,0.15),rgba(0,170,255,0.1))',
+                                    color: '#00ffaa',
+                                    border: '1px solid rgba(0,255,170,0.25)'
+                                } : {
+                                    color: '#64748b'
+                                },
+                                children: n.label
+                            }, n.href, false, {
+                                fileName: "[project]/src/components/layout/Topbar.tsx",
+                                lineNumber: 64,
+                                columnNumber: 15
+                            }, this);
+                        })
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/layout/Topbar.tsx",
+                        lineNumber: 59,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                lineNumber: 62,
+                lineNumber: 57,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "flex items-center gap-1.5 sm:gap-2.5 ml-auto shrink-0",
+                className: "flex items-center gap-1.5 shrink-0",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                         onClick: doSync,
-                        className: "font-mono text-[10px] px-2.5 py-[5px] rounded-md border cursor-pointer transition-all hidden sm:block",
+                        className: "font-mono text-[9px] px-2 py-[5px] rounded-md border cursor-pointer transition-all hidden sm:block",
                         style: {
                             background: sync === 'done' ? 'rgba(0,255,170,0.1)' : 'rgba(255,255,255,0.04)',
                             borderColor: sync === 'done' ? 'rgba(0,255,170,0.3)' : 'rgba(255,255,255,0.08)',
@@ -571,11 +609,11 @@ function Topbar() {
                         children: sync === 'syncing' ? '⟳' : sync === 'done' ? '✓' : '↻ SYNC'
                     }, void 0, false, {
                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                        lineNumber: 80,
+                        lineNumber: 78,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "font-mono text-[9px] sm:text-[10px] font-bold px-2 sm:px-3 py-[3px] rounded hidden sm:block",
+                        className: "font-mono text-[9px] font-bold px-2 py-[3px] rounded hidden sm:block",
                         style: {
                             background: 'rgba(255,58,92,0.12)',
                             border: '1px solid rgba(255,58,92,0.3)',
@@ -584,36 +622,29 @@ function Topbar() {
                         children: "DEFCON 3"
                     }, void 0, false, {
                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                        lineNumber: 91,
+                        lineNumber: 83,
                         columnNumber: 9
                     }, this),
-                    editing ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "flex items-center gap-1",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                            ref: inputRef,
-                            value: draft,
-                            onChange: (e)=>setDraft(e.target.value),
-                            onKeyDown: (e)=>{
-                                if (e.key === 'Enter') saveAlias();
-                                if (e.key === 'Escape') setEditing(false);
-                            },
-                            onBlur: saveAlias,
-                            autoFocus: true,
-                            className: "font-mono text-[10px] px-2 py-[4px] rounded-full w-[110px] outline-none",
-                            style: {
-                                background: 'rgba(0,255,170,0.1)',
-                                border: '1px solid rgba(0,255,170,0.4)',
-                                color: '#00ffaa'
-                            },
-                            maxLength: 24
-                        }, void 0, false, {
-                            fileName: "[project]/src/components/layout/Topbar.tsx",
-                            lineNumber: 99,
-                            columnNumber: 13
-                        }, this)
+                    editing ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                        ref: inputRef,
+                        value: draft,
+                        onChange: (e)=>setDraft(e.target.value),
+                        onKeyDown: (e)=>{
+                            if (e.key === 'Enter') saveAlias();
+                            if (e.key === 'Escape') setEditing(false);
+                        },
+                        onBlur: saveAlias,
+                        autoFocus: true,
+                        maxLength: 24,
+                        className: "font-mono text-[10px] px-2 py-[4px] rounded-full w-[100px] outline-none",
+                        style: {
+                            background: 'rgba(0,255,170,0.1)',
+                            border: '1px solid rgba(0,255,170,0.4)',
+                            color: '#00ffaa'
+                        }
                     }, void 0, false, {
                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                        lineNumber: 98,
+                        lineNumber: 88,
                         columnNumber: 11
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                         onClick: ()=>{
@@ -621,60 +652,52 @@ function Topbar() {
                             setEditing(true);
                             setTimeout(()=>inputRef.current?.select(), 50);
                         },
-                        className: "font-mono text-[10px] sm:text-[11px] px-2 sm:px-3 py-[4px] rounded-full cursor-pointer transition-all group",
+                        className: "font-mono text-[10px] px-2 py-[4px] rounded-full cursor-pointer group",
                         style: {
                             color: '#00ffaa',
                             background: 'rgba(255,255,255,0.04)',
                             border: '1px solid rgba(255,255,255,0.08)'
                         },
-                        title: "Click to change your alias",
+                        title: "Click to rename",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 className: "hidden sm:inline",
                                 children: "👤 "
                             }, void 0, false, {
                                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                                lineNumber: 113,
+                                lineNumber: 98,
                                 columnNumber: 13
                             }, this),
+                            alias.slice(0, 10),
+                            alias.length > 10 ? '…' : '',
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                children: [
-                                    alias.slice(0, 12),
-                                    alias.length > 12 ? '…' : ''
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/src/components/layout/Topbar.tsx",
-                                lineNumber: 114,
-                                columnNumber: 13
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "font-mono text-[8px] ml-1 text-slate-600 group-hover:text-slate-400",
+                                className: "text-[8px] ml-0.5 text-slate-600 group-hover:text-slate-400",
                                 children: "✎"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                                lineNumber: 115,
-                                columnNumber: 13
+                                lineNumber: 98,
+                                columnNumber: 101
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                        lineNumber: 109,
+                        lineNumber: 94,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                lineNumber: 78,
+                lineNumber: 77,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/layout/Topbar.tsx",
-        lineNumber: 51,
+        lineNumber: 46,
         columnNumber: 5
     }, this);
 }
-_s(Topbar, "O+u5MgF/Y4W9joRWOEMFoMSkioA=", false, function() {
+_s(Topbar, "e2XvL3Jc/bjRw7chW4ks/JFqPfw=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"]
     ];

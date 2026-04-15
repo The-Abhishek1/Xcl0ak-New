@@ -1624,8 +1624,8 @@ function ThreatMapPage() {
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [activeLayers, setActiveLayers] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(new Set(ALL_TYPES));
     const [globeKey, setGlobeKey] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0);
-    const [panelOpen, setPanelOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false) // mobile layer panel toggle
-    ;
+    const [panelOpen, setPanelOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const globeRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
     async function load() {
         setLoading(true);
         try {
@@ -1704,16 +1704,17 @@ function ThreatMapPage() {
             return n;
         });
     }
-    const LayerPanel = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+    // Shared layer panel content
+    const LayerPanel = ({ compact = false })=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             style: {
                 display: 'flex',
                 flexDirection: 'column',
-                height: '100%'
+                height: compact ? 'auto' : '100%'
             },
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     style: {
-                        padding: '10px 12px 6px',
+                        padding: '8px 12px 6px',
                         borderBottom: '1px solid rgba(255,255,255,0.06)'
                     },
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1727,17 +1728,17 @@ function ThreatMapPage() {
                         children: "THREAT TYPES"
                     }, void 0, false, {
                         fileName: "[project]/src/app/threat-map/page.tsx",
-                        lineNumber: 68,
+                        lineNumber: 62,
                         columnNumber: 9
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/app/threat-map/page.tsx",
-                    lineNumber: 67,
+                    lineNumber: 61,
                     columnNumber: 7
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     style: {
-                        flex: 1,
+                        flex: compact ? undefined : 1,
                         overflowY: 'auto',
                         padding: '4px 0'
                     },
@@ -1749,11 +1750,10 @@ function ThreatMapPage() {
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
-                                padding: '8px 12px',
+                                padding: '7px 12px',
                                 background: activeLayers.size === ALL_TYPES.length ? 'rgba(0,255,170,0.06)' : 'transparent',
                                 border: 'none',
-                                cursor: 'pointer',
-                                transition: 'all 0.15s'
+                                cursor: 'pointer'
                             },
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1769,44 +1769,41 @@ function ThreatMapPage() {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/threat-map/page.tsx",
-                                    lineNumber: 79,
+                                    lineNumber: 68,
                                     columnNumber: 11
                                 }, this),
                                 activeLayers.size === ALL_TYPES.length && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     style: {
-                                        width: '8px',
-                                        height: '8px',
+                                        width: '7px',
+                                        height: '7px',
                                         borderRadius: '50%',
                                         background: '#00ffaa',
                                         display: 'inline-block'
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/threat-map/page.tsx",
-                                    lineNumber: 82,
+                                    lineNumber: 71,
                                     columnNumber: 52
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 74,
+                            lineNumber: 67,
                             columnNumber: 9
                         }, this),
                         ALL_TYPES.map((type)=>{
-                            const count = typeCounts[type] ?? 0;
-                            const active = activeLayers.has(type);
-                            const color = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$map$2f$Globe3D$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TYPE_COLOR"][type];
+                            const count = typeCounts[type] ?? 0, active = activeLayers.has(type), color = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$map$2f$Globe3D$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TYPE_COLOR"][type];
                             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 onClick: ()=>toggleLayer(type),
                                 style: {
                                     width: '100%',
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: '10px',
-                                    padding: '7px 12px',
+                                    gap: '9px',
+                                    padding: '6px 12px',
                                     background: active ? color + '10' : 'transparent',
                                     border: 'none',
-                                    cursor: 'pointer',
-                                    transition: 'all 0.15s'
+                                    cursor: 'pointer'
                                 },
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1815,13 +1812,12 @@ function ThreatMapPage() {
                                             height: '8px',
                                             borderRadius: '2px',
                                             flexShrink: 0,
-                                            transition: 'all 0.15s',
                                             background: active ? color : '#1e293b',
-                                            boxShadow: active ? `0 0 6px ${color}60` : 'none'
+                                            boxShadow: active ? `0 0 5px ${color}60` : 'none'
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 95,
+                                        lineNumber: 77,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1835,7 +1831,7 @@ function ThreatMapPage() {
                                         children: type
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 97,
+                                        lineNumber: 78,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1851,23 +1847,23 @@ function ThreatMapPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 100,
+                                        lineNumber: 79,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, type, true, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 90,
+                                lineNumber: 76,
                                 columnNumber: 13
                             }, this);
                         })
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/threat-map/page.tsx",
-                    lineNumber: 72,
+                    lineNumber: 66,
                     columnNumber: 7
                 }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                !compact && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     style: {
                         padding: '10px 12px',
                         borderTop: '1px solid rgba(255,255,255,0.06)'
@@ -1885,8 +1881,8 @@ function ThreatMapPage() {
                             children: "SEVERITY"
                         }, void 0, false, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 110,
-                            columnNumber: 9
+                            lineNumber: 86,
+                            columnNumber: 11
                         }, this),
                         [
                             [
@@ -1910,7 +1906,7 @@ function ThreatMapPage() {
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '8px',
-                                    marginBottom: '6px'
+                                    marginBottom: '5px'
                                 },
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1923,8 +1919,8 @@ function ThreatMapPage() {
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 115,
-                                        columnNumber: 13
+                                        lineNumber: 89,
+                                        columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         style: {
@@ -1935,32 +1931,38 @@ function ThreatMapPage() {
                                         children: l
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 116,
-                                        columnNumber: 13
+                                        lineNumber: 90,
+                                        columnNumber: 15
                                     }, this)
                                 ]
                             }, l, true, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 114,
-                                columnNumber: 11
+                                lineNumber: 88,
+                                columnNumber: 13
                             }, this))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/threat-map/page.tsx",
-                    lineNumber: 109,
-                    columnNumber: 7
+                    lineNumber: 85,
+                    columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/threat-map/page.tsx",
-            lineNumber: 66,
+            lineNumber: 60,
             columnNumber: 5
         }, this);
-    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+    return(// Use fixed positioning to take full remaining viewport — avoids the calc issue
+    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         style: {
+            position: 'fixed',
+            top: '52px',
+            left: 0,
+            right: 0,
+            bottom: 0,
             display: 'flex',
             flexDirection: 'column',
-            height: 'calc(100vh - 52px)'
+            zIndex: 1
         },
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1969,9 +1971,9 @@ function ThreatMapPage() {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     padding: '0 12px',
-                    height: '44px',
+                    height: '40px',
                     flexShrink: 0,
-                    background: 'rgba(3,5,10,0.9)',
+                    background: 'rgba(3,5,10,0.92)',
                     borderBottom: '1px solid rgba(255,255,255,0.07)'
                 },
                 children: [
@@ -1986,7 +1988,7 @@ function ThreatMapPage() {
                                 className: "live-dot live-dot-red"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 133,
+                                lineNumber: 105,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2000,40 +2002,39 @@ function ThreatMapPage() {
                                 children: "GLOBAL SITUATION"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 134,
+                                lineNumber: 106,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 style: {
                                     fontFamily: "'Space Mono',monospace",
                                     fontSize: '10px',
-                                    color: '#475569'
+                                    color: '#475569',
+                                    display: 'var(--hide-mobile,block)'
                                 },
-                                className: "hide-mobile",
                                 children: new Date().toUTCString().replace('GMT', 'UTC')
                             }, void 0, false, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 137,
+                                lineNumber: 107,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/threat-map/page.tsx",
-                        lineNumber: 132,
+                        lineNumber: 104,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         style: {
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '10px'
+                            gap: '8px'
                         },
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 style: {
                                     fontFamily: "'Space Mono',monospace",
-                                    fontSize: '10px',
-                                    color: '#64748b'
+                                    fontSize: '10px'
                                 },
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2043,43 +2044,54 @@ function ThreatMapPage() {
                                         children: visiblePts.length
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 144,
+                                        lineNumber: 113,
                                         columnNumber: 13
                                     }, this),
-                                    " / ",
-                                    points.length,
-                                    " events"
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        style: {
+                                            color: '#475569'
+                                        },
+                                        children: [
+                                            " / ",
+                                            points.length,
+                                            " events"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/threat-map/page.tsx",
+                                        lineNumber: 114,
+                                        columnNumber: 13
+                                    }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 143,
+                                lineNumber: 112,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 onClick: ()=>setPanelOpen((o)=>!o),
+                                className: "show-mobile",
                                 style: {
                                     fontFamily: "'Space Mono',monospace",
                                     fontSize: '10px',
-                                    padding: '5px 10px',
+                                    padding: '4px 10px',
                                     borderRadius: '6px',
-                                    border: '1px solid rgba(255,255,255,0.1)',
-                                    background: panelOpen ? 'rgba(0,255,170,0.1)' : 'rgba(255,255,255,0.04)',
+                                    border: `1px solid ${panelOpen ? 'rgba(0,255,170,0.3)' : 'rgba(255,255,255,0.1)'}`,
+                                    background: panelOpen ? 'rgba(0,255,170,0.08)' : 'rgba(255,255,255,0.04)',
                                     color: panelOpen ? '#00ffaa' : '#64748b',
                                     cursor: 'pointer'
                                 },
-                                className: "show-mobile",
                                 children: "⚡ Layers"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 147,
+                                lineNumber: 117,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 onClick: load,
                                 style: {
                                     fontFamily: "'Space Mono',monospace",
-                                    fontSize: '10px',
-                                    padding: '5px 10px',
+                                    fontSize: '11px',
+                                    padding: '4px 10px',
                                     borderRadius: '6px',
                                     border: '1px solid rgba(255,255,255,0.08)',
                                     background: 'rgba(255,255,255,0.03)',
@@ -2089,72 +2101,79 @@ function ThreatMapPage() {
                                 children: loading ? '⟳' : '↻'
                             }, void 0, false, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 158,
+                                lineNumber: 121,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/threat-map/page.tsx",
-                        lineNumber: 142,
+                        lineNumber: 111,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/threat-map/page.tsx",
-                lineNumber: 127,
+                lineNumber: 103,
                 columnNumber: 7
             }, this),
             panelOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "show-mobile",
                 style: {
                     flexShrink: 0,
                     background: 'rgba(6,10,20,0.97)',
                     borderBottom: '1px solid rgba(255,255,255,0.08)',
-                    maxHeight: '260px',
+                    maxHeight: '240px',
                     overflowY: 'auto'
                 },
-                className: "show-mobile",
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LayerPanel, {}, void 0, false, {
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LayerPanel, {
+                    compact: true
+                }, void 0, false, {
                     fileName: "[project]/src/app/threat-map/page.tsx",
-                    lineNumber: 176,
+                    lineNumber: 130,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/app/threat-map/page.tsx",
-                lineNumber: 171,
+                lineNumber: 129,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 style: {
                     display: 'flex',
                     flex: 1,
-                    minHeight: 0
+                    minHeight: 0,
+                    overflow: 'hidden'
                 },
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        style: {
-                            width: '190px',
-                            flexShrink: 0,
-                            background: 'rgba(6,10,20,0.85)',
-                            borderRight: '1px solid rgba(255,255,255,0.06)',
-                            overflowY: 'auto'
-                        },
                         className: "hide-mobile",
+                        style: {
+                            width: '185px',
+                            flexShrink: 0,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            background: 'rgba(5,8,15,0.88)',
+                            borderRight: '1px solid rgba(255,255,255,0.06)',
+                            overflow: 'hidden'
+                        },
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LayerPanel, {}, void 0, false, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 190,
+                            lineNumber: 139,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/app/threat-map/page.tsx",
-                        lineNumber: 184,
+                        lineNumber: 138,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        ref: globeRef,
                         style: {
                             flex: 1,
+                            minWidth: 0,
                             position: 'relative',
                             background: '#020608',
-                            minWidth: 0
+                            overflow: 'hidden'
                         },
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$map$2f$Globe3D$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Globe3D"], {
@@ -2162,7 +2181,7 @@ function ThreatMapPage() {
                                 activeLayers: activeLayers
                             }, globeKey, false, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 195,
+                                lineNumber: 144,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2172,7 +2191,7 @@ function ThreatMapPage() {
                                     right: '12px',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    gap: '6px',
+                                    gap: '5px',
                                     alignItems: 'flex-end'
                                 },
                                 children: [
@@ -2195,12 +2214,12 @@ function ThreatMapPage() {
                                         style: {
                                             fontFamily: "'Space Mono',monospace",
                                             fontSize: '10px',
-                                            padding: '5px 10px',
-                                            borderRadius: '8px',
+                                            padding: '4px 10px',
+                                            borderRadius: '7px',
                                             background: 'rgba(0,0,0,0.75)',
-                                            border: `1px solid ${s.c}25`,
+                                            border: `1px solid ${s.c}22`,
                                             display: 'flex',
-                                            gap: '8px'
+                                            gap: '7px'
                                         },
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2211,7 +2230,7 @@ function ThreatMapPage() {
                                                 children: s.v
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                                lineNumber: 210,
+                                                lineNumber: 150,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2221,78 +2240,53 @@ function ThreatMapPage() {
                                                 children: s.l
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                                lineNumber: 211,
+                                                lineNumber: 151,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, s.l, true, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 204,
+                                        lineNumber: 149,
                                         columnNumber: 15
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 198,
+                                lineNumber: 147,
                                 columnNumber: 11
-                            }, this),
-                            loading && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                style: {
-                                    position: 'absolute',
-                                    inset: 0,
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    pointerEvents: 'none'
-                                },
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    style: {
-                                        fontFamily: "'Space Mono',monospace",
-                                        fontSize: '12px',
-                                        color: '#00ffaa'
-                                    },
-                                    className: "animate-pulse",
-                                    children: "⟳ Fetching OTX intelligence..."
-                                }, void 0, false, {
-                                    fileName: "[project]/src/app/threat-map/page.tsx",
-                                    lineNumber: 218,
-                                    columnNumber: 15
-                                }, this)
-                            }, void 0, false, {
-                                fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 217,
-                                columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/threat-map/page.tsx",
-                        lineNumber: 194,
+                        lineNumber: 143,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "hide-mobile",
                         style: {
-                            width: '260px',
+                            width: '255px',
                             flexShrink: 0,
                             display: 'flex',
                             flexDirection: 'column',
-                            background: 'rgba(6,10,20,0.85)',
-                            borderLeft: '1px solid rgba(255,255,255,0.06)'
+                            background: 'rgba(5,8,15,0.88)',
+                            borderLeft: '1px solid rgba(255,255,255,0.06)',
+                            overflow: 'hidden'
                         },
-                        className: "hide-mobile",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 style: {
                                     display: 'flex',
                                     alignItems: 'center',
                                     gap: '8px',
-                                    padding: '10px 12px',
-                                    borderBottom: '1px solid rgba(255,255,255,0.06)'
+                                    padding: '9px 12px',
+                                    borderBottom: '1px solid rgba(255,255,255,0.06)',
+                                    flexShrink: 0
                                 },
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "live-dot"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 232,
+                                        lineNumber: 160,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2306,7 +2300,7 @@ function ThreatMapPage() {
                                         children: "OTX Pulses"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 233,
+                                        lineNumber: 161,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -2323,13 +2317,13 @@ function ThreatMapPage() {
                                         children: "OTX ↗"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 236,
+                                        lineNumber: 162,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 231,
+                                lineNumber: 159,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2340,7 +2334,7 @@ function ThreatMapPage() {
                                 children: [
                                     !pulses.length && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         style: {
-                                            padding: '24px',
+                                            padding: '20px',
                                             textAlign: 'center',
                                             fontFamily: "'Space Mono',monospace",
                                             fontSize: '10px',
@@ -2349,8 +2343,8 @@ function ThreatMapPage() {
                                         children: "Loading OTX..."
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 243,
-                                        columnNumber: 15
+                                        lineNumber: 165,
+                                        columnNumber: 32
                                     }, this),
                                     pulses.map((p)=>{
                                         const text = [
@@ -2364,7 +2358,7 @@ function ThreatMapPage() {
                                             rel: "noreferrer",
                                             style: {
                                                 display: 'block',
-                                                padding: '10px 12px',
+                                                padding: '9px 12px',
                                                 borderBottom: '1px solid rgba(255,255,255,0.04)',
                                                 textDecoration: 'none'
                                             },
@@ -2375,7 +2369,7 @@ function ThreatMapPage() {
                                                         fontWeight: 600,
                                                         color: '#cbd5e1',
                                                         lineHeight: 1.4,
-                                                        marginBottom: '6px',
+                                                        marginBottom: '5px',
                                                         display: '-webkit-box',
                                                         WebkitLineClamp: 2,
                                                         WebkitBoxOrient: 'vertical',
@@ -2384,14 +2378,14 @@ function ThreatMapPage() {
                                                     children: p.name
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/threat-map/page.tsx",
-                                                    lineNumber: 254,
+                                                    lineNumber: 172,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     style: {
                                                         display: 'flex',
                                                         alignItems: 'center',
-                                                        gap: '6px',
+                                                        gap: '5px',
                                                         flexWrap: 'wrap'
                                                     },
                                                     children: [
@@ -2408,7 +2402,7 @@ function ThreatMapPage() {
                                                             children: type.toUpperCase()
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/threat-map/page.tsx",
-                                                            lineNumber: 259,
+                                                            lineNumber: 174,
                                                             columnNumber: 21
                                                         }, this),
                                                         p.targeted_countries?.slice(0, 2).map((c)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2420,8 +2414,8 @@ function ThreatMapPage() {
                                                                 children: c
                                                             }, c, false, {
                                                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                                                lineNumber: 264,
-                                                                columnNumber: 23
+                                                                lineNumber: 175,
+                                                                columnNumber: 62
                                                             }, this)),
                                                         p.adversary && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             style: {
@@ -2432,7 +2426,7 @@ function ThreatMapPage() {
                                                             children: p.adversary
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/threat-map/page.tsx",
-                                                            lineNumber: 266,
+                                                            lineNumber: 176,
                                                             columnNumber: 35
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2445,32 +2439,33 @@ function ThreatMapPage() {
                                                             children: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["timeAgo"])(p.modified ?? p.created)
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/threat-map/page.tsx",
-                                                            lineNumber: 267,
+                                                            lineNumber: 177,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/threat-map/page.tsx",
-                                                    lineNumber: 258,
+                                                    lineNumber: 173,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, p.id, true, {
                                             fileName: "[project]/src/app/threat-map/page.tsx",
-                                            lineNumber: 251,
+                                            lineNumber: 170,
                                             columnNumber: 17
                                         }, this);
                                     })
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 241,
+                                lineNumber: 164,
                                 columnNumber: 11
                             }, this),
                             stats.cveIds?.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 style: {
                                     borderTop: '1px solid rgba(255,255,255,0.06)',
-                                    padding: '10px 12px'
+                                    padding: '9px 12px',
+                                    flexShrink: 0
                                 },
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2485,7 +2480,7 @@ function ThreatMapPage() {
                                         children: "CVEs IN OTX"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 278,
+                                        lineNumber: 185,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2509,40 +2504,40 @@ function ThreatMapPage() {
                                                 children: cve
                                             }, cve, false, {
                                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                                lineNumber: 283,
+                                                lineNumber: 188,
                                                 columnNumber: 19
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 281,
+                                        lineNumber: 186,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 277,
+                                lineNumber: 184,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/threat-map/page.tsx",
-                        lineNumber: 226,
+                        lineNumber: 158,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/threat-map/page.tsx",
-                lineNumber: 181,
+                lineNumber: 135,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/threat-map/page.tsx",
-        lineNumber: 124,
+        lineNumber: 100,
         columnNumber: 5
-    }, this);
+    }, this));
 }
-_s(ThreatMapPage, "t/nGMNz5oqUaMR+GKZYzSFdS6+k=");
+_s(ThreatMapPage, "X31TVN4EBq91y0D8YwwhYej8vzM=");
 _c1 = ThreatMapPage;
 var _c, _c1;
 __turbopack_refresh__.register(_c, "ALL_TYPES");

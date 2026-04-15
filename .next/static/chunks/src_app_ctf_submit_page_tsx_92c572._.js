@@ -33,49 +33,80 @@ const DIFFS = [
 function CTFSubmitPage() {
     _s();
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"])();
-    const [alias, setAlias] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('anon');
-    const [form, setForm] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
-        title: '',
-        category: 'web',
-        difficulty: 'medium',
-        description: '',
-        flag: '',
-        points: '300',
-        hints: [
-            '',
-            '',
-            ''
-        ]
-    });
+    const titleRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const descRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const flagRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const hint1Ref = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const hint2Ref = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const hint3Ref = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const ptsRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const fileRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const [category, setCategory] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('web');
+    const [difficulty, setDifficulty] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('medium');
     const [submitting, setSubmitting] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [uploading, setUploading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [fileInfo, setFileInfo] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [result, setResult] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [alias, setAlias] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('anon');
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "CTFSubmitPage.useEffect": ()=>{
             setAlias(localStorage.getItem('xcloak:alias') ?? 'anon');
         }
     }["CTFSubmitPage.useEffect"], []);
-    function set(k, v) {
-        setForm((f)=>({
-                ...f,
-                [k]: v
-            }));
-    }
-    function setHint(i, v) {
-        setForm((f)=>{
-            const h = [
-                ...f.hints
-            ];
-            h[i] = v;
-            return {
-                ...f,
-                hints: h
-            };
-        });
+    async function handleFile(e) {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        if (file.size > 10 * 1024 * 1024) {
+            setResult({
+                ok: false,
+                msg: 'File too large (max 10MB)'
+            });
+            return;
+        }
+        setUploading(true);
+        try {
+            const fd = new FormData();
+            fd.append('file', file);
+            fd.append('prefix', 'ctf');
+            const res = await fetch('/api/v1/upload', {
+                method: 'POST',
+                body: fd
+            });
+            const d = await res.json();
+            if (d.error) throw new Error(d.error);
+            setFileInfo({
+                name: d.name,
+                url: d.url,
+                size: d.size
+            });
+        } catch (err) {
+            setResult({
+                ok: false,
+                msg: err.message
+            });
+        } finally{
+            setUploading(false);
+        }
     }
     async function submit(e) {
         e.preventDefault();
-        if (!form.title || !form.flag || !form.description) return;
-        if (!form.flag.startsWith('xcloak{')) {
+        const title = titleRef.current?.value.trim() ?? '';
+        const description = descRef.current?.value.trim() ?? '';
+        const flag = flagRef.current?.value.trim() ?? '';
+        const points = parseInt(ptsRef.current?.value ?? '300');
+        const hints = [
+            hint1Ref,
+            hint2Ref,
+            hint3Ref
+        ].map((r)=>r.current?.value.trim() ?? '').filter(Boolean);
+        if (!title || !description || !flag) {
+            setResult({
+                ok: false,
+                msg: 'Title, description and flag are required.'
+            });
+            return;
+        }
+        if (!flag.startsWith('xcloak{')) {
             setResult({
                 ok: false,
                 msg: 'Flag must start with xcloak{...}'
@@ -91,17 +122,22 @@ function CTFSubmitPage() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    ...form,
-                    points: parseInt(form.points),
+                    title,
+                    category,
+                    difficulty,
+                    description,
+                    flag,
+                    points,
                     authorAlias: alias,
-                    hints: form.hints.filter(Boolean)
+                    hints,
+                    fileUrl: fileInfo?.url ?? null
                 })
             });
             const d = await res.json();
             if (res.ok) {
                 setResult({
                     ok: true,
-                    msg: d.message
+                    msg: d.message ?? 'Submitted for review!'
                 });
                 setTimeout(()=>router.push('/ctf'), 2500);
             } else {
@@ -119,62 +155,75 @@ function CTFSubmitPage() {
             setSubmitting(false);
         }
     }
-    const inp = "w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 font-mono text-[12px] text-slate-200 outline-none focus:border-green-500/40 transition-colors placeholder-slate-700";
+    const inp = "w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 font-mono text-[12px] text-slate-200 outline-none focus:border-accent/30 transition-colors placeholder-slate-700";
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "p-5 max-w-2xl mx-auto",
+        className: "p-3 sm:p-5 max-w-2xl mx-auto",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "mb-6",
+                className: "flex items-center gap-3 mb-5",
                 children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                        className: "text-2xl font-black",
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        onClick: ()=>router.back(),
+                        className: "font-mono text-[11px] text-slate-500 hover:text-slate-300 transition-colors cursor-pointer",
+                        children: "← Back"
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/ctf/submit/page.tsx",
+                        lineNumber: 77,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         children: [
-                            "Submit ",
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                style: {
-                                    color: '#00ffaa'
-                                },
-                                children: "CTF Challenge"
-                            }, void 0, false, {
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                                className: "text-2xl font-black",
+                                children: [
+                                    "Submit ",
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-accent",
+                                        children: "CTF Challenge"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                        lineNumber: 79,
+                                        columnNumber: 54
+                                    }, this)
+                                ]
+                            }, void 0, true, {
                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                lineNumber: 62,
-                                columnNumber: 52
+                                lineNumber: 79,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "font-mono text-[11px] text-slate-500 mt-0.5",
+                                children: [
+                                    "As ",
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-accent",
+                                        children: alias
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                        lineNumber: 80,
+                                        columnNumber: 73
+                                    }, this),
+                                    " · Reviewed by admins before going live"
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                lineNumber: 80,
+                                columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                        lineNumber: 62,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                        className: "font-mono text-[11px] text-slate-500 mt-1",
-                        children: [
-                            "As ",
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                style: {
-                                    color: '#00ffaa'
-                                },
-                                children: alias
-                            }, void 0, false, {
-                                fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                lineNumber: 64,
-                                columnNumber: 14
-                            }, this),
-                            " · Reviewed by admins before going live"
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/src/app/ctf/submit/page.tsx",
-                        lineNumber: 63,
+                        lineNumber: 78,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                lineNumber: 61,
+                lineNumber: 76,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "glass p-4 mb-5 flex gap-3",
+                className: "glass p-3 mb-4 flex gap-3",
                 style: {
                     borderColor: 'rgba(255,215,0,0.2)',
                     background: 'rgba(255,215,0,0.04)'
@@ -185,7 +234,7 @@ function CTFSubmitPage() {
                         children: "📋"
                     }, void 0, false, {
                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                        lineNumber: 70,
+                        lineNumber: 85,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -195,7 +244,7 @@ function CTFSubmitPage() {
                                 children: "ADMIN REVIEW REQUIRED"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                lineNumber: 72,
+                                lineNumber: 87,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -203,19 +252,19 @@ function CTFSubmitPage() {
                                 children: "Submitted challenges are reviewed for quality and correctness before appearing publicly. Flag correctness, difficulty, and description will be verified."
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                lineNumber: 73,
+                                lineNumber: 88,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                        lineNumber: 71,
+                        lineNumber: 86,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                lineNumber: 69,
+                lineNumber: 84,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -223,7 +272,7 @@ function CTFSubmitPage() {
                 className: "space-y-4",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "glass p-5 space-y-4",
+                        className: "glass p-4 sm:p-5 space-y-4",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 children: [
@@ -232,24 +281,23 @@ function CTFSubmitPage() {
                                         children: "Challenge Title *"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                        lineNumber: 83,
+                                        lineNumber: 95,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                        value: form.title,
-                                        onChange: (e)=>set('title', e.target.value),
+                                        ref: titleRef,
+                                        defaultValue: "",
                                         placeholder: "e.g. Cookie Monster, RSA with a Twist",
-                                        className: inp,
-                                        required: true
+                                        className: inp
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                        lineNumber: 84,
+                                        lineNumber: 96,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                lineNumber: 82,
+                                lineNumber: 94,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -262,30 +310,29 @@ function CTFSubmitPage() {
                                                 children: "Category *"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                                lineNumber: 91,
+                                                lineNumber: 100,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
-                                                value: form.category,
-                                                onChange: (e)=>set('category', e.target.value),
+                                                value: category,
+                                                onChange: (e)=>setCategory(e.target.value),
                                                 className: inp,
                                                 children: CATS.map((c)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                        value: c,
                                                         children: c
                                                     }, c, false, {
                                                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                                        lineNumber: 93,
-                                                        columnNumber: 32
+                                                        lineNumber: 102,
+                                                        columnNumber: 30
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                                lineNumber: 92,
+                                                lineNumber: 101,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                        lineNumber: 90,
+                                        lineNumber: 99,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -295,30 +342,29 @@ function CTFSubmitPage() {
                                                 children: "Difficulty *"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                                lineNumber: 97,
+                                                lineNumber: 106,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
-                                                value: form.difficulty,
-                                                onChange: (e)=>set('difficulty', e.target.value),
+                                                value: difficulty,
+                                                onChange: (e)=>setDifficulty(e.target.value),
                                                 className: inp,
                                                 children: DIFFS.map((d)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                        value: d,
                                                         children: d
                                                     }, d, false, {
                                                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                                        lineNumber: 99,
-                                                        columnNumber: 33
+                                                        lineNumber: 108,
+                                                        columnNumber: 31
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                                lineNumber: 98,
+                                                lineNumber: 107,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                        lineNumber: 96,
+                                        lineNumber: 105,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -328,32 +374,32 @@ function CTFSubmitPage() {
                                                 children: "Points *"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                                lineNumber: 103,
+                                                lineNumber: 112,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                ref: ptsRef,
                                                 type: "number",
-                                                value: form.points,
-                                                onChange: (e)=>set('points', e.target.value),
+                                                defaultValue: "300",
                                                 min: 50,
                                                 max: 1000,
                                                 step: 50,
                                                 className: inp
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                                lineNumber: 104,
+                                                lineNumber: 113,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                        lineNumber: 102,
+                                        lineNumber: 111,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                lineNumber: 89,
+                                lineNumber: 98,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -363,57 +409,55 @@ function CTFSubmitPage() {
                                         children: "Description *"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                        lineNumber: 111,
+                                        lineNumber: 117,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
-                                        value: form.description,
-                                        onChange: (e)=>set('description', e.target.value),
+                                        ref: descRef,
+                                        defaultValue: "",
                                         placeholder: "Describe the challenge. What's the goal? What vulnerability does it demonstrate?",
                                         className: `${inp} resize-y`,
-                                        rows: 4,
-                                        required: true
+                                        rows: 4
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                        lineNumber: 112,
+                                        lineNumber: 118,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                lineNumber: 110,
+                                lineNumber: 116,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                        lineNumber: 80,
+                        lineNumber: 93,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "glass p-5",
+                        className: "glass p-4 sm:p-5",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
                                 className: "font-mono text-[9px] uppercase tracking-widest text-slate-600 block mb-1.5",
                                 children: "Flag *"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                lineNumber: 120,
+                                lineNumber: 124,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                value: form.flag,
-                                onChange: (e)=>set('flag', e.target.value),
+                                ref: flagRef,
+                                defaultValue: "",
                                 placeholder: "xcloak{your_flag_here}",
                                 className: inp,
                                 style: {
                                     color: '#00ffaa',
                                     letterSpacing: '0.05em'
-                                },
-                                required: true
+                                }
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                lineNumber: 121,
+                                lineNumber: 125,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -421,45 +465,225 @@ function CTFSubmitPage() {
                                 children: [
                                     "Must start with ",
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        style: {
-                                            color: '#00ffaa'
-                                        },
+                                        className: "text-accent",
                                         children: [
                                             "xcloak",
                                             '{'
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                        lineNumber: 125,
+                                        lineNumber: 127,
                                         columnNumber: 29
                                     }, this),
                                     "...",
                                     '}',
-                                    " — flag is hashed before storage, only you know the plaintext"
+                                    " · Flag is hashed before storage, only you know the plaintext"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                lineNumber: 124,
+                                lineNumber: 126,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                        lineNumber: 119,
+                        lineNumber: 123,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "glass p-5 space-y-3",
+                        className: "glass p-4 sm:p-5",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-2",
+                                children: [
+                                    "Challenge File ",
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-slate-700",
+                                        children: "(optional — binary, zip, pcap, image, etc.)"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                        lineNumber: 134,
+                                        columnNumber: 28
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                lineNumber: 133,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "border-2 border-dashed border-white/[0.1] rounded-xl p-6 text-center cursor-pointer hover:border-accent/30 transition-colors",
+                                onClick: ()=>fileRef.current?.click(),
+                                onDragOver: (e)=>e.preventDefault(),
+                                onDrop: (e)=>{
+                                    e.preventDefault();
+                                    const f = e.dataTransfer.files[0];
+                                    if (f && fileRef.current) {
+                                        const dt = new DataTransfer();
+                                        dt.items.add(f);
+                                        fileRef.current.files = dt.files;
+                                        handleFile({
+                                            target: fileRef.current
+                                        });
+                                    }
+                                },
+                                children: fileInfo ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "space-y-1",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "text-2xl",
+                                            children: "📎"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                            lineNumber: 143,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "font-mono text-[12px] font-bold text-accent",
+                                            children: fileInfo.name
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                            lineNumber: 144,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "font-mono text-[10px] text-slate-600",
+                                            children: [
+                                                (fileInfo.size / 1024).toFixed(1),
+                                                " KB"
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                            lineNumber: 145,
+                                            columnNumber: 17
+                                        }, this),
+                                        fileInfo.url ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "font-mono text-[9px] text-green-400",
+                                            children: "✓ Uploaded to Supabase Storage"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                            lineNumber: 147,
+                                            columnNumber: 21
+                                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "font-mono text-[9px] text-yellow-400",
+                                            children: "⚠ Saved (configure Supabase bucket for storage)"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                            lineNumber: 148,
+                                            columnNumber: 21
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            type: "button",
+                                            onClick: (e)=>{
+                                                e.stopPropagation();
+                                                setFileInfo(null);
+                                                if (fileRef.current) fileRef.current.value = '';
+                                            },
+                                            className: "font-mono text-[9px] text-red-400 hover:text-red-300",
+                                            children: "✕ Remove"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                            lineNumber: 150,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                    lineNumber: 142,
+                                    columnNumber: 15
+                                }, this) : uploading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "text-2xl mb-2",
+                                            children: "⟳"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                            lineNumber: 154,
+                                            columnNumber: 20
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "font-mono text-[11px] text-accent animate-pulse",
+                                            children: "Uploading..."
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                            lineNumber: 154,
+                                            columnNumber: 58
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                    lineNumber: 154,
+                                    columnNumber: 15
+                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "text-3xl mb-2",
+                                            children: "📁"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                            lineNumber: 157,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "font-mono text-[12px] text-slate-400 mb-1",
+                                            children: "Drop challenge file here or click to browse"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                            lineNumber: 158,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "font-mono text-[10px] text-slate-600",
+                                            children: "Binary · .zip · .pcap · .png · .pdf · max 10MB"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                            lineNumber: 159,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                    lineNumber: 156,
+                                    columnNumber: 15
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                lineNumber: 136,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                ref: fileRef,
+                                type: "file",
+                                className: "hidden",
+                                accept: ".zip,.tar,.gz,.pcap,.pcapng,.png,.jpg,.pdf,.txt,.bin,.exe,.elf,.pyc",
+                                onChange: handleFile
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/ctf/submit/page.tsx",
+                                lineNumber: 163,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/ctf/submit/page.tsx",
+                        lineNumber: 132,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "glass p-4 sm:p-5 space-y-3",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "font-mono text-[9px] uppercase tracking-widest text-slate-600",
                                 children: "Hints (optional — up to 3)"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                lineNumber: 131,
+                                lineNumber: 170,
                                 columnNumber: 11
                             }, this),
-                            form.hints.map((h, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            [
+                                hint1Ref,
+                                hint2Ref,
+                                hint3Ref
+                            ].map((ref, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
                                             className: "font-mono text-[9px] text-slate-700 block mb-1",
@@ -469,29 +693,29 @@ function CTFSubmitPage() {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                            lineNumber: 134,
+                                            lineNumber: 173,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            value: h,
-                                            onChange: (e)=>setHint(i, e.target.value),
+                                            ref: ref,
+                                            defaultValue: "",
                                             placeholder: i === 0 ? 'First hint (easiest)' : i === 1 ? 'Second hint' : 'Final hint (most revealing)',
                                             className: inp
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                            lineNumber: 135,
+                                            lineNumber: 174,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, i, true, {
                                     fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                    lineNumber: 133,
+                                    lineNumber: 172,
                                     columnNumber: 13
                                 }, this))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                        lineNumber: 130,
+                        lineNumber: 169,
                         columnNumber: 9
                     }, this),
                     result && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -508,7 +732,7 @@ function CTFSubmitPage() {
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                        lineNumber: 143,
+                        lineNumber: 180,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -516,8 +740,8 @@ function CTFSubmitPage() {
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 type: "submit",
-                                disabled: submitting,
-                                className: "flex-1 py-3 rounded-lg border font-mono text-[12px] font-bold tracking-wider cursor-pointer transition-all disabled:opacity-40",
+                                disabled: submitting || uploading,
+                                className: "flex-1 py-3 rounded-xl border font-mono text-[12px] font-bold tracking-wider cursor-pointer transition-all disabled:opacity-40",
                                 style: {
                                     background: 'rgba(0,255,170,0.1)',
                                     borderColor: 'rgba(0,255,170,0.35)',
@@ -526,39 +750,39 @@ function CTFSubmitPage() {
                                 children: submitting ? '⟳ SUBMITTING...' : '📤 SUBMIT FOR REVIEW'
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                lineNumber: 154,
+                                lineNumber: 187,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 type: "button",
                                 onClick: ()=>router.back(),
-                                className: "px-6 py-3 rounded-lg border border-white/[0.08] text-slate-500 font-mono text-[12px] hover:text-slate-300 cursor-pointer transition-colors",
+                                className: "px-5 py-3 rounded-xl border border-white/[0.08] text-slate-500 font-mono text-[12px] hover:text-slate-300 cursor-pointer transition-colors",
                                 children: "BACK"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                                lineNumber: 159,
+                                lineNumber: 192,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ctf/submit/page.tsx",
-                        lineNumber: 153,
+                        lineNumber: 186,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/ctf/submit/page.tsx",
-                lineNumber: 79,
+                lineNumber: 92,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/ctf/submit/page.tsx",
-        lineNumber: 60,
+        lineNumber: 75,
         columnNumber: 5
     }, this);
 }
-_s(CTFSubmitPage, "6T5T1BbMSamb6XxCKgrKX5G3aIg=", false, function() {
+_s(CTFSubmitPage, "re9wJ44H2D+kMiJTAgflBIzlfjA=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
     ];
