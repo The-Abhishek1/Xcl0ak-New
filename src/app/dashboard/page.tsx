@@ -10,7 +10,7 @@ import { AIPanel }        from '@/components/ai/AIPanel'
 import { Leaderboard }    from '@/components/layout/Leaderboard'
 
 export const metadata = { title:'Dashboard' }
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
 
 async function getData() {
   const [nvd, pulses, threatPoints, exploits, exploitCount, cveCount] = await Promise.all([

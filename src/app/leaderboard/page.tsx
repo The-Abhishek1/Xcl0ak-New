@@ -3,7 +3,7 @@ import { timeAgo } from '@/lib/utils'
 import Link from 'next/link'
 
 export const metadata = { title:'Leaderboard' }
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
 
 async function getData() {
   const [users, exploitCounts, ctfSolves] = await Promise.all([
