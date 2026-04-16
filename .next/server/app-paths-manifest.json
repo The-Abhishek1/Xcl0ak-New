@@ -1,0 +1,23 @@
+{
+  "/page": "app/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/api/v1/threat/route": "app/api/v1/threat/route.js",
+  "/scan/page": "app/scan/page.js",
+  "/api/eso/[[...path]]/route": "app/api/eso/[[...path]]/route.js",
+  "/scan/new/page": "app/scan/new/page.js",
+  "/scan/[id]/page": "app/scan/[id]/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/scanner/page": "app/scanner/page.js",
+  "/playground/page": "app/playground/page.js",
+  "/findings/page": "app/findings/page.js",
+  "/attack-surface/page": "app/attack-surface/page.js",
+  "/schedules/page": "app/schedules/page.js",
+  "/scan-history/page": "app/scan-history/page.js",
+  "/teams/page": "app/teams/page.js",
+  "/audit/page": "app/audit/page.js",
+  "/reports/page": "app/reports/page.js",
+  "/settings/page": "app/settings/page.js",
+  "/threat-map/page": "app/threat-map/page.js",
+  "/osint/page": "app/osint/page.js",
+  "/api/v1/sync/route": "app/api/v1/sync/route.js"
+}

@@ -3,11 +3,14 @@ import { supabase } from '@/lib/supabase'
 
 const ALLOWED_TYPES = [
   'text/plain','text/x-python','text/x-sh','text/x-c','text/x-ruby',
-  'application/zip','application/x-zip-compressed',
+  'application/zip','application/x-zip-compressed','application/x-7z-compressed',
   'application/octet-stream','application/x-tar','application/gzip',
   'text/html','application/json','text/markdown',
+  'image/png','image/jpeg','image/gif','image/webp',
+  'application/pdf','application/x-executable','application/x-elf',
+  'application/vnd.tcpdump.pcap','application/x-pcapng',
 ]
-const MAX_SIZE = 5 * 1024 * 1024 // 5MB
+const MAX_SIZE = 10 * 1024 * 1024 // 10MB
 
 export async function POST(req: NextRequest) {
   try {
@@ -34,15 +37,17 @@ export async function POST(req: NextRequest) {
       })
 
     if (error) {
-      // If bucket doesn't exist, return a mock URL for dev
       console.error('[Upload] Supabase error:', error.message)
-      // Still return success in dev — store file path as placeholder
+      // Bucket may not exist yet — return a placeholder URL so fileUrl is not null
+      // Admin can see the filename was provided even without storage configured
+      const placeholderUrl = `pending://${safe}?name=${encodeURIComponent(file.name)}&size=${file.size}`
       return NextResponse.json({
-        url: null,
+        url: placeholderUrl,
         path: safe,
         name: file.name,
         size: file.size,
-        note: 'File storage not configured — create a Supabase bucket named "xcloak-files"',
+        pending: true,
+        note: 'Create a Supabase public bucket named "xcloak-files" to enable file storage',
       })
     }
 

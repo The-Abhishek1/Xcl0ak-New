@@ -28,6 +28,16 @@ const SECTIONS = [
     { icon:'🤖', label:'AI Assistant',href:'/ai' },
     { icon:'📚', label:'Learn',       href:'/learn' },
   ]},
+  { label:'Scan Engine', items:[
+    { icon:'⚡', label:'Scan Dashboard', href:'/scan' },
+    { icon:'🔍', label:'Findings',       href:'/findings' },
+    { icon:'🛡', label:'Attack Surface', href:'/attack-surface' },
+    { icon:'⏰', label:'Schedules',      href:'/schedules' },
+    { icon:'📋', label:'Scan History',   href:'/scan-history' },
+    { icon:'👥', label:'Teams',          href:'/teams' },
+    { icon:'📝', label:'Audit Log',      href:'/audit' },
+    { icon:'⚙',  label:'ESO Settings',   href:'/settings' },
+  ]},
 ]
 
 export function Sidebar() {
@@ -46,7 +56,7 @@ export function Sidebar() {
 
   return (
     <aside style={{
-      position:'fixed', left:0, top:'52px', bottom:25, width:'220px',
+      position:'fixed', left:0, top:'52px', bottom:30, width:'220px',
       zIndex:90, display:'flex', flexDirection:'column',
       background:'rgba(3,5,10,0.65)',
       backdropFilter:'blur(20px)', WebkitBackdropFilter:'blur(20px)',

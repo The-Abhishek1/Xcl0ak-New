@@ -18,7 +18,7 @@ export async function GET() {
 // POST - submit a new CTF challenge (goes to pending)
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const { title, category, difficulty, description, flag, points, authorAlias, hints } = body
+  const { title, category, difficulty, description, flag, points, authorAlias, hints, fileUrl } = body
 
   if (!title || !category || !flag || !points || !authorAlias)
     return NextResponse.json({ error: 'title, category, flag, points, authorAlias required' }, { status: 400 })
@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
       points:      Number(points),
       authorAlias: authorAlias,
       hints:       Array.isArray(hints) ? hints.slice(0, 3) : [],
+      fileUrl:     fileUrl ?? null,
       status:      'pending',
     },
   })

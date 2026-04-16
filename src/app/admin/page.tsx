@@ -337,52 +337,139 @@ export default function AdminPage() {
                     <span className="font-mono text-[11px] text-accent uppercase tracking-widest">Review</span>
                     <button onClick={()=>setSelected(null)} className="text-slate-600 hover:text-slate-400 font-mono text-[12px] cursor-pointer">✕</button>
                   </div>
-                  <div className="p-4 overflow-y-auto space-y-4" style={{maxHeight:'500px'}}>
+                  <div className="p-4 overflow-y-auto space-y-3" style={{maxHeight:'560px'}}>
+                    {/* Title + meta */}
                     <div>
                       <div className="text-[15px] font-bold text-slate-100 mb-1">{selected.title}</div>
-                      <div className="font-mono text-[10px] text-slate-500">by <span className="text-accent">{selected.authorAlias}</span> · {timeAgo(selected.createdAt)}</div>
+                      <div className="font-mono text-[10px] text-slate-500">
+                        by <span className="text-accent">{selected.authorAlias}</span> · {timeAgo(selected.createdAt)}
+                        {tab==='exploits' && (selected as Exploit).type && (
+                          <span className="ml-2 px-1.5 py-[1px] rounded font-mono text-[9px]"
+                            style={{background:'rgba(255,255,255,0.06)',color:'#94a3b8'}}>
+                            {(selected as Exploit).type} · {(selected as Exploit).language} · {(selected as Exploit).difficulty}
+                          </span>
+                        )}
+                        {tab==='ctf' && (selected as CTFChallenge).category && (
+                          <span className="ml-2 px-1.5 py-[1px] rounded font-mono text-[9px]"
+                            style={{background:'rgba(255,255,255,0.06)',color:'#94a3b8'}}>
+                            {(selected as CTFChallenge).category} · {(selected as CTFChallenge).difficulty} · {(selected as CTFChallenge).points} pts
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-[12px] text-slate-300 leading-relaxed p-3 rounded-lg" style={{background:'rgba(255,255,255,0.025)',border:'1px solid rgba(255,255,255,0.06)'}}>
-                      {selected.description}
+
+                    {/* Description */}
+                    <div>
+                      <div className="font-mono text-[9px] text-slate-600 uppercase tracking-widest mb-1">Description</div>
+                      <div className="text-[12px] text-slate-300 leading-relaxed p-3 rounded-lg"
+                        style={{background:'rgba(255,255,255,0.025)',border:'1px solid rgba(255,255,255,0.06)'}}>
+                        {selected.description}
+                      </div>
                     </div>
-                    {'code' in selected && selected.code && (
-                      <pre className="text-[11px] text-slate-300 p-3 rounded-lg overflow-x-auto" style={{background:'#05080f',border:'1px solid rgba(0,255,170,0.08)',maxHeight:'160px'}}>
-                        {selected.code}
-                      </pre>
-                    )}
-                    {/* File attachment */}
-                    {selected.fileUrl && (
-                      <div className="flex items-center gap-3 p-3 rounded-lg" style={{background:'rgba(0,170,255,0.06)',border:'1px solid rgba(0,170,255,0.2)'}}>
-                        <span className="text-xl">📎</span>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-mono text-[11px] font-bold text-accent2">Attached File</div>
-                          <div className="font-mono text-[9px] text-slate-600 truncate">{selected.fileUrl}</div>
-                        </div>
-                        <a href={selected.fileUrl} target="_blank" rel="noreferrer" download
-                          className="font-mono text-[10px] px-3 py-1.5 rounded border border-accent2/30 text-accent2 hover:bg-accent2/10 transition-colors cursor-pointer">
-                          ⬇ Download
+
+                    {/* CVE ID (exploits) */}
+                    {tab==='exploits' && (selected as Exploit).cveId && (
+                      <div className="flex items-center gap-2">
+                        <div className="font-mono text-[9px] text-slate-600 uppercase tracking-widest">CVE:</div>
+                        <a href={`https://nvd.nist.gov/vuln/detail/${(selected as Exploit).cveId}`}
+                          target="_blank" rel="noreferrer"
+                          className="font-mono text-[11px] text-purple-400 hover:underline">
+                          {(selected as Exploit).cveId} ↗
                         </a>
                       </div>
                     )}
-                    {'fileUrl' in selected && selected.fileUrl && !('code' in selected) && (
-                      <div className="flex items-center gap-3 p-3 rounded-lg" style={{background:'rgba(0,170,255,0.06)',border:'1px solid rgba(0,170,255,0.2)'}}>
-                        <span className="text-xl">📎</span>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-mono text-[11px] font-bold text-accent2">Challenge File</div>
-                          <div className="font-mono text-[9px] text-slate-600 truncate">{selected.fileUrl}</div>
-                        </div>
-                        <a href={selected.fileUrl} target="_blank" rel="noreferrer" download
-                          className="font-mono text-[10px] px-3 py-1.5 rounded border border-accent2/30 text-accent2 hover:bg-accent2/10 transition-colors cursor-pointer">
-                          ⬇ Download
-                        </a>
-                      </div>
-                    )}
-                    {'hints' in selected && selected.hints?.length > 0 && (
+
+                    {/* Exploit code */}
+                    {tab==='exploits' && (selected as Exploit).code && (
                       <div>
-                        <div className="font-mono text-[9px] text-slate-600 uppercase tracking-widest mb-1.5">Hints</div>
-                        {selected.hints.map((h:string,i:number)=>(
-                          <div key={i} className="font-mono text-[11px] text-slate-400 p-2 rounded mb-1" style={{background:'rgba(255,255,255,0.025)'}}>{i+1}. {h}</div>
+                        <div className="font-mono text-[9px] text-slate-600 uppercase tracking-widest mb-1">
+                          Exploit Code · {(selected as Exploit).language?.toUpperCase()}
+                        </div>
+                        <pre className="text-[11px] text-slate-300 p-3 rounded-lg overflow-x-auto"
+                          style={{background:'#05080f',border:'1px solid rgba(0,255,170,0.08)',maxHeight:'200px',overflowY:'auto'}}>
+                          {(selected as Exploit).code}
+                        </pre>
+                      </div>
+                    )}
+
+                    {/* DNA risk */}
+                    {tab==='exploits' && (selected as Exploit).dnaRisk != null && (
+                      <div className="flex items-center gap-3 p-3 rounded-lg"
+                        style={{background:'rgba(255,58,92,0.05)',border:'1px solid rgba(255,58,92,0.15)'}}>
+                        <div>
+                          <div className="font-mono text-[9px] text-slate-600 uppercase tracking-widest mb-0.5">DNA Risk Score</div>
+                          <div className="font-mono text-xl font-bold text-red-400">{(selected as Exploit).dnaRisk?.toFixed(1)} / 10</div>
+                        </div>
+                        {(selected as Exploit).dnaPayload && (
+                          <div>
+                            <div className="font-mono text-[9px] text-slate-600 uppercase tracking-widest mb-0.5">Payload Type</div>
+                            <div className="font-mono text-[12px] text-slate-300">{(selected as Exploit).dnaPayload}</div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Tags (exploits) */}
+                    {tab==='exploits' && (selected as Exploit).tags?.length > 0 && (
+                      <div>
+                        <div className="font-mono text-[9px] text-slate-600 uppercase tracking-widest mb-1">Tags</div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {(selected as Exploit).tags.map((t:string)=>(
+                            <span key={t} className="font-mono text-[9px] px-2 py-[2px] rounded"
+                              style={{background:'rgba(255,255,255,0.06)',color:'#64748b'}}>#{t}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* CTF Hints */}
+                    {tab==='ctf' && (selected as CTFChallenge).hints?.length > 0 && (
+                      <div>
+                        <div className="font-mono text-[9px] text-slate-600 uppercase tracking-widest mb-1.5">Hints ({(selected as CTFChallenge).hints.length})</div>
+                        {(selected as CTFChallenge).hints.map((h:string,i:number)=>(
+                          <div key={i} className="font-mono text-[11px] text-slate-400 p-2 rounded mb-1"
+                            style={{background:'rgba(255,255,255,0.025)'}}>
+                            {i+1}. {h}
+                          </div>
                         ))}
+                      </div>
+                    )}
+
+                    {/* File attachment — works for both exploit and CTF */}
+                    {selected.fileUrl ? (
+                      <div>
+                        <div className="font-mono text-[9px] text-slate-600 uppercase tracking-widest mb-1">
+                          {tab==='exploits' ? 'Exploit File' : 'Challenge File'}
+                        </div>
+                        <div className="flex items-center gap-3 p-3 rounded-lg"
+                          style={{background:'rgba(0,170,255,0.06)',border:'1px solid rgba(0,170,255,0.2)'}}>
+                          <span className="text-2xl">📎</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-mono text-[11px] font-bold text-accent2 truncate">
+                              {selected.fileUrl.startsWith('pending://')
+                                ? decodeURIComponent(selected.fileUrl.split('name=')[1]?.split('&')[0] ?? 'file')
+                                : selected.fileUrl.split('/').pop()}
+                            </div>
+                            {selected.fileUrl.startsWith('pending://') ? (
+                              <div className="font-mono text-[9px] text-yellow-400">
+                                ⚠ Storage not configured — create Supabase bucket "xcloak-files"
+                              </div>
+                            ) : (
+                              <div className="font-mono text-[9px] text-slate-600 truncate">{selected.fileUrl}</div>
+                            )}
+                          </div>
+                          {!selected.fileUrl.startsWith('pending://') && (
+                            <a href={selected.fileUrl} target="_blank" rel="noreferrer" download
+                              className="font-mono text-[10px] px-3 py-2 rounded border border-accent2/30 text-accent2 hover:bg-accent2/10 transition-colors cursor-pointer shrink-0">
+                              ⬇ Download
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="font-mono text-[10px] text-slate-700 p-2 rounded"
+                        style={{background:'rgba(255,255,255,0.025)'}}>
+                        📁 No file attached
                       </div>
                     )}
                     <div>

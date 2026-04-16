@@ -56,7 +56,7 @@ export default function CTFSubmitPage() {
     try {
       const res = await fetch('/api/v1/ctf', {
         method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ title, category, difficulty, description, flag, points, authorAlias:alias, hints, fileUrl:fileInfo?.url ?? null }),
+        body: JSON.stringify({ title, category, difficulty, description, flag, points, authorAlias:alias, hints, fileUrl:fileInfo?.url ?? null, fileName:fileInfo?.name ?? null }),
       })
       const d = await res.json()
       if (res.ok) {
@@ -144,8 +144,10 @@ export default function CTFSubmitPage() {
                 <div className="font-mono text-[12px] font-bold text-accent">{fileInfo.name}</div>
                 <div className="font-mono text-[10px] text-slate-600">{(fileInfo.size/1024).toFixed(1)} KB</div>
                 {fileInfo.url
-                  ? <div className="font-mono text-[9px] text-green-400">✓ Uploaded to Supabase Storage</div>
-                  : <div className="font-mono text-[9px] text-yellow-400">⚠ Saved (configure Supabase bucket for storage)</div>
+                  ? fileInfo.url.startsWith('pending://')
+                    ? <div className="font-mono text-[9px] text-yellow-400">⚠ File queued — create Supabase bucket "xcloak-files" to enable storage</div>
+                    : <div className="font-mono text-[9px] text-green-400">✓ Uploaded to Supabase Storage</div>
+                  : <div className="font-mono text-[9px] text-yellow-400">⚠ File info saved</div>
                 }
                 <button type="button" onClick={e=>{e.stopPropagation();setFileInfo(null);if(fileRef.current)fileRef.current.value=''}}
                   className="font-mono text-[9px] text-red-400 hover:text-red-300">✕ Remove</button>

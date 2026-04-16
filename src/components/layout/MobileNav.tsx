@@ -35,13 +35,23 @@ const ALL_NAV = [
     { icon:'🤖', label:'AI',         href:'/ai' },
     { icon:'📚', label:'Learn',      href:'/learn' },
   ]},
+  { section:'Scan Engine', items:[
+    { icon:'⚡', label:'Scans',          href:'/scan' },
+    { icon:'🔍', label:'Findings',       href:'/findings' },
+    { icon:'🛡', label:'Attack Surface', href:'/attack-surface' },
+    { icon:'⏰', label:'Schedules',      href:'/schedules' },
+    { icon:'📋', label:'History',        href:'/scan-history' },
+    { icon:'👥', label:'Teams',          href:'/teams' },
+    { icon:'📝', label:'Audit',          href:'/audit' },
+    { icon:'⚙',  label:'Settings',      href:'/settings' },
+  ]},
 ]
 
 // Styles as constants so no Tailwind conflict
 const S = {
   bar: {
     position: 'fixed' as const,
-    bottom: 25, left: 0, right: 0,
+    bottom: 30, left: 0, right: 0,
     height: '56px',
     zIndex: 100,
     display: 'flex',
