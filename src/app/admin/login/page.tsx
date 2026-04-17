@@ -1,79 +1,98 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { saveSession } from '@/lib/eso-auth'
 
 export default function AdminLoginPage() {
   const router = useRouter()
-  const [alias, setAlias]       = useState('')
+  const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError]       = useState('')
-  const [loading, setLoading]   = useState(false)
+  const [error,    setError]    = useState('')
+  const [loading,  setLoading]  = useState(false)
 
-  async function login(e: React.FormEvent) {
+  // If already admin, skip
+  useEffect(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('eso_user') ?? 'null')
+      if (u?.role === 'admin') router.replace('/admin')
+    } catch {}
+  }, [router])
+
+  async function submit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true); setError('')
     try {
-      const res = await fetch('/api/v1/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ alias, password }),
+      const res = await fetch('/api/eso/auth/login', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ email, password }),
       })
       const d = await res.json()
-      if (res.ok) {
-        sessionStorage.setItem('xcloak-admin-alias', d.alias)
-        router.push('/admin')
-      } else {
-        setError(d.error ?? 'Login failed')
-      }
-    } catch { setError('Network error') }
+      if (!res.ok) throw new Error(d.detail || 'Login failed')
+      if (d.user?.role !== 'admin') throw new Error('Access denied — admin account required')
+      saveSession(d.access_token, d.user)
+      // Also set xcloak legacy key
+      sessionStorage.setItem('xcloak-admin-alias', d.user.username ?? 'admin')
+      router.push('/admin')
+    } catch(e:any) { setError(e.message) }
     finally { setLoading(false) }
   }
 
+  const inp = "w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 font-mono text-[13px] text-slate-200 outline-none focus:border-red-500/40 transition-all placeholder-slate-700"
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-5" style={{ background:'#03050a' }}>
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <div className="text-4xl mb-3">🛡</div>
-          <h1 className="text-2xl font-black">X<span style={{ color:'#00ffaa' }}>cloak</span> Admin</h1>
-          <p className="font-mono text-[11px] text-slate-600 mt-1">Restricted access — admins only</p>
+    <div className="min-h-screen flex items-center justify-center p-5" style={{background:'#03050a'}}>
+      <div className="w-full max-w-[360px]">
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 mb-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+              style={{background:'rgba(255,58,92,0.1)',border:'1px solid rgba(255,58,92,0.25)'}}>🔑</div>
+            <span className="text-2xl font-black">X<span style={{color:'#00ffaa'}}>cloak</span></span>
+          </div>
+          <p className="font-mono text-[11px] text-slate-600">Admin access only</p>
         </div>
 
-        <div className="glass p-6">
-          <form onSubmit={login} className="space-y-4">
-            <div>
-              <label className="font-mono text-[9px] uppercase tracking-widest text-slate-600 block mb-1.5">Admin Alias</label>
-              <input value={alias} onChange={e => setAlias(e.target.value)}
-                placeholder="admin" autoComplete="username"
-                className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5
-                           font-mono text-[12px] text-slate-200 outline-none focus:border-green-500/40
-                           transition-colors placeholder-slate-700" required />
+        <div className="glass p-6" style={{borderColor:'rgba(255,58,92,0.15)'}}>
+          <div className="font-mono text-[9px] uppercase tracking-widest text-red-400/60 text-center mb-5">
+            ⚠ Restricted — Authorised Personnel Only
+          </div>
+          <form onSubmit={submit} className="space-y-4">
+            <div className="space-y-1">
+              <label className="font-mono text-[9px] uppercase tracking-widest text-slate-600">Admin Email</label>
+              <input type="email" required value={email} onChange={e=>setEmail(e.target.value)}
+                placeholder="admin@example.com" className={inp} autoFocus/>
             </div>
-            <div>
-              <label className="font-mono text-[9px] uppercase tracking-widest text-slate-600 block mb-1.5">Password</label>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••" autoComplete="current-password"
-                className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5
-                           font-mono text-[12px] text-slate-200 outline-none focus:border-green-500/40
-                           transition-colors placeholder-slate-700" required />
+            <div className="space-y-1">
+              <label className="font-mono text-[9px] uppercase tracking-widest text-slate-600">Password</label>
+              <input type="password" required value={password} onChange={e=>setPassword(e.target.value)}
+                placeholder="••••••••" className={inp}/>
             </div>
 
             {error && (
-              <div className="font-mono text-[11px] text-red-400 p-2.5 rounded-lg border border-red-500/20 bg-red-500/8">
+              <div className="font-mono text-[11px] text-red-400 p-3 rounded-xl border border-red-500/20 bg-red-500/[0.05]">
                 ✗ {error}
               </div>
             )}
 
             <button type="submit" disabled={loading}
-              className="w-full py-3 rounded-lg border font-mono text-[12px] font-bold cursor-pointer transition-all disabled:opacity-40"
-              style={{ background:'rgba(0,255,170,0.1)', borderColor:'rgba(0,255,170,0.3)', color:'#00ffaa' }}>
-              {loading ? '⟳ AUTHENTICATING...' : 'LOGIN →'}
+              className="w-full py-3 rounded-xl font-mono text-[13px] font-bold cursor-pointer transition-all disabled:opacity-40"
+              style={{background:'rgba(255,58,92,0.1)',border:'1px solid rgba(255,58,92,0.3)',color:'#ff3a5c'}}>
+              {loading ? '⟳ Verifying...' : 'Access Admin Panel →'}
             </button>
           </form>
 
-          <div className="font-mono text-[9px] text-slate-700 mt-4 text-center">
-            First login creates the admin account
+          <div className="mt-4 pt-4 border-t border-white/[0.06] text-center">
+            <Link href="/login" className="font-mono text-[10px] text-slate-600 hover:text-slate-400 transition-colors">
+              ← Back to user login
+            </Link>
           </div>
         </div>
+
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-3 p-2.5 rounded-xl border border-white/[0.05] text-center">
+            <p className="font-mono text-[9px] text-slate-700">Dev: dev@example.com / dev_password</p>
+          </div>
+        )}
       </div>
     </div>
   )

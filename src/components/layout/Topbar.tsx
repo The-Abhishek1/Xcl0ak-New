@@ -1,103 +1,221 @@
 'use client'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { useEffect, useState, useRef } from 'react'
+import { useRouter } from 'next/navigation'
+import { getUser, isLoggedIn, clearSession } from '@/lib/eso-auth'
 
-const NAV = [
-  { label:'DASHBOARD', href:'/dashboard' },
-  { label:'EXPLOITS',  href:'/exploits' },
-  { label:'CVE',       href:'/cve' },
-  { label:'THREAT MAP',href:'/threat-map' },
-  { label:'SCANNER',   href:'/scanner' },
-  { label:'CTF',       href:'/ctf' },
-]
-
-export function Topbar() {
-  const path = usePathname()
-  const [alias, setAliasState] = useState('ghost_x91')
-  const [editing, setEditing]  = useState(false)
-  const [draft,   setDraft]    = useState('')
-  const [sync,    setSync]     = useState<'idle'|'syncing'|'done'>('idle')
-  const inputRef = useRef<HTMLInputElement>(null)
+function useAuth() {
+  const [user,     setUser]     = useState<any>(null)
+  const [loggedIn, setLoggedIn] = useState(false)
 
   useEffect(() => {
-    let a = localStorage.getItem('xcloak:alias')
-    if (!a) {
-      const adj=['ghost','shadow','null','void','cipher','phantom','byte','hex','root','xor']
-      a = `${adj[Math.floor(Math.random()*10)]}_${Math.random().toString(36).slice(2,6)}`
-      localStorage.setItem('xcloak:alias', a)
+    const refresh = () => { setUser(getUser()); setLoggedIn(isLoggedIn()) }
+    refresh()
+    window.addEventListener('eso-auth-change', refresh)
+    window.addEventListener('storage', refresh)
+    return () => {
+      window.removeEventListener('eso-auth-change', refresh)
+      window.removeEventListener('storage', refresh)
     }
-    setAliasState(a); setDraft(a)
   }, [])
 
-  function saveAlias() {
-    const clean = draft.replace(/[^a-z0-9_\-]/gi,'').slice(0,24)
-    if (clean.length >= 3) { localStorage.setItem('xcloak:alias',clean); setAliasState(clean) }
-    setEditing(false)
-  }
+  return { user, loggedIn }
+}
+
+const TIER_COLOR: Record<string,string> = {
+  free:'#64748b', pro:'#00aaff', enterprise:'#a78bfa', admin:'#ff3a5c'
+}
+
+export function Topbar() {
+  const router             = useRouter()
+  const { user, loggedIn } = useAuth()
+  const [sync,       setSync]       = useState<'idle'|'syncing'|'done'>('idle')
+  const [notifOpen,  setNotifOpen]  = useState(false)
+  const [userOpen,   setUserOpen]   = useState(false)
+  const notifRef = useRef<HTMLDivElement>(null)
+  const userRef  = useRef<HTMLDivElement>(null)
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false)
+      if (userRef.current  && !userRef.current.contains(e.target as Node))  setUserOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   async function doSync() {
     setSync('syncing')
-    try { await fetch('/api/v1/sync',{method:'POST'}); setSync('done'); setTimeout(()=>setSync('idle'),3000) }
+    try { await fetch('/api/v1/sync', { method:'POST' }); setSync('done'); setTimeout(()=>setSync('idle'), 3000) }
     catch { setSync('idle') }
   }
 
-  return (
-    <nav className="fixed top-0 left-0 right-0 h-[52px] z-[100] flex items-center px-3 gap-2"
-      style={{background:'rgba(3,5,10,0.95)',backdropFilter:'blur(20px)',borderBottom:'1px solid rgba(255,255,255,0.07)'}}>
+  function logout() {
+    clearSession()
+    setUserOpen(false)
+    router.push('/login')
+  }
 
-      {/* Logo — always visible */}
-      <Link href="/dashboard" className="font-black text-[16px] tracking-tight shrink-0 flex items-center gap-1.5">
-        <span className="w-7 h-7 rounded-md flex items-center justify-center text-sm shrink-0"
-          style={{background:'linear-gradient(135deg,#00ffaa,#00aaff)'}}>🛡</span>
-        <span className="hidden sm:block">X<span style={{color:'#00ffaa'}}>cloak</span></span>
+  const tier  = user?.role === 'admin' ? 'admin' : (user?.tier ?? 'free')
+  const tColor = TIER_COLOR[tier] ?? '#64748b'
+
+  return (
+    <nav
+      className="fixed top-0 left-0 right-0 h-[52px] z-[100] flex items-center px-4 gap-3"
+      style={{
+        background:'rgba(3,5,10,0.95)',
+        backdropFilter:'blur(20px)',
+        borderBottom:'1px solid rgba(255,255,255,0.07)',
+      }}
+    >
+      {/* Logo */}
+      <Link href="/dashboard" className="flex items-center gap-2 shrink-0" style={{textDecoration:'none'}}>
+        <span
+          className="w-7 h-7 rounded-md flex items-center justify-center text-sm shrink-0"
+          style={{background:'linear-gradient(135deg,#00ffaa,#00aaff)'}}>
+          🛡
+        </span>
+        <span className="font-black text-[16px] tracking-tight">
+          X<span style={{color:'#00ffaa'}}>cloak</span>
+        </span>
       </Link>
 
-      {/* Nav — scrollable, items never wrap or shrink */}
-      <div className="flex-1 overflow-x-auto min-w-0" style={{scrollbarWidth:'none',msOverflowStyle:'none'}}>
-        <style>{`.topbar-scroll::-webkit-scrollbar{display:none}`}</style>
-        <div className="topbar-scroll flex gap-[2px] p-[3px] rounded-lg w-max"
-          style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)'}}>
-          {NAV.map(n => {
-            const active = path?.startsWith(n.href)
-            return (
-              <Link key={n.href} href={n.href}
-                className="font-mono text-[10px] px-2.5 py-[5px] rounded-[5px] transition-all tracking-wide whitespace-nowrap shrink-0"
-                style={active
-                  ?{background:'linear-gradient(135deg,rgba(0,255,170,0.15),rgba(0,170,255,0.1))',color:'#00ffaa',border:'1px solid rgba(0,255,170,0.25)'}
-                  :{color:'#64748b'}}>
-                {n.label}
-              </Link>
-            )
-          })}
-        </div>
-      </div>
+      {/* Spacer */}
+      <div className="flex-1"/>
 
-      {/* Right controls */}
-      <div className="flex items-center gap-1.5 shrink-0">
-        <button onClick={doSync}
-          className="font-mono text-[9px] px-2 py-[5px] rounded-md border cursor-pointer transition-all hidden sm:block"
-          style={{background:sync==='done'?'rgba(0,255,170,0.1)':'rgba(255,255,255,0.04)',borderColor:sync==='done'?'rgba(0,255,170,0.3)':'rgba(255,255,255,0.08)',color:sync==='done'?'#00ffaa':'#64748b'}}>
-          {sync==='syncing'?'⟳':sync==='done'?'✓':'↻ SYNC'}
+      {/* Right controls — neatly grouped */}
+      <div className="flex items-center gap-2 shrink-0">
+
+        {/* Sync */}
+        <button
+          onClick={doSync}
+          title="Sync threat feeds"
+          className="flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer transition-all"
+          style={{
+            background: sync==='done' ? 'rgba(0,255,170,0.1)' : 'rgba(255,255,255,0.04)',
+            border:     sync==='done' ? '1px solid rgba(0,255,170,0.3)' : '1px solid rgba(255,255,255,0.08)',
+            color:      sync==='done' ? '#00ffaa' : '#64748b',
+            fontSize:   '14px',
+          }}>
+          {sync==='syncing' ? '⟳' : sync==='done' ? '✓' : '↻'}
         </button>
-        <div className="font-mono text-[9px] font-bold px-2 py-[3px] rounded hidden sm:block"
-          style={{background:'rgba(255,58,92,0.12)',border:'1px solid rgba(255,58,92,0.3)',color:'#ff3a5c'}}>
-          DEFCON 3
-        </div>
-        {editing ? (
-          <input ref={inputRef} value={draft} onChange={e=>setDraft(e.target.value)}
-            onKeyDown={e=>{if(e.key==='Enter')saveAlias();if(e.key==='Escape')setEditing(false)}}
-            onBlur={saveAlias} autoFocus maxLength={24}
-            className="font-mono text-[10px] px-2 py-[4px] rounded-full w-[100px] outline-none"
-            style={{background:'rgba(0,255,170,0.1)',border:'1px solid rgba(0,255,170,0.4)',color:'#00ffaa'}} />
-        ) : (
-          <button onClick={()=>{setDraft(alias);setEditing(true);setTimeout(()=>inputRef.current?.select(),50)}}
-            className="font-mono text-[10px] px-2 py-[4px] rounded-full cursor-pointer group"
-            style={{color:'#00ffaa',background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)'}}
-            title="Click to rename">
-            <span className="hidden sm:inline">👤 </span>{alias.slice(0,10)}{alias.length>10?'…':''}<span className="text-[8px] ml-0.5 text-slate-600 group-hover:text-slate-400">✎</span>
+
+        {/* Notifications */}
+        <div ref={notifRef} className="relative">
+          <button
+            onClick={()=>setNotifOpen(v=>!v)}
+            title="Notifications"
+            className="relative flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer transition-all"
+            style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)'}}>
+            <span style={{fontSize:'14px'}}>🔔</span>
+            {/* Unread dot */}
+            <span
+              className="absolute top-1 right-1 w-[6px] h-[6px] rounded-full"
+              style={{background:'#ff3a5c'}}/>
           </button>
-        )}
+
+          {notifOpen && (
+            <div
+              className="absolute right-0 top-11 w-72 rounded-xl shadow-2xl z-50"
+              style={{background:'rgba(6,9,16,0.98)',border:'1px solid rgba(255,255,255,0.1)',backdropFilter:'blur(24px)'}}>
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06]">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">Notifications</span>
+                <button className="font-mono text-[9px] text-accent cursor-pointer">Mark read</button>
+              </div>
+              {[
+                {icon:'🔴', msg:'New critical CVE: CVE-2024-3094 in xz-utils', time:'2m', unread:true},
+                {icon:'💉', msg:'Your exploit submission was approved',          time:'1h', unread:true},
+                {icon:'🏆', msg:'You solved a CTF challenge — +500 pts',         time:'3h', unread:false},
+                {icon:'📡', msg:'New threat pulse from OTX',                     time:'5h', unread:false},
+              ].map((n,i)=>(
+                <div key={i} className="flex items-start gap-3 px-4 py-3 hover:bg-white/[0.02] cursor-pointer transition-colors border-b border-white/[0.03] last:border-0">
+                  <span className="text-[13px] mt-0.5 shrink-0">{n.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-mono text-[11px] text-slate-300 leading-snug">{n.msg}</p>
+                    <p className="font-mono text-[9px] text-slate-600 mt-1">{n.time} ago</p>
+                  </div>
+                  {n.unread && <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{background:'#00ffaa'}}/>}
+                </div>
+              ))}
+              <div className="px-4 py-2 border-t border-white/[0.06] text-center">
+                <Link href="/notifications" onClick={()=>setNotifOpen(false)} className="font-mono text-[9px] text-accent hover:underline">
+                  View all
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Chatroom */}
+        <Link
+          href="/chatroom"
+          title="Chatroom"
+          className="flex items-center justify-center w-8 h-8 rounded-lg transition-all"
+          style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)'}}>
+          <span style={{fontSize:'14px'}}>💬</span>
+        </Link>
+
+        {/* User button */}
+        <div ref={userRef} className="relative">
+          {loggedIn && user ? (
+            <>
+              <button
+                onClick={()=>setUserOpen(v=>!v)}
+                className="flex items-center gap-1.5 h-8 px-2.5 rounded-lg cursor-pointer transition-all"
+                style={{background:'rgba(0,255,170,0.06)',border:`1px solid ${tColor}30`,color:'#e2e8f0'}}>
+                <span style={{fontSize:'12px'}}>👤</span>
+                <span className="font-mono text-[10px] font-bold text-slate-200 hidden sm:inline">
+                  {(user.username ?? 'user').slice(0,12)}
+                </span>
+                <span
+                  className="font-mono text-[8px] font-bold px-1.5 py-[1px] rounded-full"
+                  style={{background:`${tColor}22`,color:tColor,border:`1px solid ${tColor}30`}}>
+                  {tier.toUpperCase().slice(0,4)}
+                </span>
+              </button>
+
+              {userOpen && (
+                <div
+                  className="absolute right-0 top-11 w-52 rounded-xl shadow-2xl z-50"
+                  style={{background:'rgba(6,9,16,0.98)',border:'1px solid rgba(255,255,255,0.1)',backdropFilter:'blur(24px)'}}>
+                  <div className="px-4 py-3 border-b border-white/[0.06]">
+                    <div className="font-mono text-[12px] text-slate-200 font-bold">{user.username}</div>
+                    <div className="font-mono text-[9px] text-slate-600 mt-0.5 truncate">{user.email}</div>
+                  </div>
+                  {[
+                    {label:'My Settings',    href:'/settings',  icon:'⚙'},
+                    {label:'Scan Dashboard', href:'/scan',       icon:'⚡'},
+                    {label:'My Findings',    href:'/findings',   icon:'🔍'},
+                    ...(user.role==='admin'      ? [{label:'Admin Panel',  href:'/admin',   icon:'🔑'}] : []),
+                    ...(tier==='free'            ? [{label:'Upgrade Plan', href:'/pricing', icon:'⬆'}] : []),
+                  ].map(item=>(
+                    <Link key={item.href} href={item.href} onClick={()=>setUserOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-white/[0.03] transition-colors"
+                      style={{textDecoration:'none'}}>
+                      <span style={{fontSize:'12px'}}>{item.icon}</span>
+                      <span className="font-mono text-[11px] text-slate-400">{item.label}</span>
+                    </Link>
+                  ))}
+                  <div className="border-t border-white/[0.06]">
+                    <button onClick={logout}
+                      className="w-full flex items-center gap-2.5 px-4 py-2.5 hover:bg-white/[0.03] transition-colors cursor-pointer">
+                      <span style={{fontSize:'12px'}}>🚪</span>
+                      <span className="font-mono text-[11px] text-red-400">Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <Link
+              href="/login"
+              className="flex items-center h-8 px-3 rounded-lg font-mono text-[10px] font-bold cursor-pointer transition-all"
+              style={{color:'#00ffaa',background:'rgba(0,255,170,0.08)',border:'1px solid rgba(0,255,170,0.2)'}}>
+              Sign In
+            </Link>
+          )}
+        </div>
       </div>
     </nav>
   )

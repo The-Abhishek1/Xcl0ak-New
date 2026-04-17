@@ -1,324 +1,415 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { esoSystem, esoAuth } from '@/lib/eso/api'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { getUser, getToken, isLoggedIn, saveSession } from '@/lib/eso-auth'
 
-const inp = "w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 font-mono text-[12px] text-slate-200 outline-none focus:border-accent/30 transition-colors placeholder-slate-700"
+const TIER_COLOR:  Record<string,string> = { free:'#64748b', pro:'#00aaff', enterprise:'#a78bfa', admin:'#00ffaa' }
+const TIER_BORDER: Record<string,string> = { free:'rgba(100,116,139,0.25)', pro:'rgba(0,170,255,0.3)', enterprise:'rgba(167,139,250,0.3)', admin:'rgba(0,255,170,0.3)' }
 
-// Ollama models — these are common models. User can type custom ones too.
+const TIER_INFO: Record<string, {scans:number, tools:string, concurrent:number, extra:string[]}> = {
+  free:       { scans:3,    concurrent:1, tools:'nmap only',                  extra:[] },
+  pro:        { scans:20,   concurrent:2, tools:'nmap,nuclei,whatweb,nikto,gobuster', extra:['AI analysis','PDF reports','Scheduling','API access','Attack surface'] },
+  enterprise: { scans:100,  concurrent:5, tools:'All 7 tools (incl. sqlmap,ffuf)',    extra:['All Pro features','Teams & RBAC','Priority queue','Dedicated support'] },
+  admin:      { scans:9999, concurrent:10,tools:'All 7 tools',                         extra:['Unlimited everything'] },
+}
+
 const OLLAMA_MODELS = [
-  { id:'phi3:mini',       size:'2.2GB', speed:'⚡⚡⚡', quality:'★★☆', note:'Fast, poor JSON' },
-  { id:'llama3.2:3b',    size:'2.0GB', speed:'⚡⚡⚡', quality:'★★★', note:'Best for this size' },
-  { id:'qwen2.5:7b',     size:'4.7GB', speed:'⚡⚡☆', quality:'★★★', note:'Recommended local' },
-  { id:'qwen2.5:14b',    size:'9.0GB', speed:'⚡☆☆',  quality:'★★★', note:'Best local quality' },
-  { id:'mistral:7b',     size:'4.1GB', speed:'⚡⚡☆', quality:'★★★', note:'Good at JSON' },
-  { id:'deepseek-r1:7b', size:'4.7GB', speed:'⚡⚡☆', quality:'★★★', note:'Strong reasoning' },
+  { id:'qwen2.5:3b',   size:'1.9GB', note:'Recommended · Best for 16GB RAM' },
+  { id:'llama3.2:3b',  size:'2.0GB', note:'Good quality' },
+  { id:'qwen2.5:7b',   size:'4.7GB', note:'Better quality · needs 8GB free' },
+  { id:'qwen2.5:14b',  size:'9.0GB', note:'Best quality · needs 12GB free' },
+  { id:'mistral:7b',   size:'4.1GB', note:'Good at JSON' },
 ]
 
-const OPENAI_MODELS = [
-  { id:'gpt-4o',          note:'Best quality, fastest' },
-  { id:'gpt-4o-mini',     note:'Fast + cheap, great for planning' },
-  { id:'gpt-4-turbo',     note:'Long context' },
-  { id:'gpt-3.5-turbo',   note:'Cheapest' },
-]
-
-const ANTHROPIC_MODELS = [
-  { id:'claude-sonnet-4-6',         note:'Best balance (recommended)' },
-  { id:'claude-opus-4-6',           note:'Most powerful' },
-  { id:'claude-haiku-4-5-20251001', note:'Fastest + cheapest' },
-]
-
-type TestResult = { status: 'ok'|'error'; message?: string; error?: string } | null
+async function apiFetch(path: string, opts?: RequestInit) {
+  const token = getToken()
+  const res = await fetch(`/api/eso${path}`, {
+    ...opts,
+    headers: { 'Content-Type':'application/json', ...(token?{Authorization:`Bearer ${token}`}:{}), ...opts?.headers },
+  })
+  if (!res.ok) throw new Error(await res.text().catch(()=>res.statusText))
+  return res.json()
+}
 
 export default function SettingsPage() {
-  const [sysInfo,    setSysInfo]    = useState<any>(null)
-  const [loading,    setLoading]    = useState(true)
-  const [switching,  setSwitching]  = useState(false)
-  const [testResult, setTestResult] = useState<TestResult>(null)
-  const [testing,    setTesting]    = useState(false)
+  const router = useRouter()
+  const [ready,       setReady]       = useState(false)
+  const [user,        setUser]        = useState<any>(null)
+  const [tab,         setTab]         = useState<'profile'|'llm'|'apikeys'|'billing'>('profile')
+  const [llmConfig,   setLlmConfig]   = useState<any>(null)
+  const [apiKeys,     setApiKeys]     = useState<any[]>([])
+  const [newKeyName,  setNewKeyName]  = useState('')
+  const [newKey,      setNewKey]      = useState<any>(null)
+  const [msg,         setMsg]         = useState('')
+  const [loading,     setLoading]     = useState(false)
+  const [provider,    setProvider]    = useState('local')
+  const [model,       setModel]       = useState('qwen2.5:3b')
+  const [openaiKey,   setOpenaiKey]   = useState('')
+  const [anthropicKey,setAnthropicKey]= useState('')
 
-  // Form state
-  const [provider,   setProvider]   = useState('local')
-  const [model,      setModel]      = useState('')
-  const [customModel,setCustomModel]= useState('')
-  const [apiKey,     setApiKey]     = useState('')
-  const [ollamaUrl,  setOllamaUrl]  = useState('http://localhost:11434')
-  const [showKey,    setShowKey]    = useState(false)
+  useEffect(() => {
+    if (!isLoggedIn()) { router.push('/login?from=settings'); return }
+    // Always fetch fresh user data from /auth/me — localStorage may not have tier
+    apiFetch('/auth/me').then(freshUser => {
+      // Merge: admin role = admin tier effectively
+      if (freshUser.role === 'admin' && (!freshUser.tier || freshUser.tier === 'free')) {
+        freshUser.tier = 'admin'
+      }
+      setUser(freshUser)
+      // Update localStorage so sidebar/topbar also see the fresh tier
+      saveSession(getToken()!, freshUser)
+    }).catch(() => {
+      // Fallback to localStorage
+      setUser(getUser())
+    }).finally(() => setReady(true))
+  }, [router])
 
-  // API keys
-  const [keys,       setKeys]       = useState<any[]>([])
-  const [newKeyName, setNewKeyName] = useState('')
-  const [newKey,     setNewKey]     = useState('')
-  const [creatingKey,setCreatingKey]= useState(false)
+  useEffect(() => {
+    if (!ready) return
+    apiFetch('/system/llm-config').then(c => {
+      setLlmConfig(c)
+      setProvider(c.provider ?? 'local')
+      setModel(c.model ?? 'qwen2.5:3b')
+    }).catch(()=>{})
+    apiFetch('/auth/api-keys').then(r => setApiKeys(r.keys ?? [])).catch(()=>{})
+  }, [ready])
 
-  const load = async () => {
+  async function saveLLM() {
+    setLoading(true); setMsg('')
     try {
-      const info = await esoSystem.info()
-      setSysInfo(info)
-      setProvider(info.llm_provider || 'local')
-      setModel(info.llm_model || '')
-      setOllamaUrl(info.local_llm_url || 'http://localhost:11434')
-    } catch {}
-    try { const r = await esoAuth.listKeys(); setKeys(r.api_keys ?? []) } catch {}
+      await apiFetch('/system/llm-config', {
+        method:'POST',
+        body: JSON.stringify({ provider, model, openai_api_key: openaiKey||undefined, anthropic_api_key: anthropicKey||undefined }),
+      })
+      setMsg('✓ LLM settings saved')
+    } catch(e:any) { setMsg(`✗ ${e.message}`) }
     setLoading(false)
   }
 
-  useEffect(() => { load() }, [])
-
-  const effectiveModel = customModel.trim() || model
-
-  const switchLLM = async () => {
-    setSwitching(true); setTestResult(null)
-    try {
-      const body: any = { provider }
-      if (effectiveModel) body.model = effectiveModel
-      const r = await esoSystem.switchLLM(provider, effectiveModel || undefined)
-      setSysInfo((p:any) => ({ ...p, llm_provider:r.current, llm_model:r.model }))
-      setTestResult({ status:'ok', message: r.message })
-      setCustomModel('')
-    } catch (e:any) {
-      setTestResult({ status:'error', error: e.message })
-    }
-    setSwitching(false)
-  }
-
-  const testLLM = async () => {
-    setTesting(true); setTestResult(null)
-    try {
-      const r = await esoSystem.testLLM()
-      setTestResult(r.ok ? { status:'ok', message:`✓ ${r.model || sysInfo?.llm_model} responded` } : { status:'error', error: r.error || 'No response' })
-    } catch (e:any) { setTestResult({ status:'error', error: e.message }) }
-    setTesting(false)
-  }
-
-  const createKey = async () => {
+  async function createKey() {
     if (!newKeyName.trim()) return
-    setCreatingKey(true)
+    setLoading(true); setMsg('')
     try {
-      const r = await esoAuth.createKey(newKeyName.trim())
-      setNewKey(r.api_key); setNewKeyName(''); load()
-    } catch {}
-    setCreatingKey(false)
+      const r = await apiFetch('/auth/api-keys', { method:'POST', body:JSON.stringify({name:newKeyName.trim()}) })
+      setNewKey(r)
+      setNewKeyName('')
+      apiFetch('/auth/api-keys').then(r => setApiKeys(r.keys ?? []))
+      setMsg("✓ API key created — copy it now, it won't be shown again")
+    } catch(e:any) { setMsg(`✗ ${e.message}`) }
+    setLoading(false)
   }
 
-  const revokeKey = async (id: string) => {
-    if (!confirm('Revoke this API key?')) return
-    await esoAuth.revokeKey(id).catch(()=>{})
-    load()
+  async function revokeKey(keyId: string) {
+    try {
+      await apiFetch(`/auth/api-keys/${keyId}`, { method:'DELETE' })
+      setApiKeys(k => k.filter(k2 => k2.key_id !== keyId))
+      setMsg('✓ Key revoked')
+    } catch(e:any) { setMsg(`✗ ${e.message}`) }
   }
 
-  const providerModels = provider==='openai' ? OPENAI_MODELS : provider==='anthropic' ? ANTHROPIC_MODELS : null
+  if (!ready) return (
+    <div className="flex items-center justify-center h-64">
+      <div className="font-mono text-[11px] text-slate-600 animate-pulse">Loading account...</div>
+    </div>
+  )
+
+  const userTier  = user?.role === 'admin' ? 'admin' : (user?.tier ?? 'free')
+  const tierInfo  = TIER_INFO[userTier] ?? TIER_INFO.free
+  const isAdmin   = user?.role === 'admin'
+  const scansLeft = user?.scans_today !== undefined
+    ? Math.max(0, tierInfo.scans - (user.scans_today ?? 0))
+    : tierInfo.scans
+
+  const TABS = [
+    {id:'profile'  as const, label:'Profile',    icon:'👤'},
+    {id:'llm'      as const, label:'LLM Config',  icon:'🤖'},
+    {id:'apikeys'  as const, label:'API Keys',    icon:'🔑'},
+    {id:'billing'  as const, label:'Billing',     icon:'💳'},
+  ]
+
+  const inp = "w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5 font-mono text-[12px] text-slate-200 outline-none focus:border-accent/40 transition-colors placeholder-slate-700"
+  const sel = "w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-3 py-2.5 font-mono text-[12px] text-slate-200 outline-none focus:border-accent/40 transition-colors cursor-pointer"
 
   return (
-    <div className="p-3 sm:p-5 max-w-4xl">
-      <div className="mb-5">
-        <h1 className="text-2xl font-black">Scan Engine <span className="text-accent">Settings</span></h1>
-        <p className="font-mono text-[11px] text-slate-500 mt-1">Configure AI provider · Switch LLM at runtime · Manage API keys</p>
+    <div className="p-3 sm:p-5 max-w-2xl">
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h1 className="text-2xl font-black">Settings</h1>
+          <p className="font-mono text-[11px] text-slate-500 mt-1">
+            Account: <span className="text-accent">{user?.username}</span>
+            <span className="text-slate-700"> · </span>
+            <span style={{color:TIER_COLOR[userTier]}}>{userTier} tier</span>
+          </p>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Tabs */}
+      <div className="flex gap-1 mb-5 p-1 rounded-xl overflow-x-auto"
+        style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.06)'}}>
+        {TABS.map(t => (
+          <button key={t.id} onClick={()=>setTab(t.id)}
+            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg font-mono text-[11px] font-bold cursor-pointer transition-all"
+            style={tab===t.id
+              ?{background:'rgba(0,255,170,0.1)',border:'1px solid rgba(0,255,170,0.25)',color:'#00ffaa'}
+              :{color:'#475569',border:'1px solid transparent'}}>
+            <span>{t.icon}</span><span>{t.label}</span>
+          </button>
+        ))}
+      </div>
 
-        {/* ── LLM Provider ── */}
-        <div className="glass p-5 lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600">AI / LLM Provider</div>
-            {sysInfo && (
-              <div className="flex items-center gap-2 font-mono text-[10px]">
-                <span className="text-slate-600">Active:</span>
-                <span className="text-accent font-bold">{sysInfo.llm_provider}</span>
-                <span className="text-slate-600">·</span>
-                <span className="text-accent2">{sysInfo.llm_model}</span>
-              </div>
-            )}
+      {/* Message */}
+      {msg && (
+        <div className="mb-4 p-3 rounded-xl border font-mono text-[11px]"
+          style={msg.startsWith('✓')
+            ?{background:'rgba(0,255,170,0.06)',borderColor:'rgba(0,255,170,0.2)',color:'#00ffaa'}
+            :{background:'rgba(255,58,92,0.06)',borderColor:'rgba(255,58,92,0.2)',color:'#ff3a5c'}}>
+          {msg} <button onClick={()=>setMsg('')} className="ml-2 opacity-50 hover:opacity-100 cursor-pointer">✕</button>
+        </div>
+      )}
+
+      {/* ── PROFILE ── */}
+      {tab==='profile' && (
+        <div className="space-y-4">
+          {/* Account info */}
+          <div className="glass p-5">
+            <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-4">Account Info</div>
+            <div className="space-y-0">
+              {[
+                ['Username',    user?.username,    null],
+                ['Email',       user?.email,       null],
+                ['User ID',     user?.user_id,     null],
+                ['Role',        user?.role ?? 'user', user?.role==='admin'?'#ff3a5c':null],
+                ['Tier',        userTier,          TIER_COLOR[userTier]],
+                ['Tenant',      user?.tenant_id ?? 'default', null],
+                ['Member since',user?.created_at ? new Date(user.created_at).toLocaleDateString() : '—', null],
+              ].map(([label, val, color]) => (
+                <div key={String(label)} className="flex items-center justify-between py-2.5 border-b border-white/[0.04] last:border-0">
+                  <span className="font-mono text-[10px] text-slate-600">{label}</span>
+                  <span className="font-mono text-[11px]" style={{color: color as string ?? '#e2e8f0'}}>
+                    {String(val ?? '—')}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Provider selector */}
-          <div className="grid grid-cols-3 gap-2 mb-5">
-            {[
-              { id:'local',     name:'Ollama',    icon:'🏠', desc:'Free · Runs locally · No API key' },
-              { id:'openai',    name:'OpenAI',    icon:'🌐', desc:'GPT-4o · Best quality' },
-              { id:'anthropic', name:'Anthropic', icon:'🤖', desc:'Claude · Excellent JSON' },
-            ].map(p => (
-              <button key={p.id} onClick={()=>{ setProvider(p.id); setModel(''); setCustomModel('') }}
-                className="p-3 rounded-xl border text-left transition-all cursor-pointer"
-                style={provider===p.id
-                  ?{background:'rgba(0,255,170,0.08)',borderColor:'rgba(0,255,170,0.3)'}
-                  :{background:'rgba(255,255,255,0.02)',borderColor:'rgba(255,255,255,0.06)'}}>
-                <div className="text-xl mb-1">{p.icon}</div>
-                <div className="font-mono text-[12px] font-bold" style={{color:provider===p.id?'#00ffaa':'#94a3b8'}}>{p.name}</div>
-                <div className="font-mono text-[10px] text-slate-600 mt-0.5">{p.desc}</div>
-                {sysInfo?.llm_provider===p.id && (
-                  <div className="font-mono text-[9px] text-accent mt-1">● ACTIVE</div>
+          {/* Plan card */}
+          <div className="glass p-5">
+            <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-4">Current Plan</div>
+            <div className="p-4 rounded-xl border" style={{borderColor:TIER_BORDER[userTier],background:`${TIER_COLOR[userTier]}08`}}>
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-mono text-xl font-black capitalize" style={{color:TIER_COLOR[userTier]}}>{userTier}</span>
+                {!isAdmin && userTier !== 'enterprise' && (
+                  <Link href="/pricing"
+                    className="font-mono text-[11px] font-bold px-4 py-2 rounded-xl cursor-pointer transition-all"
+                    style={{background:'rgba(0,170,255,0.1)',border:'1px solid rgba(0,170,255,0.3)',color:'#00aaff'}}>
+                    Upgrade →
+                  </Link>
                 )}
+              </div>
+              {/* Usage stats */}
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  {label:'Scans Today',    val:`${user?.scans_today??0} / ${tierInfo.scans==='9999'?'∞':tierInfo.scans}`},
+                  {label:'Scans Left',     val:tierInfo.scans===9999?'∞':String(scansLeft)},
+                  {label:'Concurrent',     val:String(tierInfo.concurrent)},
+                  {label:'Total Scans',    val:String(user?.total_scans??0)},
+                ].map(s => (
+                  <div key={s.label} className="p-2.5 rounded-lg border border-white/[0.04] bg-white/[0.02]">
+                    <div className="font-mono text-[9px] text-slate-600 mb-1">{s.label}</div>
+                    <div className="font-mono text-[14px] font-bold" style={{color:TIER_COLOR[userTier]}}>{s.val}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 pt-3 border-t border-white/[0.06]">
+                <div className="font-mono text-[9px] text-slate-600 mb-1">Tools</div>
+                <div className="font-mono text-[10px] text-slate-400">{tierInfo.tools}</div>
+                {tierInfo.extra.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {tierInfo.extra.map(f => (
+                      <span key={f} className="font-mono text-[8px] px-1.5 py-[1px] rounded-full" style={{background:`${TIER_COLOR[userTier]}15`,color:TIER_COLOR[userTier]}}>
+                        ✓ {f}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── LLM ── */}
+      {tab==='llm' && (
+        <div className="glass p-5 space-y-4">
+          <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600">LLM Provider</div>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              {id:'local',     label:'Ollama',    desc:'Free · local · private'},
+              {id:'openai',    label:'OpenAI',    desc:'GPT-4o · API key required'},
+              {id:'anthropic', label:'Anthropic', desc:'Claude · API key required'},
+            ].map(p => (
+              <button key={p.id} onClick={()=>setProvider(p.id)}
+                className="p-3 rounded-xl border text-left cursor-pointer transition-all"
+                style={provider===p.id
+                  ?{background:'rgba(0,255,170,0.08)',borderColor:'rgba(0,255,170,0.3)',color:'#00ffaa'}
+                  :{background:'rgba(255,255,255,0.02)',borderColor:'rgba(255,255,255,0.08)',color:'#475569'}}>
+                <div className="font-mono text-[11px] font-bold">{p.label}</div>
+                <div className="font-mono text-[9px] mt-0.5 opacity-70">{p.desc}</div>
               </button>
             ))}
           </div>
 
-          {/* Model selection */}
-          <div className="space-y-3 mb-4">
-            {provider === 'local' && (
-              <>
-                <div>
-                  <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-2">Ollama URL</div>
-                  <input className={inp} value={ollamaUrl} onChange={e=>setOllamaUrl(e.target.value)} placeholder="http://localhost:11434"/>
-                </div>
-                <div>
-                  <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-2">Select Model</div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
-                    {OLLAMA_MODELS.map(m => (
-                      <button key={m.id} onClick={()=>{ setModel(m.id); setCustomModel('') }}
-                        className="flex items-start gap-2 p-2.5 rounded-lg border text-left transition-all cursor-pointer"
-                        style={model===m.id&&!customModel
-                          ?{background:'rgba(0,170,255,0.08)',borderColor:'rgba(0,170,255,0.3)'}
-                          :{background:'rgba(255,255,255,0.02)',borderColor:'rgba(255,255,255,0.06)'}}>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-mono text-[11px] font-bold text-slate-200 truncate">{m.id}</div>
-                          <div className="font-mono text-[9px] text-slate-600 mt-0.5">{m.size} · {m.note}</div>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <div className="font-mono text-[9px] text-slate-600">Speed {m.speed}</div>
-                          <div className="font-mono text-[9px] text-slate-600">Q {m.quality}</div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                  <div>
-                    <div className="font-mono text-[9px] text-slate-600 mb-1.5">Or type a custom model name:</div>
-                    <input className={inp} value={customModel} onChange={e=>setCustomModel(e.target.value)}
-                      placeholder="e.g. llama3.1:8b, gemma2:9b, codellama:13b ..."/>
-                  </div>
-                </div>
-                <div className="p-3 rounded-lg border border-yellow-500/20 bg-yellow-500/[0.04] font-mono text-[10px] text-yellow-500/80">
-                  ⚠ phi3:mini struggles with complex JSON planning. Recommend: <span className="text-yellow-400 font-bold">qwen2.5:7b</span> or <span className="text-yellow-400 font-bold">llama3.2:3b</span> for better scan proposals.
-                  <br/>Install: <span className="text-slate-400">ollama pull qwen2.5:7b</span>
-                </div>
-              </>
-            )}
-
-            {(provider === 'openai' || provider === 'anthropic') && (
-              <>
-                <div>
-                  <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-2">API Key</div>
-                  <div className="relative">
-                    <input className={inp} type={showKey?'text':'password'} value={apiKey}
-                      onChange={e=>setApiKey(e.target.value)}
-                      placeholder={provider==='openai'?'sk-...':'sk-ant-...'}/>
-                    <button onClick={()=>setShowKey(!showKey)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 font-mono text-[10px] text-slate-500 hover:text-slate-300 cursor-pointer">
-                      {showKey?'Hide':'Show'}
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-2">Model</div>
-                  <div className="grid grid-cols-2 gap-2 mb-2">
-                    {(providerModels??[]).map(m => (
-                      <button key={m.id} onClick={()=>setModel(m.id)}
-                        className="p-2.5 rounded-lg border text-left transition-all cursor-pointer"
-                        style={model===m.id
-                          ?{background:'rgba(0,170,255,0.08)',borderColor:'rgba(0,170,255,0.3)'}
-                          :{background:'rgba(255,255,255,0.02)',borderColor:'rgba(255,255,255,0.06)'}}>
-                        <div className="font-mono text-[11px] font-bold text-slate-200">{m.id}</div>
-                        <div className="font-mono text-[9px] text-slate-600 mt-0.5">{m.note}</div>
-                      </button>
-                    ))}
-                  </div>
-                  <input className={inp} value={customModel} onChange={e=>setCustomModel(e.target.value)} placeholder="Or enter custom model name..."/>
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* Actions */}
-          <div className="flex flex-wrap gap-2">
-            <button onClick={switchLLM} disabled={switching}
-              className="px-5 py-2.5 rounded-xl border font-mono text-[12px] font-bold cursor-pointer transition-all disabled:opacity-40"
-              style={{background:'rgba(0,255,170,0.1)',borderColor:'rgba(0,255,170,0.3)',color:'#00ffaa'}}>
-              {switching?'⟳ Switching...':'⚡ Apply & Switch'}
-            </button>
-            <button onClick={testLLM} disabled={testing}
-              className="px-5 py-2.5 rounded-xl border border-white/[0.08] font-mono text-[12px] text-slate-400 hover:text-slate-200 cursor-pointer transition-all disabled:opacity-40">
-              {testing?'⟳ Testing...':'🧪 Test Connection'}
-            </button>
-          </div>
-
-          {testResult && (
-            <div className="mt-3 p-3 rounded-lg border font-mono text-[11px]"
-              style={testResult.status==='ok'
-                ?{background:'rgba(0,255,170,0.06)',borderColor:'rgba(0,255,170,0.2)',color:'#00ffaa'}
-                :{background:'rgba(255,58,92,0.06)',borderColor:'rgba(255,58,92,0.2)',color:'#ff3a5c'}}>
-              {testResult.status==='ok'
-                ? `✓ ${testResult.message}`
-                : `✗ ${testResult.error}`}
+          {provider==='local' && (
+            <div className="space-y-2">
+              <label className="font-mono text-[9px] uppercase tracking-widest text-slate-600">Model</label>
+              <select value={model} onChange={e=>setModel(e.target.value)} className={sel}>
+                {OLLAMA_MODELS.map(m => <option key={m.id} value={m.id}>{m.id} ({m.size}) — {m.note}</option>)}
+              </select>
             </div>
           )}
-        </div>
+          {provider==='openai' && (
+            <div className="space-y-3">
+              <select value={model} onChange={e=>setModel(e.target.value)} className={sel}>
+                {['gpt-4o','gpt-4o-mini','gpt-4-turbo','gpt-3.5-turbo'].map(m=><option key={m}>{m}</option>)}
+              </select>
+              <input type="password" value={openaiKey} onChange={e=>setOpenaiKey(e.target.value)} placeholder="sk-..." className={inp}/>
+            </div>
+          )}
+          {provider==='anthropic' && (
+            <div className="space-y-3">
+              <select value={model} onChange={e=>setModel(e.target.value)} className={sel}>
+                {['claude-sonnet-4-6','claude-opus-4-6','claude-haiku-4-5-20251001'].map(m=><option key={m}>{m}</option>)}
+              </select>
+              <input type="password" value={anthropicKey} onChange={e=>setAnthropicKey(e.target.value)} placeholder="sk-ant-..." className={inp}/>
+            </div>
+          )}
 
-        {/* ── System info ── */}
-        <div className="glass p-5">
-          <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-3">Infrastructure</div>
-          {loading ? (
-            <div className="font-mono text-[11px] text-slate-600 animate-pulse">Connecting to ESO...</div>
-          ) : sysInfo ? (
-            <div className="space-y-2">
-              {Object.entries(sysInfo.services||{}).map(([name,status]:any) => {
-                const ok = String(status).includes('connect')
-                return (
-                  <div key={name} className="flex items-center justify-between py-2 border-b border-white/[0.04] last:border-0">
-                    <span className="text-[12px] capitalize text-slate-300">{name}</span>
-                    <span className="font-mono text-[10px] font-bold" style={{color:ok?'#00ffaa':'#ff3a5c'}}>
-                      {ok?'● Online':'○ Offline'}
-                    </span>
-                  </div>
-                )
-              })}
-              <div className="flex items-center justify-between py-2">
-                <span className="text-[12px] text-slate-300">Environment</span>
-                <span className="font-mono text-[10px] text-accent2">{sysInfo.environment}</span>
+          <button onClick={saveLLM} disabled={loading}
+            className="w-full py-2.5 rounded-xl font-mono text-[12px] font-bold cursor-pointer transition-all disabled:opacity-40"
+            style={{background:'rgba(0,255,170,0.1)',border:'1px solid rgba(0,255,170,0.3)',color:'#00ffaa'}}>
+            {loading ? '⟳ Saving...' : 'Save LLM Settings'}
+          </button>
+
+          {llmConfig && (
+            <div className="p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]">
+              <div className="font-mono text-[9px] text-slate-600 mb-1">Active</div>
+              <div className="font-mono text-[10px] text-slate-400">
+                {llmConfig.provider} · {llmConfig.model}
               </div>
             </div>
-          ) : (
-            <div className="font-mono text-[11px] text-red-400">ESO backend offline</div>
           )}
         </div>
+      )}
 
-        {/* ── API Keys ── */}
-        <div className="glass p-5">
-          <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-3">API Keys (for CI/CD)</div>
-          <div className="flex gap-2 mb-3">
-            <input className={`${inp} flex-1`} value={newKeyName} onChange={e=>setNewKeyName(e.target.value)}
-              placeholder="Key name (e.g. github-actions)" onKeyDown={e=>e.key==='Enter'&&createKey()}/>
-            <button onClick={createKey} disabled={creatingKey}
-              className="px-3 py-2 rounded-lg border font-mono text-[11px] font-bold cursor-pointer shrink-0 transition-all disabled:opacity-40"
-              style={{background:'rgba(0,255,170,0.1)',borderColor:'rgba(0,255,170,0.3)',color:'#00ffaa'}}>
-              {creatingKey?'...':'+ Create'}
-            </button>
-          </div>
-          {newKey && (
-            <div className="p-3 mb-3 rounded-lg border border-accent/20 bg-accent/[0.05]">
-              <div className="font-mono text-[9px] text-accent mb-1">⚠ Save this — won't be shown again:</div>
-              <div className="font-mono text-[10px] text-slate-300 break-all select-all">{newKey}</div>
+      {/* ── API KEYS ── */}
+      {tab==='apikeys' && (
+        <div className="space-y-4">
+          <div className="glass p-5">
+            <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-3">Create New Key</div>
+            <div className="flex gap-2">
+              <input value={newKeyName} onChange={e=>setNewKeyName(e.target.value)}
+                placeholder="Key name (e.g. CI/CD pipeline)" className={inp + ' flex-1'}
+                onKeyDown={e=>e.key==='Enter'&&createKey()}/>
+              <button onClick={createKey} disabled={loading||!newKeyName.trim()}
+                className="px-4 py-2.5 rounded-xl font-mono text-[11px] font-bold cursor-pointer transition-all disabled:opacity-40 shrink-0"
+                style={{background:'rgba(0,255,170,0.1)',border:'1px solid rgba(0,255,170,0.3)',color:'#00ffaa'}}>
+                Create
+              </button>
             </div>
-          )}
-          {keys.length===0 ? (
-            <div className="font-mono text-[11px] text-slate-600 py-4 text-center">No API keys yet</div>
-          ) : (
-            <div className="space-y-2">
-              {keys.map(k=>(
-                <div key={k.key_id} className="flex items-center justify-between p-2.5 rounded-lg border border-white/[0.06] bg-white/[0.02]">
+            {newKey && (
+              <div className="mt-3 p-3 rounded-xl border border-yellow-500/20 bg-yellow-500/[0.04]">
+                <div className="font-mono text-[9px] text-yellow-500/70 mb-2">⚠ Copy now — won't be shown again</div>
+                <code className="font-mono text-[11px] text-yellow-400 break-all">{newKey.api_key ?? newKey.key}</code>
+              </div>
+            )}
+          </div>
+
+          <div className="glass overflow-hidden">
+            <div className="px-4 py-2.5 border-b border-white/[0.06]">
+              <span className="font-mono text-[10px] text-accent uppercase tracking-widest">Active Keys ({apiKeys.length})</span>
+            </div>
+            {apiKeys.length===0
+              ? <div className="p-8 text-center font-mono text-[11px] text-slate-600">No API keys yet</div>
+              : apiKeys.map(k => (
+                <div key={k.key_id} className="flex items-center justify-between px-4 py-3 border-b border-white/[0.03] last:border-0">
                   <div>
-                    <div className="text-[12px] font-semibold text-slate-200">{k.name}</div>
-                    <div className="font-mono text-[9px] text-slate-600">{k.key_prefix}... · {k.is_active?'Active':'Revoked'}</div>
+                    <div className="font-mono text-[12px] text-slate-200 font-semibold">{k.name}</div>
+                    <div className="font-mono text-[9px] text-slate-600 mt-0.5">
+                      {k.key_prefix}... · {new Date(k.created_at).toLocaleDateString()}
+                    </div>
                   </div>
-                  {k.is_active&&(
-                    <button onClick={()=>revokeKey(k.key_id)} className="font-mono text-[10px] text-red-400 hover:text-red-300 cursor-pointer">Revoke</button>
-                  )}
+                  <button onClick={()=>revokeKey(k.key_id)}
+                    className="font-mono text-[9px] text-red-400 hover:text-red-300 cursor-pointer">Revoke</button>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      )}
+
+      {/* ── BILLING ── */}
+      {tab==='billing' && (
+        <div className="space-y-4">
+          <div className="glass p-5">
+            <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-4">Subscription</div>
+            <div className="p-4 rounded-xl border" style={{borderColor:TIER_BORDER[userTier],background:`${TIER_COLOR[userTier]}06`}}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-mono text-lg font-bold capitalize" style={{color:TIER_COLOR[userTier]}}>{userTier}</div>
+                  <div className="font-mono text-[10px] text-slate-600 mt-1">
+                    {userTier==='free'?'$0 / month':userTier==='pro'?'$29 / month':userTier==='enterprise'?'$99 / month':userTier==='admin'?'Admin — no billing':'—'}
+                  </div>
+                </div>
+                {!isAdmin && (
+                  <div className="text-right">
+                    <div className="font-mono text-[9px] text-slate-600">Renews</div>
+                    <div className="font-mono text-[10px] text-slate-400">—</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {!isAdmin && (
+            <div className="glass p-5">
+              <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-4">Available Plans</div>
+              {[
+                {tier:'free',       price:'$0',   label:'Free',       color:'#64748b'},
+                {tier:'pro',        price:'$29',  label:'Pro',        color:'#00aaff'},
+                {tier:'enterprise', price:'$99',  label:'Enterprise', color:'#a78bfa'},
+              ].map(plan=>(
+                <div key={plan.tier} className="flex items-center justify-between py-3 border-b border-white/[0.04] last:border-0">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-[12px] font-bold" style={{color:plan.color}}>{plan.label}</span>
+                    {plan.tier===userTier && (
+                      <span className="font-mono text-[8px] px-1.5 py-[1px] rounded-full" style={{background:`${plan.color}20`,color:plan.color}}>CURRENT</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-[14px] font-bold" style={{color:plan.color}}>{plan.price}<span className="text-[9px] font-normal text-slate-600">/mo</span></span>
+                    {plan.tier!==userTier && plan.tier!=='free' && (
+                      <Link href={`/pricing?plan=${plan.tier}`}
+                        className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-all"
+                        style={{background:`${plan.color}10`,border:`1px solid ${plan.color}40`,color:plan.color}}>
+                        {userTier==='free'||(['pro','enterprise'].indexOf(plan.tier)>['pro','enterprise'].indexOf(userTier)) ? 'Upgrade' : 'Downgrade'}
+                      </Link>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
           )}
-        </div>
 
-      </div>
+          <div className="glass p-4 text-center">
+            <p className="font-mono text-[11px] text-slate-600">
+              Payments via Razorpay · Cancel anytime ·{' '}
+              <a href="mailto:billing@xcloak.app" className="text-accent2 hover:underline">Contact billing</a>
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
