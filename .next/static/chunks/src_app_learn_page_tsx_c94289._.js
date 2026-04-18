@@ -16,6 +16,7 @@ var _s = __turbopack_refresh__.signature();
 'use client';
 ;
 ;
+// ── Static curriculum — modules are real topics with real links ───────────────
 const TRACKS = [
     {
         id: 'beginner',
@@ -27,32 +28,32 @@ const TRACKS = [
             {
                 title: 'What is cybersecurity?',
                 type: 'read',
-                done: true
+                url: 'https://www.cloudflare.com/learning/security/what-is-cybersecurity/'
             },
             {
                 title: 'Understanding the CIA Triad',
                 type: 'read',
-                done: true
+                url: 'https://www.nist.gov/cybersecurity'
             },
             {
                 title: 'How the Web works (HTTP/HTTPS)',
                 type: 'read',
-                done: false
+                url: 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview'
             },
             {
-                title: 'Common attack types overview',
+                title: 'OWASP Top 10 Overview',
                 type: 'read',
-                done: false
+                url: 'https://owasp.org/www-project-top-ten/'
             },
             {
-                title: 'Setting up a lab with VirtualBox',
+                title: 'Setting up Kali Linux',
                 type: 'lab',
-                done: false
+                url: 'https://www.kali.org/docs/installation/'
             },
             {
                 title: 'First CTF: Cookie Monster',
                 type: 'ctf',
-                done: false
+                url: '/ctf'
             }
         ]
     },
@@ -66,37 +67,47 @@ const TRACKS = [
             {
                 title: 'SQL Injection — theory & practice',
                 type: 'read',
-                done: false
+                url: 'https://portswigger.net/web-security/sql-injection'
             },
             {
                 title: 'Cross-Site Scripting (XSS)',
                 type: 'read',
-                done: false
+                url: 'https://portswigger.net/web-security/cross-site-scripting'
             },
             {
                 title: 'CSRF — attack and defense',
                 type: 'read',
-                done: false
+                url: 'https://portswigger.net/web-security/csrf'
             },
             {
-                title: 'Authentication flaws (JWT, sessions)',
+                title: 'JWT Authentication Flaws',
                 type: 'read',
-                done: false
+                url: 'https://portswigger.net/web-security/jwt'
             },
             {
-                title: 'SSRF & XXE injection',
+                title: 'SSRF & XXE Injection',
                 type: 'read',
-                done: false
+                url: 'https://portswigger.net/web-security/ssrf'
             },
             {
-                title: 'Burp Suite fundamentals',
+                title: 'Burp Suite Fundamentals',
                 type: 'lab',
-                done: false
+                url: 'https://portswigger.net/burp/documentation/desktop/getting-started'
             },
             {
-                title: 'CTF: SQLi in the Dark',
+                title: 'CTF: JWT Forgery',
                 type: 'ctf',
-                done: false
+                url: '/ctf'
+            },
+            {
+                title: 'CTF: SSTI — Template Injection',
+                type: 'ctf',
+                url: '/ctf'
+            },
+            {
+                title: 'PortSwigger Labs (free)',
+                type: 'lab',
+                url: 'https://portswigger.net/web-security/all-labs'
             }
         ]
     },
@@ -108,39 +119,39 @@ const TRACKS = [
         desc: 'Low-level attack techniques',
         modules: [
             {
-                title: 'x86/x64 assembly basics',
+                title: 'x86/x64 Assembly Basics',
                 type: 'read',
-                done: false
+                url: 'https://cs.lmu.edu/~ray/notes/x86assembly/'
             },
             {
-                title: 'Stack buffer overflows',
+                title: 'Stack Buffer Overflows',
                 type: 'read',
-                done: false
+                url: 'https://azeria-labs.com/stack-overflow-arm32/'
             },
             {
                 title: 'Return-Oriented Programming (ROP)',
                 type: 'read',
-                done: false
+                url: 'https://en.wikipedia.org/wiki/Return-oriented_programming'
             },
             {
-                title: 'Heap exploitation fundamentals',
+                title: 'Heap Exploitation Fundamentals',
                 type: 'read',
-                done: false
+                url: 'https://heap-exploitation.dhavalkapil.com/'
             },
             {
-                title: 'Format string vulnerabilities',
-                type: 'read',
-                done: false
-            },
-            {
-                title: 'GDB & pwntools setup',
+                title: 'pwntools Setup & Usage',
                 type: 'lab',
-                done: false
+                url: 'https://github.com/Gallopsled/pwntools'
             },
             {
-                title: 'CTF: Stack Smasher',
+                title: 'CTF: Binary Exploit — Buffer Overflow',
                 type: 'ctf',
-                done: false
+                url: '/ctf'
+            },
+            {
+                title: 'pwn.college (free platform)',
+                type: 'lab',
+                url: 'https://pwn.college'
             }
         ]
     },
@@ -152,34 +163,29 @@ const TRACKS = [
         desc: 'Packets, protocols, and pivoting',
         modules: [
             {
-                title: 'TCP/IP deep dive',
+                title: 'TCP/IP Deep Dive',
                 type: 'read',
-                done: false
+                url: 'https://www.cloudflare.com/learning/network-layer/what-is-the-network-layer/'
             },
             {
-                title: 'Network scanning with Nmap',
+                title: 'Network Scanning with Nmap',
                 type: 'lab',
-                done: false
+                url: 'https://nmap.org/book/man.html'
             },
             {
-                title: 'Man-in-the-Middle attacks',
+                title: 'Man-in-the-Middle Attacks',
                 type: 'read',
-                done: false
+                url: 'https://book.hacktricks.xyz/generic-methodologies-and-resources/pentesting-network/spoofing-arp-dns-dhcp-packets-and-sniffing'
             },
             {
-                title: 'VPN & tunneling techniques',
-                type: 'read',
-                done: false
-            },
-            {
-                title: 'Wireshark packet analysis',
+                title: 'Wireshark Packet Analysis',
                 type: 'lab',
-                done: false
+                url: 'https://www.wireshark.org/docs/wsug_html_chunked/'
             },
             {
-                title: 'CTF: Phantom Packet',
-                type: 'ctf',
-                done: false
+                title: 'VPN & Tunneling Techniques',
+                type: 'read',
+                url: 'https://book.hacktricks.xyz/tunneling-and-port-forwarding'
             }
         ]
     },
@@ -191,34 +197,29 @@ const TRACKS = [
         desc: 'Breaking and building secure systems',
         modules: [
             {
-                title: 'Symmetric encryption (AES)',
+                title: 'Symmetric Encryption (AES)',
                 type: 'read',
-                done: false
+                url: 'https://cryptohack.org/courses/symmetric/'
             },
             {
-                title: 'Asymmetric encryption (RSA)',
+                title: 'RSA — Math & Attacks',
                 type: 'read',
-                done: false
+                url: 'https://cryptohack.org/courses/public-key/'
             },
             {
-                title: 'Hash functions & collisions',
+                title: 'Hash Functions & Collisions',
                 type: 'read',
-                done: false
+                url: 'https://cryptohack.org/courses/hashing/'
             },
             {
-                title: 'Padding oracle attacks',
-                type: 'read',
-                done: false
-            },
-            {
-                title: "Wiener's attack on RSA",
-                type: 'read',
-                done: false
-            },
-            {
-                title: "CTF: RSA with Twist",
+                title: 'CTF: RSA Small Exponent',
                 type: 'ctf',
-                done: false
+                url: '/ctf'
+            },
+            {
+                title: 'CryptoHack (free platform)',
+                type: 'lab',
+                url: 'https://cryptohack.org'
             }
         ]
     },
@@ -230,34 +231,34 @@ const TRACKS = [
         desc: 'Advanced offensive techniques',
         modules: [
             {
-                title: 'OPSEC fundamentals',
+                title: 'OPSEC Fundamentals',
                 type: 'read',
-                done: false
+                url: 'https://book.hacktricks.xyz/generic-methodologies-and-resources/external-recon-methodology'
             },
             {
-                title: 'Active Directory attacks',
+                title: 'Active Directory Attacks',
                 type: 'read',
-                done: false
+                url: 'https://book.hacktricks.xyz/windows-hardening/active-directory-methodology'
             },
             {
-                title: 'Lateral movement techniques',
+                title: 'Lateral Movement Techniques',
                 type: 'read',
-                done: false
+                url: 'https://attack.mitre.org/tactics/TA0008/'
             },
             {
-                title: 'C2 frameworks (Cobalt Strike, Sliver)',
+                title: 'C2 Frameworks Overview',
                 type: 'read',
-                done: false
+                url: 'https://github.com/vysecurity/RedTips'
             },
             {
-                title: 'Malware development basics',
-                type: 'read',
-                done: false
-            },
-            {
-                title: 'Full red team simulation',
+                title: 'HackTheBox Pro Labs',
                 type: 'lab',
-                done: false
+                url: 'https://www.hackthebox.com/hacker/pro-labs'
+            },
+            {
+                title: 'MITRE ATT&CK Framework',
+                type: 'read',
+                url: 'https://attack.mitre.org/'
             }
         ]
     }
@@ -273,10 +274,10 @@ const RESOURCES = [
         name: 'TryHackMe',
         url: 'https://tryhackme.com',
         icon: '🎯',
-        desc: 'Guided learning paths'
+        desc: 'Guided paths'
     },
     {
-        name: 'PortSwigger Labs',
+        name: 'PortSwigger',
         url: 'https://portswigger.net/web-security',
         icon: '🔬',
         desc: 'Web security labs'
@@ -300,6 +301,18 @@ const RESOURCES = [
         desc: 'Technique bible'
     },
     {
+        name: 'CryptoHack',
+        url: 'https://cryptohack.org',
+        icon: '🔐',
+        desc: 'Crypto challenges'
+    },
+    {
+        name: 'pwn.college',
+        url: 'https://pwn.college',
+        icon: '💣',
+        desc: 'Binary exploitation'
+    },
+    {
         name: 'Exploit-DB',
         url: 'https://exploit-db.com',
         icon: '💾',
@@ -309,7 +322,19 @@ const RESOURCES = [
         name: 'GTFOBins',
         url: 'https://gtfobins.github.io',
         icon: '🚀',
-        desc: 'Unix privilege escalation'
+        desc: 'Unix privesc'
+    },
+    {
+        name: 'MITRE ATT&CK',
+        url: 'https://attack.mitre.org',
+        icon: '🎭',
+        desc: 'Adversary tactics'
+    },
+    {
+        name: 'OWASP',
+        url: 'https://owasp.org',
+        icon: '🛡',
+        desc: 'Web security standards'
     }
 ];
 const TYPE_ICON = {
@@ -322,54 +347,118 @@ const TYPE_COLOR = {
     lab: 'text-accent2',
     ctf: 'text-yellow-400'
 };
+const STORAGE_KEY = 'xcloak:learn:progress';
 function LearnPage() {
     _s();
     const [activeTrack, setActiveTrack] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('beginner');
     const [progress, setProgress] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({});
-    const track = TRACKS.find((t)=>t.id === activeTrack);
+    const [loaded, setLoaded] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    // Load progress from localStorage on mount
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "LearnPage.useEffect": ()=>{
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) setProgress(JSON.parse(saved));
+            } catch  {}
+            setLoaded(true);
+        }
+    }["LearnPage.useEffect"], []);
+    // Persist on every change
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "LearnPage.useEffect": ()=>{
+            if (!loaded) return;
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+            } catch  {}
+        }
+    }["LearnPage.useEffect"], [
+        progress,
+        loaded
+    ]);
     function toggle(key) {
         setProgress((p)=>({
                 ...p,
                 [key]: !p[key]
             }));
     }
-    const totalDone = track.modules.filter((m, i)=>m.done || progress[`${activeTrack}-${i}`]).length;
+    const track = TRACKS.find((t)=>t.id === activeTrack);
+    const totalDone = track.modules.filter((_, i)=>progress[`${activeTrack}-${i}`]).length;
+    // Overall progress across all tracks
+    const overallTotal = TRACKS.reduce((s, t)=>s + t.modules.length, 0);
+    const overallDone = TRACKS.reduce((s, t)=>s + t.modules.filter((_, i)=>progress[`${t.id}-${i}`] ? 1 : 0).length, 0);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "p-5",
+        className: "p-3 sm:p-5",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "mb-5",
+                className: "flex items-start justify-between mb-5 flex-wrap gap-3",
                 children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                        className: "text-2xl font-black",
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         children: [
-                            "Learning ",
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "text-accent",
-                                children: "Paths"
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
+                                className: "text-2xl font-black",
+                                children: [
+                                    "Learning ",
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-accent",
+                                        children: "Paths"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/learn/page.tsx",
+                                        lineNumber: 139,
+                                        columnNumber: 56
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/learn/page.tsx",
+                                lineNumber: 139,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "font-mono text-[11px] text-slate-500 mt-1",
+                                children: "Structured cybersecurity curriculum — beginner to red team · progress saved locally"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/learn/page.tsx",
-                                lineNumber: 133,
-                                columnNumber: 54
+                                lineNumber: 140,
+                                columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/learn/page.tsx",
-                        lineNumber: 133,
+                        lineNumber: 138,
                         columnNumber: 9
                     }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                        className: "font-mono text-[11px] text-slate-500 mt-1",
-                        children: "Structured cybersecurity curriculum — beginner to red team"
-                    }, void 0, false, {
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "glass px-4 py-2.5 rounded-xl text-center",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "font-mono text-xl font-bold text-accent",
+                                children: [
+                                    overallDone,
+                                    "/",
+                                    overallTotal
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/learn/page.tsx",
+                                lineNumber: 145,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "font-mono text-[8px] text-slate-600 uppercase tracking-widest",
+                                children: "Total Done"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/learn/page.tsx",
+                                lineNumber: 148,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
                         fileName: "[project]/src/app/learn/page.tsx",
-                        lineNumber: 134,
+                        lineNumber: 144,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/learn/page.tsx",
-                lineNumber: 132,
+                lineNumber: 137,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -378,15 +467,14 @@ function LearnPage() {
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "space-y-2",
                         children: TRACKS.map((t)=>{
-                            const done = t.modules.filter((m, i)=>m.done || progress[`${t.id}-${i}`]).length;
+                            const done = t.modules.filter((_, i)=>progress[`${t.id}-${i}`]).length;
                             const pct = Math.round(done / t.modules.length * 100);
                             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                 onClick: ()=>setActiveTrack(t.id),
-                                className: `w-full text-left p-3.5 rounded-xl border transition-all duration-150 block
-                  ${activeTrack === t.id ? 'border-opacity-50' : 'border-white/[0.06] hover:border-white/[0.12]'}`,
+                                className: "w-full text-left p-3.5 rounded-xl border transition-all block cursor-pointer",
                                 style: {
                                     background: activeTrack === t.id ? `${t.color}12` : 'rgba(255,255,255,0.025)',
-                                    borderColor: activeTrack === t.id ? `${t.color}40` : undefined
+                                    borderColor: activeTrack === t.id ? `${t.color}40` : 'rgba(255,255,255,0.06)'
                                 },
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -397,7 +485,7 @@ function LearnPage() {
                                                 children: t.icon
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/learn/page.tsx",
-                                                lineNumber: 156,
+                                                lineNumber: 167,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -408,13 +496,13 @@ function LearnPage() {
                                                 children: t.label
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/learn/page.tsx",
-                                                lineNumber: 157,
+                                                lineNumber: 168,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/learn/page.tsx",
-                                        lineNumber: 155,
+                                        lineNumber: 166,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -422,7 +510,7 @@ function LearnPage() {
                                         children: t.desc
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/learn/page.tsx",
-                                        lineNumber: 161,
+                                        lineNumber: 172,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -435,12 +523,12 @@ function LearnPage() {
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/learn/page.tsx",
-                                            lineNumber: 164,
+                                            lineNumber: 174,
                                             columnNumber: 19
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/learn/page.tsx",
-                                        lineNumber: 163,
+                                        lineNumber: 173,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -453,19 +541,19 @@ function LearnPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/learn/page.tsx",
-                                        lineNumber: 167,
+                                        lineNumber: 177,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, t.id, true, {
                                 fileName: "[project]/src/app/learn/page.tsx",
-                                lineNumber: 146,
+                                lineNumber: 160,
                                 columnNumber: 15
                             }, this);
                         })
                     }, void 0, false, {
                         fileName: "[project]/src/app/learn/page.tsx",
-                        lineNumber: 141,
+                        lineNumber: 155,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -482,7 +570,7 @@ function LearnPage() {
                                                 children: track.icon
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/learn/page.tsx",
-                                                lineNumber: 178,
+                                                lineNumber: 187,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -495,7 +583,7 @@ function LearnPage() {
                                                         children: track.label
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/learn/page.tsx",
-                                                        lineNumber: 180,
+                                                        lineNumber: 189,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -503,13 +591,13 @@ function LearnPage() {
                                                         children: track.desc
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/learn/page.tsx",
-                                                        lineNumber: 181,
+                                                        lineNumber: 190,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/learn/page.tsx",
-                                                lineNumber: 179,
+                                                lineNumber: 188,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -526,7 +614,7 @@ function LearnPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/learn/page.tsx",
-                                                        lineNumber: 184,
+                                                        lineNumber: 193,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -534,19 +622,19 @@ function LearnPage() {
                                                         children: "COMPLETE"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/learn/page.tsx",
-                                                        lineNumber: 187,
+                                                        lineNumber: 196,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/learn/page.tsx",
-                                                lineNumber: 183,
+                                                lineNumber: 192,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/learn/page.tsx",
-                                        lineNumber: 177,
+                                        lineNumber: 186,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -559,55 +647,66 @@ function LearnPage() {
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/learn/page.tsx",
-                                            lineNumber: 191,
+                                            lineNumber: 200,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/learn/page.tsx",
-                                        lineNumber: 190,
+                                        lineNumber: 199,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/learn/page.tsx",
-                                lineNumber: 176,
+                                lineNumber: 185,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "glass overflow-hidden",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "px-4 py-2.5 border-b border-white/[0.06]",
-                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "font-mono text-[10px] tracking-widest uppercase",
-                                            style: {
-                                                color: track.color
-                                            },
-                                            children: "Modules"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/app/learn/page.tsx",
-                                            lineNumber: 199,
-                                            columnNumber: 15
-                                        }, this)
-                                    }, void 0, false, {
+                                        className: "px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "font-mono text-[10px] tracking-widest uppercase",
+                                                style: {
+                                                    color: track.color
+                                                },
+                                                children: [
+                                                    "Modules (",
+                                                    track.modules.length,
+                                                    ")"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/learn/page.tsx",
+                                                lineNumber: 208,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "font-mono text-[9px] text-slate-700",
+                                                children: "Click to mark done"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/learn/page.tsx",
+                                                lineNumber: 211,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
                                         fileName: "[project]/src/app/learn/page.tsx",
-                                        lineNumber: 198,
+                                        lineNumber: 207,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "divide-y divide-white/[0.03]",
                                         children: track.modules.map((mod, i)=>{
                                             const key = `${activeTrack}-${i}`;
-                                            const done = mod.done || progress[key];
+                                            const done = !!progress[key];
                                             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: `flex items-center gap-4 px-4 py-3.5 cursor-pointer
-                                transition-colors hover:bg-white/[0.03]
-                                ${done ? 'opacity-70' : ''}`,
+                                                className: `flex items-center gap-4 px-4 py-3.5 cursor-pointer transition-colors hover:bg-white/[0.03] ${done ? 'opacity-60' : ''}`,
                                                 onClick: ()=>toggle(key),
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: `w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-all
-                                    ${done ? 'border-current' : 'border-white/[0.15]'}`,
+                                                        className: `w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-all ${done ? 'border-current' : 'border-white/[0.15]'}`,
                                                         style: {
                                                             color: done ? track.color : undefined,
                                                             background: done ? `${track.color}20` : undefined
@@ -617,39 +716,39 @@ function LearnPage() {
                                                             children: "✓"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/learn/page.tsx",
-                                                            lineNumber: 218,
+                                                            lineNumber: 225,
                                                             columnNumber: 32
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/learn/page.tsx",
-                                                        lineNumber: 214,
+                                                        lineNumber: 223,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "flex-1",
+                                                        className: "flex-1 min-w-0",
                                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: `text-[13px] font-semibold transition-colors
-                                      ${done ? 'line-through text-slate-600' : 'text-slate-200'}`,
+                                                            className: `text-[13px] font-semibold transition-colors ${done ? 'line-through text-slate-600' : 'text-slate-200'}`,
                                                             children: mod.title
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/learn/page.tsx",
-                                                            lineNumber: 223,
+                                                            lineNumber: 230,
                                                             columnNumber: 23
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/learn/page.tsx",
-                                                        lineNumber: 222,
+                                                        lineNumber: 229,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                         className: "flex items-center gap-1.5 shrink-0",
+                                                        onClick: (e)=>e.stopPropagation(),
                                                         children: [
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 className: "text-sm",
                                                                 children: TYPE_ICON[mod.type]
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/learn/page.tsx",
-                                                                lineNumber: 231,
+                                                                lineNumber: 237,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -657,51 +756,55 @@ function LearnPage() {
                                                                 children: mod.type
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/learn/page.tsx",
-                                                                lineNumber: 232,
+                                                                lineNumber: 238,
                                                                 columnNumber: 23
                                                             }, this),
-                                                            mod.type === 'ctf' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                                                href: "/ctf",
-                                                                onClick: (e)=>e.stopPropagation(),
-                                                                className: "font-mono text-[9px] px-1.5 py-[1px] rounded border border-yellow-500/25 bg-yellow-500/10 text-yellow-400 hover:bg-yellow-500/20 transition-colors",
+                                                            mod.url && (mod.url.startsWith('/') ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                                                href: mod.url,
+                                                                className: "font-mono text-[9px] px-1.5 py-[1px] rounded border transition-colors",
+                                                                style: {
+                                                                    borderColor: mod.type === 'ctf' ? 'rgba(255,215,0,0.25)' : 'rgba(0,170,255,0.25)',
+                                                                    background: mod.type === 'ctf' ? 'rgba(255,215,0,0.08)' : 'rgba(0,170,255,0.08)',
+                                                                    color: mod.type === 'ctf' ? '#ffd700' : '#00aaff'
+                                                                },
                                                                 children: "OPEN →"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/learn/page.tsx",
-                                                                lineNumber: 236,
-                                                                columnNumber: 25
-                                                            }, this),
-                                                            mod.type === 'lab' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                                                href: "/playground",
-                                                                onClick: (e)=>e.stopPropagation(),
-                                                                className: "font-mono text-[9px] px-1.5 py-[1px] rounded border border-accent2/25 bg-accent2/10 text-accent2 hover:bg-accent2/20 transition-colors",
-                                                                children: "LAB →"
+                                                                lineNumber: 241,
+                                                                columnNumber: 27
+                                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                                                href: mod.url,
+                                                                target: "_blank",
+                                                                rel: "noreferrer",
+                                                                className: "font-mono text-[9px] px-1.5 py-[1px] rounded border border-white/[0.1] text-slate-500 hover:text-slate-300 transition-colors",
+                                                                children: "READ ↗"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/learn/page.tsx",
-                                                                lineNumber: 244,
-                                                                columnNumber: 25
-                                                            }, this)
+                                                                lineNumber: 251,
+                                                                columnNumber: 27
+                                                            }, this))
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/learn/page.tsx",
-                                                        lineNumber: 230,
+                                                        lineNumber: 236,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, i, true, {
                                                 fileName: "[project]/src/app/learn/page.tsx",
-                                                lineNumber: 207,
+                                                lineNumber: 218,
                                                 columnNumber: 19
                                             }, this);
                                         })
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/learn/page.tsx",
-                                        lineNumber: 202,
+                                        lineNumber: 213,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/learn/page.tsx",
-                                lineNumber: 197,
+                                lineNumber: 206,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -711,19 +814,19 @@ function LearnPage() {
                                         className: "px-4 py-2.5 border-b border-white/[0.06]",
                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             className: "font-mono text-[10px] text-slate-500 tracking-widest uppercase",
-                                            children: "External Resources"
+                                            children: "Essential Resources"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/learn/page.tsx",
-                                            lineNumber: 261,
+                                            lineNumber: 267,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/learn/page.tsx",
-                                        lineNumber: 260,
+                                        lineNumber: 266,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "grid grid-cols-4 gap-0",
+                                        className: "grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-0",
                                         children: RESOURCES.map((r, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
                                                 href: r.url,
                                                 target: "_blank",
@@ -735,7 +838,7 @@ function LearnPage() {
                                                         children: r.icon
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/learn/page.tsx",
-                                                        lineNumber: 270,
+                                                        lineNumber: 275,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -745,7 +848,7 @@ function LearnPage() {
                                                                 children: r.name
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/learn/page.tsx",
-                                                                lineNumber: 272,
+                                                                lineNumber: 277,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -753,52 +856,70 @@ function LearnPage() {
                                                                 children: r.desc
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/learn/page.tsx",
-                                                                lineNumber: 273,
+                                                                lineNumber: 278,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/learn/page.tsx",
-                                                        lineNumber: 271,
+                                                        lineNumber: 276,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, i, true, {
                                                 fileName: "[project]/src/app/learn/page.tsx",
-                                                lineNumber: 267,
+                                                lineNumber: 273,
                                                 columnNumber: 17
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/learn/page.tsx",
-                                        lineNumber: 265,
+                                        lineNumber: 271,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/learn/page.tsx",
-                                lineNumber: 259,
+                                lineNumber: 265,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "text-right",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: ()=>{
+                                        if (confirm('Reset all progress?')) setProgress({});
+                                    },
+                                    className: "font-mono text-[9px] text-slate-700 hover:text-red-400 transition-colors cursor-pointer",
+                                    children: "Reset progress"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/app/learn/page.tsx",
+                                    lineNumber: 287,
+                                    columnNumber: 13
+                                }, this)
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/learn/page.tsx",
+                                lineNumber: 286,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/learn/page.tsx",
-                        lineNumber: 174,
+                        lineNumber: 184,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/learn/page.tsx",
-                lineNumber: 139,
+                lineNumber: 152,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/learn/page.tsx",
-        lineNumber: 131,
+        lineNumber: 136,
         columnNumber: 5
     }, this);
 }
-_s(LearnPage, "kJpQjn7f9hIvQov4pucnCGcEuy8=");
+_s(LearnPage, "Xv6SgVmR+CNMjLL4W48BrPj+CH0=");
 _c = LearnPage;
 var _c;
 __turbopack_refresh__.register(_c, "LearnPage");

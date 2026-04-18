@@ -15,7 +15,14 @@ async function esoFetch(path: string, opts?: RequestInit) {
     ...opts,
     headers: { 'Content-Type':'application/json', ...(token?{Authorization:`Bearer ${token}`}:{}), ...opts?.headers },
   })
-  if (!res.ok) throw new Error(await res.text().catch(()=>res.statusText))
+  if (!res.ok) {
+    const ct = res.headers.get('content-type') ?? ''
+    if (ct.includes('application/json')) {
+      const d = await res.json().catch(() => ({}))
+      throw new Error(d.detail ?? d.error ?? `HTTP ${res.status}`)
+    }
+    throw new Error(`HTTP ${res.status} ${res.statusText}`)
+  }
   return res.json()
 }
 
@@ -25,12 +32,19 @@ async function xcloakFetch(path: string, opts?: RequestInit) {
     ...opts,
     headers: {
       'Content-Type': 'application/json',
-      // Send ESO bearer token as x-admin-token for xcloak admin API auth
       ...(token ? { 'x-admin-token': token } : {}),
       ...opts?.headers,
     },
   })
-  if (!res.ok) throw new Error(await res.text().catch(()=>res.statusText))
+  if (!res.ok) {
+    // Parse error cleanly — don't dump raw HTML
+    const ct = res.headers.get('content-type') ?? ''
+    if (ct.includes('application/json')) {
+      const d = await res.json().catch(() => ({}))
+      throw new Error(d.error ?? d.detail ?? `HTTP ${res.status}`)
+    }
+    throw new Error(`HTTP ${res.status} ${res.statusText}`)
+  }
   return res.json()
 }
 
@@ -129,11 +143,11 @@ export default function AdminPage() {
     catch(e:any) { setMsg(`✗ ${e.message}`) }
   }
   async function reviewExploit(id: string, action: 'approved'|'rejected', note='') {
-    try { await xcloakFetch(`/api/v1/admin/exploits/${id}/review`,{method:'POST',body:JSON.stringify({status:action,reviewNote:note})}); setMsg(`✓ Exploit ${action}`); load() }
+    try { await xcloakFetch(`/api/v1/admin/exploits/${id}`,{method:'POST',body:JSON.stringify({status:action,reviewNote:note})}); setMsg(`✓ Exploit ${action}`); load() }
     catch(e:any) { setMsg(`✗ ${e.message}`) }
   }
   async function reviewCTF(id: string, action: 'approved'|'rejected', note='') {
-    try { await xcloakFetch(`/api/v1/admin/ctf/${id}/review`,{method:'POST',body:JSON.stringify({status:action,reviewNote:note})}); setMsg(`✓ CTF ${action}`); load() }
+    try { await xcloakFetch(`/api/v1/admin/ctf/${id}`,{method:'POST',body:JSON.stringify({status:action,reviewNote:note})}); setMsg(`✓ CTF ${action}`); load() }
     catch(e:any) { setMsg(`✗ ${e.message}`) }
   }
 

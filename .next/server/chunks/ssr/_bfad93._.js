@@ -135,7 +135,7 @@ function CommentItem({ c, exploitId, depth = 0 }) {
                                 children: c.authorAlias[0].toUpperCase()
                             }, void 0, false, {
                                 fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                lineNumber: 90,
+                                lineNumber: 91,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -143,7 +143,7 @@ function CommentItem({ c, exploitId, depth = 0 }) {
                                 children: c.authorAlias
                             }, void 0, false, {
                                 fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                lineNumber: 94,
+                                lineNumber: 95,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -151,13 +151,13 @@ function CommentItem({ c, exploitId, depth = 0 }) {
                                 children: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["timeAgo"])(c.createdAt)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                lineNumber: 95,
+                                lineNumber: 96,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                        lineNumber: 89,
+                        lineNumber: 90,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -165,7 +165,7 @@ function CommentItem({ c, exploitId, depth = 0 }) {
                         children: c.body
                     }, void 0, false, {
                         fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                        lineNumber: 97,
+                        lineNumber: 98,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -176,12 +176,12 @@ function CommentItem({ c, exploitId, depth = 0 }) {
                             children: showReply ? 'CANCEL' : 'REPLY'
                         }, void 0, false, {
                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                            lineNumber: 99,
+                            lineNumber: 100,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                        lineNumber: 98,
+                        lineNumber: 99,
                         columnNumber: 9
                     }, this),
                     showReply && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -195,7 +195,7 @@ function CommentItem({ c, exploitId, depth = 0 }) {
                                 className: "flex-1 bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 font-mono text-[11px] text-slate-300 outline-none focus:border-accent/30 transition-colors"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                lineNumber: 107,
+                                lineNumber: 108,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -205,19 +205,19 @@ function CommentItem({ c, exploitId, depth = 0 }) {
                                 children: submitting ? '...' : 'POST'
                             }, void 0, false, {
                                 fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                lineNumber: 112,
+                                lineNumber: 113,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                        lineNumber: 106,
+                        lineNumber: 107,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                lineNumber: 88,
+                lineNumber: 89,
                 columnNumber: 7
             }, this),
             localReplies.map((r)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(CommentItem, {
@@ -226,13 +226,13 @@ function CommentItem({ c, exploitId, depth = 0 }) {
                     depth: depth + 1
                 }, r.id, false, {
                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                    lineNumber: 122,
+                    lineNumber: 123,
                     columnNumber: 9
                 }, this))
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-        lineNumber: 87,
+        lineNumber: 88,
         columnNumber: 5
     }, this);
 }
@@ -344,7 +344,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             children: "← Back"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 214,
+                                            lineNumber: 215,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -356,7 +356,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     children: "Exploits"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 219,
+                                                    lineNumber: 220,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -364,7 +364,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     children: "›"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 220,
+                                                    lineNumber: 221,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -372,19 +372,19 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     children: exploit.type
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 221,
+                                                    lineNumber: 222,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 218,
+                                            lineNumber: 219,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 213,
+                                    lineNumber: 214,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -395,7 +395,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             children: exploit.type
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 227,
+                                            lineNumber: 228,
                                             columnNumber: 15
                                         }, this),
                                         exploit.verified && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -403,7 +403,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             children: "✓ VERIFIED"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 231,
+                                            lineNumber: 232,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -411,7 +411,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             children: exploit.language
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 235,
+                                            lineNumber: 236,
                                             columnNumber: 15
                                         }, this),
                                         exploit.os.map((o)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -419,7 +419,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                 children: o
                                             }, o, false, {
                                                 fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                lineNumber: 239,
+                                                lineNumber: 240,
                                                 columnNumber: 17
                                             }, this)),
                                         exploit.cveId && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -433,13 +433,13 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 244,
+                                            lineNumber: 245,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 226,
+                                    lineNumber: 227,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -447,7 +447,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                     children: exploit.title
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 251,
+                                    lineNumber: 252,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -461,13 +461,13 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     children: exploit.authorAlias
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 255,
+                                                    lineNumber: 256,
                                                     columnNumber: 24
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 255,
+                                            lineNumber: 256,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -477,7 +477,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 256,
+                                            lineNumber: 257,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -488,7 +488,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 257,
+                                            lineNumber: 258,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -499,7 +499,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 258,
+                                            lineNumber: 259,
                                             columnNumber: 15
                                         }, this),
                                         exploit.dnaRisk !== null && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -510,13 +510,13 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 260,
+                                            lineNumber: 261,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 254,
+                                    lineNumber: 255,
                                     columnNumber: 13
                                 }, this),
                                 exploit.dnaRisk !== null && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -531,7 +531,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             children: exploit.dnaRisk.toFixed(1)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 270,
+                                            lineNumber: 271,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -542,7 +542,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     children: "Risk Score"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 274,
+                                                    lineNumber: 275,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -555,18 +555,18 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                         }
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                        lineNumber: 276,
+                                                        lineNumber: 277,
                                                         columnNumber: 21
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 275,
+                                                    lineNumber: 276,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 273,
+                                            lineNumber: 274,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -583,7 +583,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 285,
+                                                    lineNumber: 286,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -597,19 +597,19 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 293,
+                                                    lineNumber: 294,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 284,
+                                            lineNumber: 285,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 268,
+                                    lineNumber: 269,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -617,7 +617,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                     children: exploit.description
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 306,
+                                    lineNumber: 307,
                                     columnNumber: 13
                                 }, this),
                                 exploit.tags.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -630,18 +630,18 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             ]
                                         }, tag, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 314,
+                                            lineNumber: 315,
                                             columnNumber: 19
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 312,
+                                    lineNumber: 313,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                            lineNumber: 211,
+                            lineNumber: 212,
                             columnNumber: 11
                         }, this),
                         exploit.code && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -661,7 +661,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 328,
+                                            lineNumber: 329,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -673,7 +673,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     children: copied ? '✓ COPIED' : '📋 COPY'
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 332,
+                                                    lineNumber: 333,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -683,19 +683,19 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     children: aiLoading ? '⟳ ANALYZING...' : '🤖 AI EXPLAIN'
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 337,
+                                                    lineNumber: 338,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 331,
+                                            lineNumber: 332,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 326,
+                                    lineNumber: 327,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("pre", {
@@ -707,13 +707,67 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                     children: exploit.code
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 344,
+                                    lineNumber: 345,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                            lineNumber: 325,
+                            lineNumber: 326,
+                            columnNumber: 13
+                        }, this),
+                        exploit.fileUrl && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "glass p-4 animate-float-in-d1 flex items-center justify-between gap-4",
+                            style: {
+                                borderColor: 'rgba(0,170,255,0.2)',
+                                background: 'rgba(0,170,255,0.04)'
+                            },
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-1",
+                                            children: "Attached File"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
+                                            lineNumber: 357,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "font-mono text-[11px] text-slate-400",
+                                            children: "Supporting file uploaded by the author"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
+                                            lineNumber: 358,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
+                                    lineNumber: 356,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                    href: exploit.fileUrl,
+                                    target: "_blank",
+                                    rel: "noopener noreferrer",
+                                    download: true,
+                                    className: "shrink-0 font-mono text-[12px] font-bold px-5 py-2.5 rounded-xl transition-all hover:opacity-80",
+                                    style: {
+                                        background: 'rgba(0,170,255,0.12)',
+                                        border: '1px solid rgba(0,170,255,0.35)',
+                                        color: '#00aaff'
+                                    },
+                                    children: "📎 Download"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
+                                    lineNumber: 362,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
+                            lineNumber: 354,
                             columnNumber: 13
                         }, this),
                         aiExplain && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -730,7 +784,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             children: "🤖"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 356,
+                                            lineNumber: 375,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -738,13 +792,13 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             children: "AI Analysis"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 357,
+                                            lineNumber: 376,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 355,
+                                    lineNumber: 374,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -752,13 +806,13 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                     children: aiExplain
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 359,
+                                    lineNumber: 378,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                            lineNumber: 353,
+                            lineNumber: 372,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -772,7 +826,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             children: "Community Discussion"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 368,
+                                            lineNumber: 387,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -783,13 +837,13 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 371,
+                                            lineNumber: 390,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 367,
+                                    lineNumber: 386,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -803,7 +857,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             rows: 3
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 376,
+                                            lineNumber: 395,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -818,13 +872,13 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                             children: alias
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                            lineNumber: 384,
+                                                            lineNumber: 403,
                                                             columnNumber: 33
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 383,
+                                                    lineNumber: 402,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -834,19 +888,19 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     children: submittingCmt ? '...' : 'POST COMMENT'
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 386,
+                                                    lineNumber: 405,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 382,
+                                            lineNumber: 401,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 375,
+                                    lineNumber: 394,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -857,7 +911,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             children: "No comments yet. Be the first to share findings."
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 398,
+                                            lineNumber: 417,
                                             columnNumber: 17
                                         }, this),
                                         comments.map((c)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(CommentItem, {
@@ -865,25 +919,25 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                 exploitId: exploit.id
                                             }, c.id, false, {
                                                 fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                lineNumber: 403,
+                                                lineNumber: 422,
                                                 columnNumber: 17
                                             }, this))
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 396,
+                                    lineNumber: 415,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                            lineNumber: 366,
+                            lineNumber: 385,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                    lineNumber: 208,
+                    lineNumber: 209,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -897,7 +951,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                     children: "Exploit Stats"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 414,
+                                    lineNumber: 433,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -937,7 +991,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     children: s.value
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 424,
+                                                    lineNumber: 443,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -945,24 +999,24 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     children: s.label
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 425,
+                                                    lineNumber: 444,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, s.label, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 422,
+                                            lineNumber: 441,
                                             columnNumber: 17
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 415,
+                                    lineNumber: 434,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                            lineNumber: 413,
+                            lineNumber: 432,
                             columnNumber: 11
                         }, this),
                         (exploit.dnaRisk !== null || exploit.dnaPayload) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -973,7 +1027,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                     children: "🧬 DNA Analysis"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 434,
+                                    lineNumber: 453,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -990,7 +1044,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     children: "PAYLOAD TYPE"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 438,
+                                                    lineNumber: 457,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -998,13 +1052,13 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     children: exploit.dnaPayload
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 439,
+                                                    lineNumber: 458,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 437,
+                                            lineNumber: 456,
                                             columnNumber: 19
                                         }, this),
                                         exploit.dnaRisk !== null && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1018,7 +1072,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     children: "RISK SCORE"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 444,
+                                                    lineNumber: 463,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1029,13 +1083,13 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 445,
+                                                    lineNumber: 464,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 443,
+                                            lineNumber: 462,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1049,7 +1103,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     children: "DIFFICULTY"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 451,
+                                                    lineNumber: 470,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1057,25 +1111,25 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                                     children: exploit.difficulty
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                                    lineNumber: 452,
+                                                    lineNumber: 471,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 450,
+                                            lineNumber: 469,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 435,
+                                    lineNumber: 454,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                            lineNumber: 433,
+                            lineNumber: 452,
                             columnNumber: 13
                         }, this),
                         exploit.cveId && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1086,7 +1140,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                     children: "Linked CVE"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 461,
+                                    lineNumber: 480,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1094,7 +1148,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                     children: exploit.cveId
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 462,
+                                    lineNumber: 481,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1108,7 +1162,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             children: "NVD Entry ↗"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 464,
+                                            lineNumber: 483,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -1119,19 +1173,19 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             children: "OTX Threat Intel ↗"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 470,
+                                            lineNumber: 489,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 463,
+                                    lineNumber: 482,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                            lineNumber: 460,
+                            lineNumber: 479,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1142,7 +1196,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                     children: "Actions"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 482,
+                                    lineNumber: 501,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1154,7 +1208,7 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             children: "📋 Copy Code"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 484,
+                                            lineNumber: 503,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1163,8 +1217,20 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             children: "🤖 AI Explain"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 489,
+                                            lineNumber: 508,
                                             columnNumber: 15
+                                        }, this),
+                                        exploit.fileUrl && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                            href: exploit.fileUrl,
+                                            target: "_blank",
+                                            rel: "noopener noreferrer",
+                                            download: true,
+                                            className: "block w-full font-mono text-[11px] py-2.5 rounded-lg border border-accent2/25 text-accent2 bg-accent2/6 hover:bg-accent2/12 transition-all px-3",
+                                            children: "📎 Download Attached File"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
+                                            lineNumber: 514,
+                                            columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
                                             href: `/cve?q=${exploit.cveId ?? exploit.type}`,
@@ -1172,36 +1238,36 @@ function ExploitDetail({ exploit, comments: initialComments }) {
                                             children: "🔍 Find Related CVEs"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                            lineNumber: 494,
+                                            lineNumber: 520,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                                    lineNumber: 483,
+                                    lineNumber: 502,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                            lineNumber: 481,
+                            lineNumber: 500,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-                    lineNumber: 410,
+                    lineNumber: 429,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-            lineNumber: 205,
+            lineNumber: 206,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/exploit/ExploitDetail.tsx",
-        lineNumber: 204,
+        lineNumber: 205,
         columnNumber: 5
     }, this);
 }
