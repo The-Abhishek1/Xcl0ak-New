@@ -222,7 +222,7 @@ export default function SettingsPage() {
               {/* Usage stats */}
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  {label:'Scans Today',    val:`${user?.scans_today??0} / ${tierInfo.scans==='9999'?'∞':tierInfo.scans}`},
+                  {label:'Scans Today',    val:`${user?.scans_today??0} / ${tierInfo.scans>=9999?'∞':tierInfo.scans}`},
                   {label:'Scans Left',     val:tierInfo.scans===9999?'∞':String(scansLeft)},
                   {label:'Concurrent',     val:String(tierInfo.concurrent)},
                   {label:'Total Scans',    val:String(user?.total_scans??0)},

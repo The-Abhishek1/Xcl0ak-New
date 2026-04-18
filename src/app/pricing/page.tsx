@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { isLoggedIn, getToken, getUser, saveSession } from '@/lib/eso-auth'
 
@@ -43,7 +43,7 @@ function loadRazorpay(): Promise<boolean> {
   })
 }
 
-export default function PricingPage() {
+function PricingPageInner() {
   const router = useRouter()
   const params = useSearchParams()
   const [loggedIn, setLoggedIn] = useState(false)
@@ -233,5 +233,17 @@ export default function PricingPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function PricingPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-64">
+        <div className="font-mono text-[11px] text-slate-600 animate-pulse">Loading...</div>
+      </div>
+    }>
+      <PricingPageInner />
+    </Suspense>
   )
 }

@@ -13,7 +13,7 @@ function mdToHtml(md: string): string {
       if (cells.every(c=>/^[-\s]+$/.test(c))) return ''
       return '<tr>'+cells.map(c=>`<td>${c.trim()}</td>`).join('')+'</tr>'
     })
-    .replace(/(<tr>.*?<\/tr>\s*)+/gs, '<table>$&</table>')
+    .replace(/(<tr>[\s\S]*?<\/tr>\s*)+/g, '<table>$&</table>')
     .replace(/\n\n/g, '<br>')
 }
 
