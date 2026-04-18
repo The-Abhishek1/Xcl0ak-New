@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { getToken, clearSession } from '@/lib/eso-auth'
 
-type Tab = 'overview' | 'users' | 'exploits' | 'ctf' | 'scans' | 'tiers'
+type Tab = 'overview' | 'users' | 'exploits' | 'ctf' | 'scans' | 'tiers' | 'leaderboard' | 'payments'
 
 const TIER_COLOR:   Record<string,string> = { free:'#64748b', pro:'#00aaff', enterprise:'#a78bfa', admin:'#00ffaa' }
 const STATUS_COLOR: Record<string,string> = { completed:'#00ffaa', failed:'#ff3a5c', running:'#00aaff', planning:'#ffd700', pending:'#475569', approved:'#00ffaa', rejected:'#ff3a5c' }
@@ -20,10 +20,15 @@ async function esoFetch(path: string, opts?: RequestInit) {
 }
 
 async function xcloakFetch(path: string, opts?: RequestInit) {
-  const alias = typeof window!=='undefined' ? sessionStorage.getItem('xcloak-admin-alias') : null
+  const token = typeof window!=='undefined' ? sessionStorage.getItem('xcloak-admin-token') : null
   const res = await fetch(path, {
     ...opts,
-    headers: { 'Content-Type':'application/json', ...(alias?{'x-admin-alias':alias}:{}), ...opts?.headers },
+    headers: {
+      'Content-Type': 'application/json',
+      // Send ESO bearer token as x-admin-token for xcloak admin API auth
+      ...(token ? { 'x-admin-token': token } : {}),
+      ...opts?.headers,
+    },
   })
   if (!res.ok) throw new Error(await res.text().catch(()=>res.statusText))
   return res.json()
@@ -50,6 +55,8 @@ export default function AdminPage() {
   const [exploits,   setExploits]   = useState<any[]>([])
   const [ctfs,       setCTFs]       = useState<any[]>([])
   const [xStatus,    setXStatus]    = useState<'pending'|'approved'|'rejected'>('pending')
+  const [leaders,    setLeaders]    = useState<any[]>([])
+  const [payments,   setPayments]   = useState<any[]>([])
 
   // Auth guard
   useEffect(() => {
@@ -93,6 +100,14 @@ export default function AdminPage() {
       if (tab === 'tiers') {
         const r = await esoFetch('/admin/tiers')
         setEsoTiers(r.tiers ?? [])
+      }
+      if (tab === 'leaderboard') {
+        const r = await xcloakFetch('/api/v1/admin/leaderboard')
+        setLeaders(r.users ?? [])
+      }
+      if (tab === 'payments') {
+        const r = await esoFetch('/admin/payments?limit=100')
+        setPayments(r.payments ?? [])
       }
     } catch(e:any) { setMsg(`✗ ${e.message}`) }
     setLoading(false)
@@ -138,7 +153,9 @@ export default function AdminPage() {
     {id:'exploits' as Tab, label:'Exploits',   icon:'💉'},
     {id:'ctf'      as Tab, label:'CTF',        icon:'🏆'},
     {id:'scans'    as Tab, label:'Scans',      icon:'🔍'},
-    {id:'tiers'    as Tab, label:'Tiers',      icon:'🎯'},
+    {id:'tiers'       as Tab, label:'Tiers',       icon:'🎯'},
+    {id:'leaderboard' as Tab, label:'Leaderboard', icon:'🏆'},
+    {id:'payments'    as Tab, label:'Payments',    icon:'💳'},
   ]
 
   const td = "px-4 py-2.5 font-mono text-[11px]"
@@ -354,6 +371,17 @@ export default function AdminPage() {
                     </div>
                     <div className="font-mono text-[10px] text-slate-600">by {ex.authorAlias} · {new Date(ex.createdAt).toLocaleDateString()}</div>
                     <div className="font-mono text-[11px] text-slate-500 mt-1 line-clamp-2">{ex.description}</div>
+                    <div className="flex flex-wrap items-center gap-2 mt-2">
+                      {(ex.tags??[]).slice(0,4).map((t:string)=>(
+                        <span key={t} className="font-mono text-[8px] px-1.5 py-[1px] rounded" style={{background:'rgba(255,255,255,0.04)',color:'#475569'}}>#{t}</span>
+                      ))}
+                      {ex.fileUrl && (
+                        <a href={ex.fileUrl} target="_blank" rel="noopener noreferrer"
+                          className="font-mono text-[9px] text-accent2 hover:underline">
+                          📎 Download attached file
+                        </a>
+                      )}
+                    </div>
                   </div>
                   {xStatus==='pending' && (
                     <div className="flex gap-2 shrink-0">
@@ -404,6 +432,17 @@ export default function AdminPage() {
                     </div>
                     <div className="font-mono text-[10px] text-slate-600">by {c.authorAlias} · {new Date(c.createdAt).toLocaleDateString()}</div>
                     <div className="font-mono text-[11px] text-slate-500 mt-1 line-clamp-2">{c.description}</div>
+                    <div className="flex items-center gap-3 mt-2">
+                      {c.fileUrl && (
+                        <a href={c.fileUrl} target="_blank" rel="noopener noreferrer"
+                          className="font-mono text-[9px] text-accent2 hover:underline">
+                          📎 Download challenge file
+                        </a>
+                      )}
+                      {(c.hints??[]).length > 0 && (
+                        <span className="font-mono text-[9px] text-slate-600">{c.hints.length} hint(s)</span>
+                      )}
+                    </div>
                   </div>
                   {xStatus==='pending' && (
                     <div className="flex gap-2 shrink-0">
@@ -492,6 +531,93 @@ export default function AdminPage() {
               ))}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* ── LEADERBOARD ── */}
+      {tab==='leaderboard' && !loading && (
+        <div className="glass overflow-x-auto">
+          <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
+            <span className="font-mono text-[10px] text-accent uppercase tracking-widest">Community Leaderboard</span>
+            <span className="font-mono text-[9px] text-slate-600">{leaders.length} researchers</span>
+          </div>
+          <table className="w-full border-collapse min-w-[600px]">
+            <thead>
+              <tr style={{background:'rgba(255,255,255,0.015)',borderBottom:'1px solid rgba(255,255,255,0.06)'}}>
+                {['Rank','User','Reputation','Exploits','CTF Solves','Badges'].map(h=>(
+                  <th key={h} className="font-mono text-[9px] uppercase tracking-widest text-slate-600 text-left px-4 py-2.5">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {leaders.map((u,i)=>(
+                <tr key={u.id} className="border-b border-white/[0.03] hover:bg-white/[0.02]">
+                  <td className={td}>
+                    <span className="font-mono text-[13px] font-bold" style={{color:i===0?'#ffd700':i===1?'#94a3b8':i===2?'#ff8c42':'#475569'}}>
+                      #{i+1}
+                    </span>
+                  </td>
+                  <td className={td}>
+                    <div className="font-mono text-[11px] text-slate-200 font-semibold">{u.alias}</div>
+                  </td>
+                  <td className={`${td} font-mono text-accent font-bold`}>{(u.reputation??0).toLocaleString()}</td>
+                  <td className={`${td} font-mono text-slate-400`}>{u.exploits??0}</td>
+                  <td className={`${td} font-mono text-slate-400`}>{u.ctfSolves??0}</td>
+                  <td className={td}>
+                    <div className="flex gap-1 flex-wrap">
+                      {(u.badges??[]).map((b:string)=>(
+                        <span key={b} className="font-mono text-[8px] px-1.5 py-[1px] rounded" style={{background:'rgba(255,215,0,0.1)',color:'#ffd700'}}>{b}</span>
+                      ))}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {leaders.length===0 && <div className="p-8 text-center font-mono text-[11px] text-slate-600">No community users yet</div>}
+        </div>
+      )}
+
+      {/* ── PAYMENTS ── */}
+      {tab==='payments' && !loading && (
+        <div className="glass overflow-x-auto">
+          <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
+            <span className="font-mono text-[10px] text-accent uppercase tracking-widest">Payment History</span>
+            <span className="font-mono text-[9px] text-slate-600">{payments.length} transactions</span>
+          </div>
+          {payments.length===0 ? (
+            <div className="p-8 text-center font-mono text-[11px] text-slate-600">No payments recorded yet</div>
+          ) : (
+            <table className="w-full border-collapse min-w-[700px]">
+              <thead>
+                <tr style={{background:'rgba(255,255,255,0.015)',borderBottom:'1px solid rgba(255,255,255,0.06)'}}>
+                  {['Payment ID','User','Tier','Amount','Status','Date'].map(h=>(
+                    <th key={h} className="font-mono text-[9px] uppercase tracking-widest text-slate-600 text-left px-4 py-2.5">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {payments.map((p:any)=>(
+                  <tr key={p.payment_id} className="border-b border-white/[0.03] hover:bg-white/[0.02]">
+                    <td className={`${td} font-mono text-[9px] text-slate-600`}>{p.payment_id?.slice(0,20)}...</td>
+                    <td className={`${td} text-slate-300`}>{p.username??p.user_id?.slice(0,12)}</td>
+                    <td className={td}>
+                      <span className="font-mono text-[10px] font-bold capitalize" style={{color:TIER_COLOR[p.tier??'free']}}>{p.tier}</span>
+                    </td>
+                    <td className={`${td} font-mono text-accent font-bold`}>₹{((p.amount??0)/100).toLocaleString()}</td>
+                    <td className={td}>
+                      <span className="font-mono text-[9px] px-2 py-[2px] rounded" style={{color:STATUS_COLOR[p.status??'pending']??'#64748b',background:'rgba(255,255,255,0.05)'}}>
+                        {p.status}
+                      </span>
+                    </td>
+                    <td className={`${td} font-mono text-[10px] text-slate-600`}>
+                      {p.paid_at ? new Date(p.paid_at).toLocaleDateString('en-IN') : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       )}
     </div>

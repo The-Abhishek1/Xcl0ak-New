@@ -10,8 +10,11 @@ __turbopack_esm__({
     "TYPE_COLOR": (()=>TYPE_COLOR)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
-// src/components/map/Globe3D.tsx
-// Full rewrite: high-detail country polygons, vivid threat arcs, clear labels
+// Globe3D — v3
+// Fixes:
+//  1. Arc colors: each threat type gets its own distinct color
+//  2. Filter: activeLayers prop changes re-render without needing key remount
+//  3. Popup: rich worldmonitor-style card with icon, severity bar, coords, source link
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 ;
 var _s = __turbopack_refresh__.signature();
@@ -28,48 +31,112 @@ const TYPE_COLOR = {
     RAT: '#f472b6',
     WORM: '#fb923c'
 };
+const TYPE_ICON = {
+    Ransomware: '🔒',
+    APT: '🎯',
+    Phishing: '🪝',
+    DDoS: '💥',
+    Malware: '☣️',
+    Scanner: '🔍',
+    Threat: '⚠️',
+    RAT: '🐀',
+    WORM: '🐛'
+};
+function hexRGB(hex) {
+    const h = hex.replace('#', '');
+    return {
+        r: parseInt(h.slice(0, 2), 16),
+        g: parseInt(h.slice(2, 4), 16),
+        b: parseInt(h.slice(4, 6), 16)
+    };
+}
+function rgba(hex, alpha) {
+    const { r, g, b } = hexRGB(hex);
+    return `rgba(${r},${g},${b},${alpha})`;
+}
 const tc = (t)=>TYPE_COLOR[t] ?? '#94a3b8';
-// lat/lng → 3D unit vector
-function ll2v(lat, lng, r) {
-    const phi = lat * Math.PI / 180;
-    const theta = lng * Math.PI / 180;
+const DEG = Math.PI / 180;
+function project(lat, lng, rotX, rotY, cx, cy, R) {
+    const phi = lat * DEG, lam = lng * DEG;
+    const vx = Math.cos(phi) * Math.sin(lam), vy = Math.sin(phi), vz = Math.cos(phi) * Math.cos(lam);
+    const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+    const vx1 = vx * cosY - vz * sinY, vz1 = vx * sinY + vz * cosY;
+    const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+    const vy2 = vy * cosX - vz1 * sinX, vz2 = vy * sinX + vz1 * cosX;
+    if (vz2 < 0) return null;
     return [
-        r * Math.cos(phi) * Math.sin(theta),
-        r * Math.sin(phi),
-        r * Math.cos(phi) * Math.cos(theta)
+        cx + vx1 * R,
+        cy - vy2 * R
     ];
 }
-// ─── Draw detailed world map onto canvas ──────────────────────────────────────
-function drawEarth(ctx, W, H) {
-    const x = (lng)=>(lng + 180) / 360 * W;
-    const y = (lat)=>(90 - lat) / 180 * H;
-    // Deep ocean background
-    const ocean = ctx.createLinearGradient(0, 0, 0, H);
-    ocean.addColorStop(0, '#020d1a');
-    ocean.addColorStop(0.5, '#031422');
-    ocean.addColorStop(1, '#020d1a');
-    ctx.fillStyle = ocean;
-    ctx.fillRect(0, 0, W, H);
-    // Latitude / longitude grid — subtle
-    ctx.strokeStyle = 'rgba(0,200,130,0.10)';
-    ctx.lineWidth = 0.6;
-    for(let la = -80; la <= 80; la += 20){
-        ctx.beginPath();
-        ctx.moveTo(0, y(la));
-        ctx.lineTo(W, y(la));
-        ctx.stroke();
+function projectRaw(lat, lng, rotX, rotY, cx, cy, effR) {
+    const phi = lat * DEG, lam = lng * DEG;
+    const vx = Math.cos(phi) * Math.sin(lam), vy = Math.sin(phi), vz = Math.cos(phi) * Math.cos(lam);
+    const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+    const vx1 = vx * cosY - vz * sinY, vz1 = vx * sinY + vz * cosY;
+    const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+    const vy2 = vy * cosX - vz1 * sinX, vz2 = vy * sinX + vz1 * cosX;
+    return {
+        pt: [
+            cx + vx1 * effR,
+            cy - vy2 * effR
+        ],
+        vis: vz2 >= -0.04
+    };
+}
+function greatCircle(lat1, lng1, lat2, lng2, steps) {
+    const p1 = [
+        lat1 * DEG,
+        lng1 * DEG
+    ], p2 = [
+        lat2 * DEG,
+        lng2 * DEG
+    ];
+    const v1 = [
+        Math.cos(p1[0]) * Math.cos(p1[1]),
+        Math.sin(p1[0]),
+        Math.cos(p1[0]) * Math.sin(p1[1])
+    ];
+    const v2 = [
+        Math.cos(p2[0]) * Math.cos(p2[1]),
+        Math.sin(p2[0]),
+        Math.cos(p2[0]) * Math.sin(p2[1])
+    ];
+    const dot = Math.min(1, Math.max(-1, v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]));
+    const omega = Math.acos(dot);
+    if (omega < 0.001) return [
+        [
+            lat1,
+            lng1
+        ],
+        [
+            lat2,
+            lng2
+        ]
+    ];
+    const out = [];
+    for(let i = 0; i <= steps; i++){
+        const t = i / steps, sa = Math.sin((1 - t) * omega) / Math.sin(omega), sb = Math.sin(t * omega) / Math.sin(omega);
+        const vx = sa * v1[0] + sb * v2[0], vy = sa * v1[1] + sb * v2[1], vz = sa * v1[2] + sb * v2[2];
+        out.push([
+            Math.atan2(vy, Math.sqrt(vx * vx + vz * vz)) / DEG,
+            Math.atan2(vz, vx) / DEG
+        ]);
     }
-    for(let lo = -180; lo <= 180; lo += 20){
+    return out;
+}
+function drawGeometry(ctx, geom, rotX, rotY, cx, cy, R, fill, stroke, lw) {
+    const polys = geom.type === 'Polygon' ? geom.coordinates : geom.type === 'MultiPolygon' ? geom.coordinates.flat() : [];
+    for (const ring of polys){
         ctx.beginPath();
-        ctx.moveTo(x(lo), 0);
-        ctx.lineTo(x(lo), H);
-        ctx.stroke();
-    }
-    // ── Land polygon helper ───────────────────────────────────────────────────
-    function poly(coords, fill, stroke, lw = 0.9) {
-        if (!coords.length) return;
-        ctx.beginPath();
-        coords.forEach(([lo, la], i)=>i === 0 ? ctx.moveTo(x(lo), y(la)) : ctx.lineTo(x(lo), y(la)));
+        let prev = false;
+        for (const [lng, lat] of ring){
+            const pt = project(lat, lng, rotX, rotY, cx, cy, R);
+            if (pt) {
+                prev ? ctx.lineTo(pt[0], pt[1]) : ctx.moveTo(pt[0], pt[1]);
+                prev = true;
+            } else prev = false;
+        }
         ctx.closePath();
         ctx.fillStyle = fill;
         ctx.fill();
@@ -77,1997 +144,830 @@ function drawEarth(ctx, W, H) {
         ctx.lineWidth = lw;
         ctx.stroke();
     }
-    const LAND = 'rgba(14,90,52,0.75)';
-    const BORDER = 'rgba(0,255,140,0.55)';
-    const LAND2 = 'rgba(10,75,42,0.75)' // slightly different shade for variety
-    ;
-    const B2 = 'rgba(0,220,120,0.45)';
-    // ── NORTH AMERICA ─────────────────────────────────────────────────────────
-    // Mainland
-    poly([
-        [
-            -140,
-            72
-        ],
-        [
-            -125,
-            72
-        ],
-        [
-            -100,
-            75
-        ],
-        [
-            -82,
-            72
-        ],
-        [
-            -65,
-            47
-        ],
-        [
-            -55,
-            47
-        ],
-        [
-            -56,
-            38
-        ],
-        [
-            -74,
-            25
-        ],
-        [
-            -86,
-            15
-        ],
-        [
-            -84,
-            8
-        ],
-        [
-            -77,
-            8
-        ],
-        [
-            -77,
-            18
-        ],
-        [
-            -72,
-            19
-        ],
-        [
-            -80,
-            10
-        ],
-        [
-            -85,
-            10
-        ],
-        [
-            -90,
-            14
-        ],
-        [
-            -93,
-            16
-        ],
-        [
-            -97,
-            20
-        ],
-        [
-            -104,
-            22
-        ],
-        [
-            -110,
-            23
-        ],
-        [
-            -118,
-            30
-        ],
-        [
-            -124,
-            37
-        ],
-        [
-            -124,
-            48
-        ],
-        [
-            -123,
-            60
-        ],
-        [
-            -137,
-            60
-        ],
-        [
-            -140,
-            69
-        ],
-        [
-            -140,
-            72
-        ]
-    ], LAND, BORDER);
-    // Alaska
-    poly([
-        [
-            -168,
-            72
-        ],
-        [
-            -155,
-            72
-        ],
-        [
-            -148,
-            62
-        ],
-        [
-            -140,
-            60
-        ],
-        [
-            -137,
-            60
-        ],
-        [
-            -141,
-            68
-        ],
-        [
-            -160,
-            72
-        ],
-        [
-            -168,
-            72
-        ]
-    ], LAND, BORDER, 0.7);
-    // Greenland
-    poly([
-        [
-            -52,
-            61
-        ],
-        [
-            -44,
-            58
-        ],
-        [
-            -24,
-            60
-        ],
-        [
-            -18,
-            70
-        ],
-        [
-            -20,
-            80
-        ],
-        [
-            -38,
-            84
-        ],
-        [
-            -58,
-            83
-        ],
-        [
-            -68,
-            76
-        ],
-        [
-            -58,
-            70
-        ],
-        [
-            -52,
-            64
-        ],
-        [
-            -52,
-            61
-        ]
-    ], LAND2, B2, 0.8);
-    // Cuba
-    poly([
-        [
-            -85,
-            22
-        ],
-        [
-            -75,
-            20
-        ],
-        [
-            -74,
-            22
-        ],
-        [
-            -85,
-            23
-        ],
-        [
-            -85,
-            22
-        ]
-    ], LAND, BORDER, 0.5);
-    // ── SOUTH AMERICA ─────────────────────────────────────────────────────────
-    poly([
-        [
-            -80,
-            10
-        ],
-        [
-            -77,
-            8
-        ],
-        [
-            -62,
-            8
-        ],
-        [
-            -52,
-            5
-        ],
-        [
-            -36,
-            -4
-        ],
-        [
-            -35,
-            -10
-        ],
-        [
-            -38,
-            -14
-        ],
-        [
-            -40,
-            -22
-        ],
-        [
-            -44,
-            -24
-        ],
-        [
-            -48,
-            -28
-        ],
-        [
-            -52,
-            -33
-        ],
-        [
-            -58,
-            -38
-        ],
-        [
-            -64,
-            -42
-        ],
-        [
-            -66,
-            -46
-        ],
-        [
-            -68,
-            -56
-        ],
-        [
-            -68,
-            -58
-        ],
-        [
-            -72,
-            -52
-        ],
-        [
-            -75,
-            -40
-        ],
-        [
-            -75,
-            -30
-        ],
-        [
-            -75,
-            -18
-        ],
-        [
-            -80,
-            0
-        ],
-        [
-            -80,
-            10
-        ]
-    ], LAND, BORDER);
-    // ── EUROPE ────────────────────────────────────────────────────────────────
-    poly([
-        [
-            -10,
-            36
-        ],
-        [
-            -8,
-            38
-        ],
-        [
-            -6,
-            43
-        ],
-        [
-            -2,
-            44
-        ],
-        [
-            0,
-            46
-        ],
-        [
-            5,
-            43
-        ],
-        [
-            8,
-            44
-        ],
-        [
-            10,
-            44
-        ],
-        [
-            14,
-            42
-        ],
-        [
-            14,
-            45
-        ],
-        [
-            10,
-            48
-        ],
-        [
-            14,
-            50
-        ],
-        [
-            18,
-            55
-        ],
-        [
-            20,
-            56
-        ],
-        [
-            25,
-            52
-        ],
-        [
-            28,
-            46
-        ],
-        [
-            30,
-            46
-        ],
-        [
-            32,
-            48
-        ],
-        [
-            36,
-            46
-        ],
-        [
-            38,
-            48
-        ],
-        [
-            30,
-            60
-        ],
-        [
-            24,
-            64
-        ],
-        [
-            20,
-            66
-        ],
-        [
-            15,
-            70
-        ],
-        [
-            12,
-            64
-        ],
-        [
-            8,
-            58
-        ],
-        [
-            5,
-            56
-        ],
-        [
-            0,
-            58
-        ],
-        [
-            -3,
-            58
-        ],
-        [
-            -5,
-            56
-        ],
-        [
-            -4,
-            52
-        ],
-        [
-            -6,
-            50
-        ],
-        [
-            -10,
-            36
-        ]
-    ], LAND, BORDER);
-    // Scandinavia
-    poly([
-        [
-            5,
-            56
-        ],
-        [
-            8,
-            57
-        ],
-        [
-            10,
-            58
-        ],
-        [
-            10,
-            62
-        ],
-        [
-            12,
-            65
-        ],
-        [
-            14,
-            68
-        ],
-        [
-            18,
-            70
-        ],
-        [
-            22,
-            70
-        ],
-        [
-            28,
-            70
-        ],
-        [
-            30,
-            72
-        ],
-        [
-            28,
-            70
-        ],
-        [
-            26,
-            65
-        ],
-        [
-            28,
-            60
-        ],
-        [
-            24,
-            58
-        ],
-        [
-            18,
-            58
-        ],
-        [
-            14,
-            56
-        ],
-        [
-            10,
-            56
-        ],
-        [
-            5,
-            56
-        ]
-    ], LAND2, B2, 0.7);
-    // Iceland
-    poly([
-        [
-            -24,
-            64
-        ],
-        [
-            -14,
-            64
-        ],
-        [
-            -13,
-            66
-        ],
-        [
-            -18,
-            66
-        ],
-        [
-            -22,
-            66
-        ],
-        [
-            -24,
-            65
-        ],
-        [
-            -24,
-            64
-        ]
-    ], LAND, BORDER, 0.5);
-    // ── AFRICA ────────────────────────────────────────────────────────────────
-    poly([
-        [
-            -6,
-            36
-        ],
-        [
-            5,
-            36
-        ],
-        [
-            10,
-            37
-        ],
-        [
-            18,
-            38
-        ],
-        [
-            26,
-            34
-        ],
-        [
-            32,
-            31
-        ],
-        [
-            36,
-            24
-        ],
-        [
-            42,
-            12
-        ],
-        [
-            44,
-            12
-        ],
-        [
-            50,
-            12
-        ],
-        [
-            44,
-            10
-        ],
-        [
-            42,
-            11
-        ],
-        [
-            36,
-            12
-        ],
-        [
-            34,
-            5
-        ],
-        [
-            32,
-            0
-        ],
-        [
-            34,
-            -5
-        ],
-        [
-            36,
-            -12
-        ],
-        [
-            34,
-            -22
-        ],
-        [
-            28,
-            -34
-        ],
-        [
-            18,
-            -34
-        ],
-        [
-            16,
-            -22
-        ],
-        [
-            12,
-            -5
-        ],
-        [
-            8,
-            4
-        ],
-        [
-            2,
-            6
-        ],
-        [
-            0,
-            5
-        ],
-        [
-            -4,
-            5
-        ],
-        [
-            -8,
-            5
-        ],
-        [
-            -12,
-            6
-        ],
-        [
-            -16,
-            10
-        ],
-        [
-            -18,
-            15
-        ],
-        [
-            -16,
-            24
-        ],
-        [
-            -12,
-            28
-        ],
-        [
-            -8,
-            32
-        ],
-        [
-            -6,
-            36
-        ]
-    ], LAND, BORDER);
-    // Madagascar
-    poly([
-        [
-            44,
-            -12
-        ],
-        [
-            50,
-            -14
-        ],
-        [
-            50,
-            -24
-        ],
-        [
-            44,
-            -26
-        ],
-        [
-            44,
-            -20
-        ],
-        [
-            44,
-            -12
-        ]
-    ], LAND2, B2, 0.6);
-    // ── ASIA WEST ─────────────────────────────────────────────────────────────
-    poly([
-        [
-            28,
-            40
-        ],
-        [
-            36,
-            36
-        ],
-        [
-            36,
-            24
-        ],
-        [
-            42,
-            12
-        ],
-        [
-            50,
-            12
-        ],
-        [
-            56,
-            22
-        ],
-        [
-            60,
-            22
-        ],
-        [
-            62,
-            26
-        ],
-        [
-            70,
-            22
-        ],
-        [
-            74,
-            22
-        ],
-        [
-            78,
-            30
-        ],
-        [
-            80,
-            38
-        ],
-        [
-            76,
-            44
-        ],
-        [
-            70,
-            44
-        ],
-        [
-            64,
-            46
-        ],
-        [
-            58,
-            50
-        ],
-        [
-            52,
-            50
-        ],
-        [
-            44,
-            54
-        ],
-        [
-            38,
-            50
-        ],
-        [
-            34,
-            46
-        ],
-        [
-            30,
-            46
-        ],
-        [
-            28,
-            40
-        ]
-    ], LAND, BORDER);
-    // ── MIDDLE EAST & ARABIA ─────────────────────────────────────────────────
-    poly([
-        [
-            36,
-            36
-        ],
-        [
-            42,
-            36
-        ],
-        [
-            50,
-            30
-        ],
-        [
-            58,
-            22
-        ],
-        [
-            58,
-            14
-        ],
-        [
-            45,
-            12
-        ],
-        [
-            42,
-            12
-        ],
-        [
-            36,
-            24
-        ],
-        [
-            36,
-            36
-        ]
-    ], LAND2, B2, 0.8);
-    // ── RUSSIA (large separate polygon) ───────────────────────────────────────
-    poly([
-        [
-            28,
-            68
-        ],
-        [
-            40,
-            72
-        ],
-        [
-            60,
-            72
-        ],
-        [
-            80,
-            74
-        ],
-        [
-            100,
-            72
-        ],
-        [
-            120,
-            72
-        ],
-        [
-            140,
-            68
-        ],
-        [
-            168,
-            68
-        ],
-        [
-            170,
-            62
-        ],
-        [
-            160,
-            60
-        ],
-        [
-            150,
-            56
-        ],
-        [
-            142,
-            48
-        ],
-        [
-            136,
-            46
-        ],
-        [
-            132,
-            48
-        ],
-        [
-            130,
-            42
-        ],
-        [
-            124,
-            40
-        ],
-        [
-            118,
-            48
-        ],
-        [
-            110,
-            52
-        ],
-        [
-            100,
-            56
-        ],
-        [
-            90,
-            56
-        ],
-        [
-            80,
-            56
-        ],
-        [
-            72,
-            52
-        ],
-        [
-            60,
-            56
-        ],
-        [
-            50,
-            52
-        ],
-        [
-            44,
-            54
-        ],
-        [
-            40,
-            56
-        ],
-        [
-            36,
-            58
-        ],
-        [
-            32,
-            60
-        ],
-        [
-            28,
-            64
-        ],
-        [
-            28,
-            68
-        ]
-    ], LAND2, 'rgba(0,255,160,0.50)', 0.9);
-    // Siberia / Far East extension
-    poly([
-        [
-            140,
-            68
-        ],
-        [
-            168,
-            68
-        ],
-        [
-            180,
-            70
-        ],
-        [
-            180,
-            62
-        ],
-        [
-            168,
-            62
-        ],
-        [
-            162,
-            58
-        ],
-        [
-            156,
-            56
-        ],
-        [
-            148,
-            50
-        ],
-        [
-            142,
-            48
-        ],
-        [
-            140,
-            54
-        ],
-        [
-            140,
-            60
-        ],
-        [
-            140,
-            68
-        ]
-    ], LAND2, B2, 0.7);
-    // ── SOUTH ASIA (INDIA) ────────────────────────────────────────────────────
-    poly([
-        [
-            62,
-            24
-        ],
-        [
-            72,
-            22
-        ],
-        [
-            78,
-            8
-        ],
-        [
-            80,
-            10
-        ],
-        [
-            82,
-            16
-        ],
-        [
-            80,
-            22
-        ],
-        [
-            78,
-            30
-        ],
-        [
-            72,
-            22
-        ],
-        [
-            62,
-            24
-        ]
-    ], LAND, BORDER, 0.8);
-    // Indian subcontinent fuller
-    poly([
-        [
-            62,
-            24
-        ],
-        [
-            68,
-            24
-        ],
-        [
-            72,
-            24
-        ],
-        [
-            76,
-            30
-        ],
-        [
-            80,
-            30
-        ],
-        [
-            84,
-            28
-        ],
-        [
-            88,
-            26
-        ],
-        [
-            92,
-            22
-        ],
-        [
-            90,
-            14
-        ],
-        [
-            82,
-            10
-        ],
-        [
-            80,
-            8
-        ],
-        [
-            78,
-            8
-        ],
-        [
-            72,
-            22
-        ],
-        [
-            66,
-            22
-        ],
-        [
-            62,
-            24
-        ]
-    ], LAND, BORDER);
-    // ── CHINA & EAST ASIA ────────────────────────────────────────────────────
-    poly([
-        [
-            78,
-            44
-        ],
-        [
-            90,
-            50
-        ],
-        [
-            100,
-            56
-        ],
-        [
-            110,
-            54
-        ],
-        [
-            120,
-            52
-        ],
-        [
-            130,
-            48
-        ],
-        [
-            132,
-            48
-        ],
-        [
-            130,
-            42
-        ],
-        [
-            122,
-            32
-        ],
-        [
-            120,
-            24
-        ],
-        [
-            108,
-            20
-        ],
-        [
-            100,
-            22
-        ],
-        [
-            94,
-            22
-        ],
-        [
-            90,
-            28
-        ],
-        [
-            88,
-            26
-        ],
-        [
-            84,
-            28
-        ],
-        [
-            80,
-            30
-        ],
-        [
-            78,
-            36
-        ],
-        [
-            80,
-            38
-        ],
-        [
-            78,
-            44
-        ]
-    ], LAND, BORDER);
-    // ── SOUTHEAST ASIA ────────────────────────────────────────────────────────
-    poly([
-        [
-            100,
-            22
-        ],
-        [
-            106,
-            20
-        ],
-        [
-            104,
-            10
-        ],
-        [
-            100,
-            6
-        ],
-        [
-            100,
-            2
-        ],
-        [
-            103,
-            -1
-        ],
-        [
-            106,
-            -4
-        ],
-        [
-            110,
-            -8
-        ],
-        [
-            112,
-            -6
-        ],
-        [
-            110,
-            -2
-        ],
-        [
-            108,
-            2
-        ],
-        [
-            104,
-            4
-        ],
-        [
-            100,
-            4
-        ],
-        [
-            96,
-            6
-        ],
-        [
-            100,
-            10
-        ],
-        [
-            100,
-            22
-        ]
-    ], LAND, BORDER, 0.8);
-    // Borneo
-    poly([
-        [
-            108,
-            8
-        ],
-        [
-            118,
-            8
-        ],
-        [
-            118,
-            2
-        ],
-        [
-            114,
-            -2
-        ],
-        [
-            108,
-            -4
-        ],
-        [
-            108,
-            2
-        ],
-        [
-            108,
-            8
-        ]
-    ], LAND2, B2, 0.6);
-    // Sumatra
-    poly([
-        [
-            96,
-            6
-        ],
-        [
-            104,
-            4
-        ],
-        [
-            108,
-            0
-        ],
-        [
-            108,
-            -5
-        ],
-        [
-            100,
-            -4
-        ],
-        [
-            96,
-            2
-        ],
-        [
-            96,
-            6
-        ]
-    ], LAND2, B2, 0.6);
-    // Philippines
-    poly([
-        [
-            118,
-            18
-        ],
-        [
-            122,
-            18
-        ],
-        [
-            124,
-            14
-        ],
-        [
-            122,
-            8
-        ],
-        [
-            120,
-            10
-        ],
-        [
-            118,
-            12
-        ],
-        [
-            118,
-            18
-        ]
-    ], LAND2, B2, 0.6);
-    // ── JAPAN ────────────────────────────────────────────────────────────────
-    poly([
-        [
-            130,
-            32
-        ],
-        [
-            132,
-            34
-        ],
-        [
-            134,
-            36
-        ],
-        [
-            136,
-            36
-        ],
-        [
-            138,
-            38
-        ],
-        [
-            140,
-            40
-        ],
-        [
-            142,
-            44
-        ],
-        [
-            142,
-            42
-        ],
-        [
-            140,
-            38
-        ],
-        [
-            138,
-            36
-        ],
-        [
-            136,
-            34
-        ],
-        [
-            132,
-            32
-        ],
-        [
-            130,
-            32
-        ]
-    ], LAND, BORDER, 0.7);
-    // ── SOUTH KOREA / KOREAN PENINSULA ───────────────────────────────────────
-    poly([
-        [
-            126,
-            34
-        ],
-        [
-            128,
-            36
-        ],
-        [
-            130,
-            36
-        ],
-        [
-            130,
-            38
-        ],
-        [
-            128,
-            38
-        ],
-        [
-            126,
-            38
-        ],
-        [
-            126,
-            34
-        ]
-    ], LAND2, B2, 0.6);
-    // ── AUSTRALIA ────────────────────────────────────────────────────────────
-    poly([
-        [
-            114,
-            -22
-        ],
-        [
-            118,
-            -20
-        ],
-        [
-            122,
-            -18
-        ],
-        [
-            126,
-            -14
-        ],
-        [
-            130,
-            -12
-        ],
-        [
-            132,
-            -12
-        ],
-        [
-            136,
-            -12
-        ],
-        [
-            138,
-            -14
-        ],
-        [
-            140,
-            -16
-        ],
-        [
-            142,
-            -10
-        ],
-        [
-            144,
-            -14
-        ],
-        [
-            148,
-            -18
-        ],
-        [
-            152,
-            -24
-        ],
-        [
-            152,
-            -30
-        ],
-        [
-            150,
-            -36
-        ],
-        [
-            145,
-            -38
-        ],
-        [
-            138,
-            -36
-        ],
-        [
-            132,
-            -34
-        ],
-        [
-            126,
-            -34
-        ],
-        [
-            116,
-            -30
-        ],
-        [
-            114,
-            -26
-        ],
-        [
-            114,
-            -22
-        ]
-    ], LAND, BORDER);
-    // Tasmania
-    poly([
-        [
-            144,
-            -40
-        ],
-        [
-            148,
-            -40
-        ],
-        [
-            148,
-            -44
-        ],
-        [
-            144,
-            -44
-        ],
-        [
-            144,
-            -40
-        ]
-    ], LAND2, B2, 0.5);
-    // New Zealand
-    poly([
-        [
-            172,
-            -40
-        ],
-        [
-            174,
-            -38
-        ],
-        [
-            176,
-            -36
-        ],
-        [
-            174,
-            -34
-        ],
-        [
-            172,
-            -36
-        ],
-        [
-            170,
-            -40
-        ],
-        [
-            172,
-            -40
-        ]
-    ], LAND2, B2, 0.6);
-    poly([
-        [
-            168,
-            -45
-        ],
-        [
-            170,
-            -44
-        ],
-        [
-            172,
-            -46
-        ],
-        [
-            170,
-            -47
-        ],
-        [
-            168,
-            -46
-        ],
-        [
-            168,
-            -45
-        ]
-    ], LAND2, B2, 0.5);
-    // ── CANADA detail ─────────────────────────────────────────────────────────
-    poly([
-        [
-            -140,
-            72
-        ],
-        [
-            -100,
-            75
-        ],
-        [
-            -82,
-            72
-        ],
-        [
-            -80,
-            62
-        ],
-        [
-            -92,
-            58
-        ],
-        [
-            -96,
-            58
-        ],
-        [
-            -100,
-            60
-        ],
-        [
-            -110,
-            60
-        ],
-        [
-            -120,
-            60
-        ],
-        [
-            -130,
-            62
-        ],
-        [
-            -138,
-            62
-        ],
-        [
-            -140,
-            72
-        ]
-    ], LAND2, B2, 0.7);
-    // ── ANTARCTICA ────────────────────────────────────────────────────────────
-    poly([
-        [
-            -180,
-            -70
-        ],
-        [
-            -90,
-            -68
-        ],
-        [
-            0,
-            -70
-        ],
-        [
-            90,
-            -68
-        ],
-        [
-            180,
-            -70
-        ],
-        [
-            180,
-            -90
-        ],
-        [
-            -180,
-            -90
-        ],
-        [
-            -180,
-            -70
-        ]
-    ], 'rgba(180,220,255,0.25)', 'rgba(200,230,255,0.4)', 0.8);
-    // ── Atmospheric vignette edge ─────────────────────────────────────────────
-    const vignette = ctx.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, H * 0.7);
-    vignette.addColorStop(0, 'rgba(0,0,0,0)');
-    vignette.addColorStop(1, 'rgba(1,8,16,0.45)');
-    ctx.fillStyle = vignette;
-    ctx.fillRect(0, 0, W, H);
 }
 function Globe3D({ points, height = 420, activeLayers }) {
     _s();
-    const mountRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    const cleanRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    const [ready, setReady] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
-    const visible = activeLayers?.size ? points.filter((p)=>activeLayers.has(p.type)) : points;
+    const canvasRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const st = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])({
+        rotX: 0.18,
+        rotY: 0.5,
+        velX: 0,
+        velY: 0.0028,
+        dragging: false,
+        lx: 0,
+        ly: 0,
+        geo: null,
+        arcT: 0,
+        hits: []
+    });
+    const [loaded, setLoaded] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [popup, setPopup] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const popupRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const layerKey = activeLayers ? [
+        ...activeLayers
+    ].sort().join(',') : 'all';
+    const visible = (()=>{
+        const base = points.filter((p)=>p && typeof p.srcLat === 'number');
+        if (!activeLayers || activeLayers.size === 0) return base;
+        return base.filter((p)=>activeLayers.has(p.type));
+    })();
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "Globe3D.useEffect": ()=>{
-            cleanRef.current?.();
-            cleanRef.current = null;
-            const container = mountRef.current;
-            if (!container) return;
-            let destroyed = false, animId = 0;
-            __turbopack_require__("[project]/node_modules/three/build/three.module.js [app-client] (ecmascript, async loader)")(__turbopack_import__).then({
-                "Globe3D.useEffect": (THREE)=>{
-                    if (destroyed || !container) return;
-                    const cW = container.clientWidth || 800;
-                    const cH = container.clientHeight || height;
-                    // Scene / camera
-                    const scene = new THREE.Scene();
-                    const camera = new THREE.PerspectiveCamera(38, cW / cH, 0.01, 100);
-                    camera.position.set(0, 0, 3.0);
-                    const renderer = new THREE.WebGLRenderer({
-                        antialias: true,
-                        alpha: true
-                    });
-                    renderer.setSize(cW, cH);
-                    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-                    renderer.setClearColor(0x000000, 0);
-                    container.appendChild(renderer.domElement);
-                    // ── Earth texture ──────────────────────────────────────────────────────
-                    const TW = 4096, TH = 2048;
-                    const cv = document.createElement('canvas');
-                    cv.width = TW;
-                    cv.height = TH;
-                    const ctx = cv.getContext('2d');
-                    drawEarth(ctx, TW, TH);
-                    const earthTex = new THREE.CanvasTexture(cv);
-                    earthTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-                    // Globe mesh
-                    const R = 1.0;
-                    const globe = new THREE.Mesh(new THREE.SphereGeometry(R, 96, 96), new THREE.MeshPhongMaterial({
-                        map: earthTex,
-                        shininess: 18,
-                        specular: new THREE.Color(0x002208),
-                        emissive: new THREE.Color(0x001a08),
-                        emissiveIntensity: 0.18
-                    }));
-                    scene.add(globe);
-                    // Outer atmosphere glow
-                    scene.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.06, 32, 32), new THREE.MeshPhongMaterial({
-                        color: 0x00ff88,
-                        transparent: true,
-                        opacity: 0.055,
-                        side: THREE.BackSide
-                    })));
-                    // Lights
-                    const ambient = new THREE.AmbientLight(0x1a3020, 5.5);
-                    scene.add(ambient);
-                    const sun = new THREE.DirectionalLight(0xbbffcc, 1.6);
-                    sun.position.set(5, 3, 5);
-                    scene.add(sun);
-                    const fill = new THREE.DirectionalLight(0x002244, 0.6);
-                    fill.position.set(-5, -2, -3);
-                    scene.add(fill);
-                    // Stars
-                    const sp = new Float32Array(4000 * 3);
-                    for(let i = 0; i < 4000 * 3; i++)sp[i] = (Math.random() - 0.5) * 40;
-                    const sg = new THREE.BufferGeometry();
-                    sg.setAttribute('position', new THREE.BufferAttribute(sp, 3));
-                    scene.add(new THREE.Points(sg, new THREE.PointsMaterial({
-                        color: 0xffffff,
-                        size: 0.010,
-                        transparent: true,
-                        opacity: 0.5
-                    })));
-                    // ── Attack arcs ────────────────────────────────────────────────────────
-                    const arcGroup = new THREE.Group();
-                    scene.add(arcGroup);
-                    visible.forEach({
-                        "Globe3D.useEffect": (pt)=>{
-                            const color = new THREE.Color(tc(pt.type));
-                            const brightColor = new THREE.Color(tc(pt.type)).multiplyScalar(1.5);
-                            const [sx, sy, sz] = ll2v(pt.srcLat, pt.srcLng, R);
-                            const [dx, dy, dz] = ll2v(pt.dstLat, pt.dstLng, R);
-                            const vS = new THREE.Vector3(sx, sy, sz);
-                            const vD = new THREE.Vector3(dx, dy, dz);
-                            // Arc apex: pull away from surface for visibility
-                            const arcHeight = 1.45 + pt.severity * 0.06;
-                            const vM = vS.clone().add(vD).normalize().multiplyScalar(R * arcHeight);
-                            const curve = new THREE.QuadraticBezierCurve3(vS, vM, vD);
-                            const isCrit = pt.severity >= 4;
-                            const opacity = 0.5 + pt.severity / 5 * 0.45;
-                            // Fat glow tube behind the line
-                            arcGroup.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 48, isCrit ? 0.010 : 0.007, 5, false), new THREE.MeshBasicMaterial({
-                                color,
-                                transparent: true,
-                                opacity: opacity * 0.25
-                            })));
-                            // Core line — bright and crisp
-                            arcGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve.getPoints(80)), new THREE.LineBasicMaterial({
-                                color: brightColor,
-                                transparent: true,
-                                opacity: opacity
-                            })));
-                            // Source pulse dot — large and glowing
-                            const srcR = isCrit ? 0.036 : 0.024;
-                            const [sx2, sy2, sz2] = ll2v(pt.srcLat, pt.srcLng, R + 0.018);
-                            const srcDot = new THREE.Mesh(new THREE.SphereGeometry(srcR, 10, 10), new THREE.MeshBasicMaterial({
-                                color: brightColor
-                            }));
-                            srcDot.position.set(sx2, sy2, sz2);
-                            arcGroup.add(srcDot);
-                            // Src halo ring
-                            arcGroup.add(new THREE.Mesh(new THREE.SphereGeometry(srcR * 2.2, 10, 10), new THREE.MeshBasicMaterial({
-                                color,
-                                transparent: true,
-                                opacity: 0.18
-                            })));
-                            // Destination dot
-                            const [dx2, dy2, dz2] = ll2v(pt.dstLat, pt.dstLng, R + 0.012);
-                            const dstDot = new THREE.Mesh(new THREE.SphereGeometry(0.014, 8, 8), new THREE.MeshBasicMaterial({
-                                color,
-                                transparent: true,
-                                opacity: 0.8
-                            }));
-                            dstDot.position.set(dx2, dy2, dz2);
-                            arcGroup.add(dstDot);
+            const URLS = [
+                'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson',
+                'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json'
+            ];
+            async function tryLoad() {
+                for (const url of URLS){
+                    try {
+                        const raw = await (await fetch(url)).json();
+                        if (raw.type === 'Topology') continue;
+                        if (raw.type === 'FeatureCollection' && raw.features) {
+                            st.current.geo = raw;
+                            setLoaded(true);
+                            return;
                         }
-                    }["Globe3D.useEffect"]);
-                    // ── Drag interaction ───────────────────────────────────────────────────
-                    let dragging = false, lx = 0, ly = 0;
-                    let rotY = 0.5, rotX = 0.12, velY = 0.0020, velX = 0;
-                    const el = renderer.domElement;
-                    el.style.cursor = 'grab';
-                    const onDown = {
-                        "Globe3D.useEffect.onDown": (cx, cy)=>{
-                            dragging = true;
-                            lx = cx;
-                            ly = cy;
-                            el.style.cursor = 'grabbing';
-                        }
-                    }["Globe3D.useEffect.onDown"];
-                    const onUp = {
-                        "Globe3D.useEffect.onUp": ()=>{
-                            dragging = false;
-                            el.style.cursor = 'grab';
-                        }
-                    }["Globe3D.useEffect.onUp"];
-                    const onMove = {
-                        "Globe3D.useEffect.onMove": (cx, cy)=>{
-                            if (!dragging) return;
-                            velY = (cx - lx) * 0.006;
-                            velX = (cy - ly) * 0.004;
-                            rotY += velY;
-                            rotX += velX;
-                            rotX = Math.max(-1.1, Math.min(1.1, rotX));
-                            lx = cx;
-                            ly = cy;
-                        }
-                    }["Globe3D.useEffect.onMove"];
-                    el.addEventListener('mousedown', {
-                        "Globe3D.useEffect": (e)=>onDown(e.clientX, e.clientY)
-                    }["Globe3D.useEffect"]);
-                    el.addEventListener('touchstart', {
-                        "Globe3D.useEffect": (e)=>onDown(e.touches[0].clientX, e.touches[0].clientY)
-                    }["Globe3D.useEffect"], {
-                        passive: true
-                    });
-                    window.addEventListener('mouseup', onUp);
-                    window.addEventListener('touchend', onUp);
-                    window.addEventListener('mousemove', {
-                        "Globe3D.useEffect": (e)=>onMove(e.clientX, e.clientY)
-                    }["Globe3D.useEffect"]);
-                    el.addEventListener('touchmove', {
-                        "Globe3D.useEffect": (e)=>{
-                            e.preventDefault();
-                            onMove(e.touches[0].clientX, e.touches[0].clientY);
-                        }
-                    }["Globe3D.useEffect"], {
-                        passive: false
-                    });
-                    const onResize = {
-                        "Globe3D.useEffect.onResize": ()=>{
-                            const nW = container.clientWidth || 800;
-                            const nH = container.clientHeight || height;
-                            camera.aspect = nW / nH;
-                            camera.updateProjectionMatrix();
-                            renderer.setSize(nW, nH);
-                        }
-                    }["Globe3D.useEffect.onResize"];
-                    window.addEventListener('resize', onResize);
-                    // ── Render loop ────────────────────────────────────────────────────────
-                    const animate = {
-                        "Globe3D.useEffect.animate": ()=>{
-                            if (destroyed) return;
-                            animId = requestAnimationFrame(animate);
-                            if (!dragging) {
-                                velY += (0.0020 - velY) * 0.025;
-                                velX *= 0.93;
-                                rotY += velY;
-                                rotX += velX;
-                                rotX = Math.max(-1.1, Math.min(1.1, rotX));
-                            } else {
-                                velY *= 0.9;
-                                velX *= 0.9;
-                            }
-                            globe.rotation.set(rotX, rotY, 0);
-                            arcGroup.rotation.set(rotX, rotY, 0);
-                            renderer.render(scene, camera);
-                        }
-                    }["Globe3D.useEffect.animate"];
-                    animate();
-                    setReady(true);
-                    cleanRef.current = ({
-                        "Globe3D.useEffect": ()=>{
-                            destroyed = true;
-                            cancelAnimationFrame(animId);
-                            window.removeEventListener('mouseup', onUp);
-                            window.removeEventListener('touchend', onUp);
-                            window.removeEventListener('resize', onResize);
-                            renderer.dispose();
-                            earthTex.dispose();
-                            if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
-                        }
-                    })["Globe3D.useEffect"];
+                    } catch  {}
                 }
-            }["Globe3D.useEffect"]).catch({
-                "Globe3D.useEffect": ()=>setReady(true)
-            }["Globe3D.useEffect"]);
+                setLoaded(true);
+            }
+            tryLoad();
+        }
+    }["Globe3D.useEffect"], []);
+    const draw = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "Globe3D.useCallback[draw]": ()=>{
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+            const dpr = window.devicePixelRatio || 1;
+            const W = canvas.clientWidth, H = canvas.clientHeight;
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            ctx.scale(dpr, dpr);
+            const s = st.current;
+            const cx = W / 2, cy = H / 2, R = Math.min(W, H) * 0.44;
+            const hits = [];
+            ctx.clearRect(0, 0, W, H);
+            // Atmosphere
+            const halo = ctx.createRadialGradient(cx, cy, R * 0.88, cx, cy, R * 1.20);
+            halo.addColorStop(0, 'rgba(0,200,120,0.00)');
+            halo.addColorStop(0.55, 'rgba(0,220,140,0.06)');
+            halo.addColorStop(1, 'rgba(0,255,170,0.00)');
+            ctx.fillStyle = halo;
+            ctx.beginPath();
+            ctx.arc(cx, cy, R * 1.20, 0, Math.PI * 2);
+            ctx.fill();
+            // Ocean
+            const ocean = ctx.createRadialGradient(cx - R * 0.2, cy - R * 0.25, 0, cx, cy, R);
+            ocean.addColorStop(0, '#0d2d4a');
+            ocean.addColorStop(0.6, '#081e33');
+            ocean.addColorStop(1, '#040f1c');
+            ctx.fillStyle = ocean;
+            ctx.beginPath();
+            ctx.arc(cx, cy, R, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(cx, cy, R, 0, Math.PI * 2);
+            ctx.clip();
+            // Grid
+            ctx.strokeStyle = 'rgba(0,180,110,0.10)';
+            ctx.lineWidth = 0.5;
+            for(let lat = -80; lat <= 80; lat += 20){
+                ctx.beginPath();
+                let f = true;
+                for(let lng = -180; lng <= 180; lng += 2){
+                    const p = project(lat, lng, s.rotX, s.rotY, cx, cy, R);
+                    if (!p) {
+                        f = true;
+                        continue;
+                    }
+                    f ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
+                    f = false;
+                }
+                ;
+                ctx.stroke();
+            }
+            for(let lng = -180; lng < 180; lng += 20){
+                ctx.beginPath();
+                let f = true;
+                for(let lat = -88; lat <= 88; lat += 2){
+                    const p = project(lat, lng, s.rotX, s.rotY, cx, cy, R);
+                    if (!p) {
+                        f = true;
+                        continue;
+                    }
+                    f ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
+                    f = false;
+                }
+                ;
+                ctx.stroke();
+            }
+            // Countries
+            if (s.geo?.features) {
+                for (const feat of s.geo.features){
+                    if (!feat.geometry) continue;
+                    const name = (feat.properties?.NAME ?? feat.properties?.name ?? feat.properties?.ADMIN ?? '').toLowerCase();
+                    const isThreat = /russia|china|iran|north.korea|dprk/.test(name);
+                    drawGeometry(ctx, feat.geometry, s.rotX, s.rotY, cx, cy, R, isThreat ? 'rgba(30,110,65,0.88)' : 'rgba(18,95,56,0.80)', isThreat ? 'rgba(0,255,130,0.75)' : 'rgba(0,240,130,0.58)', 0.65);
+                }
+            }
+            // Equator
+            ctx.strokeStyle = 'rgba(0,255,150,0.22)';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            let feq = true;
+            for(let lng = -180; lng <= 180; lng++){
+                const p = project(0, lng, s.rotX, s.rotY, cx, cy, R);
+                if (!p) {
+                    feq = true;
+                    continue;
+                }
+                feq ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
+                feq = false;
+            }
+            ;
+            ctx.stroke();
+            // ── Threat arcs — each type uses its unique TYPE_COLOR ─────────────────
+            s.arcT = (s.arcT + 0.006) % 1;
+            for (const pt of visible){
+                const color = tc(pt.type) // ← unique per-type color
+                ;
+                const isCrit = pt.severity >= 4;
+                const STEPS = 80;
+                const gc = greatCircle(pt.srcLat, pt.srcLng, pt.dstLat, pt.dstLng, STEPS);
+                let prevPt = null, prevVis = false, midPt = null;
+                for(let i = 0; i < gc.length; i++){
+                    const [lat, lng] = gc[i], t = i / (STEPS - 1);
+                    const lift = 1 + Math.sin(t * Math.PI) * (isCrit ? 0.14 : 0.09);
+                    const { pt: px, vis } = projectRaw(lat, lng, s.rotX, s.rotY, cx, cy, R * lift);
+                    if (Math.abs(t - 0.5) < 0.02) midPt = px;
+                    if (vis && prevPt && prevVis) {
+                        const tMid = (i - 0.5) / STEPS, diff = Math.abs(tMid - s.arcT);
+                        const inPulse = diff < 0.15 || 1 - diff < 0.15;
+                        // Glow — type color
+                        ctx.beginPath();
+                        ctx.moveTo(prevPt[0], prevPt[1]);
+                        ctx.lineTo(px[0], px[1]);
+                        ctx.strokeStyle = rgba(color, 0.28);
+                        ctx.lineWidth = isCrit ? 7 : 5;
+                        ctx.stroke();
+                        // Core — type color
+                        ctx.beginPath();
+                        ctx.moveTo(prevPt[0], prevPt[1]);
+                        ctx.lineTo(px[0], px[1]);
+                        if (inPulse) {
+                            const d = 1 - Math.min(diff, 1 - diff) / 0.15;
+                            ctx.strokeStyle = `rgba(255,255,255,${0.6 + d * 0.4})`;
+                            ctx.lineWidth = isCrit ? 2.5 : 1.8;
+                        } else {
+                            ctx.strokeStyle = rgba(color, 0.92);
+                            ctx.lineWidth = isCrit ? 1.8 : 1.2 // full sat type color
+                            ;
+                        }
+                        ctx.stroke();
+                    }
+                    prevPt = px;
+                    prevVis = vis;
+                }
+                // Source dot + animated ring
+                const src = project(pt.srcLat, pt.srcLng, s.rotX, s.rotY, cx, cy, R);
+                if (src) {
+                    const pR = s.arcT * (isCrit ? 22 : 15), alp = 1 - s.arcT;
+                    ctx.beginPath();
+                    ctx.arc(src[0], src[1], pR, 0, Math.PI * 2);
+                    ctx.strokeStyle = rgba(color, alp);
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                    const pR2 = (s.arcT + 0.5) % 1 * (isCrit ? 22 : 15), alp2 = 1 - (s.arcT + 0.5) % 1;
+                    ctx.beginPath();
+                    ctx.arc(src[0], src[1], pR2, 0, Math.PI * 2);
+                    ctx.strokeStyle = rgba(color, alp2 * 0.6);
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    const dotR = isCrit ? 5.5 : 4;
+                    ctx.beginPath();
+                    ctx.arc(src[0], src[1], dotR, 0, Math.PI * 2);
+                    ctx.fillStyle = color;
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(src[0], src[1], isCrit ? 2.2 : 1.5, 0, Math.PI * 2);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fill();
+                    hits.push({
+                        x: src[0],
+                        y: src[1],
+                        r: dotR + 8,
+                        pt
+                    });
+                }
+                // Destination dot
+                const dst = project(pt.dstLat, pt.dstLng, s.rotX, s.rotY, cx, cy, R);
+                if (dst) {
+                    ctx.beginPath();
+                    ctx.arc(dst[0], dst[1], isCrit ? 4.5 : 3, 0, Math.PI * 2);
+                    ctx.fillStyle = rgba(color, 0.75);
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    hits.push({
+                        x: dst[0],
+                        y: dst[1],
+                        r: 10,
+                        pt
+                    });
+                }
+                if (midPt) hits.push({
+                    x: midPt[0],
+                    y: midPt[1],
+                    r: 12,
+                    pt
+                });
+            }
+            s.hits = hits;
+            ctx.restore();
+            // Rim
+            const rim = ctx.createRadialGradient(cx, cy, R * 0.82, cx, cy, R);
+            rim.addColorStop(0, 'rgba(0,255,170,0.00)');
+            rim.addColorStop(0.88, 'rgba(0,255,170,0.05)');
+            rim.addColorStop(1, 'rgba(0,255,170,0.28)');
+            ctx.fillStyle = rim;
+            ctx.beginPath();
+            ctx.arc(cx, cy, R, 0, Math.PI * 2);
+            ctx.fill();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        }
+    }["Globe3D.useCallback[draw]"], [
+        loaded,
+        layerKey,
+        visible.length
+    ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "Globe3D.useEffect": ()=>{
+            let id = 0;
+            const loop = {
+                "Globe3D.useEffect.loop": ()=>{
+                    const s = st.current;
+                    if (!s.dragging) {
+                        s.velY += (0.0028 - s.velY) * 0.025;
+                        s.velX *= 0.94;
+                        s.rotY += s.velY;
+                        s.rotX += s.velX;
+                        s.rotX = Math.max(-1.2, Math.min(1.2, s.rotX));
+                    } else {
+                        s.velY *= 0.88;
+                        s.velX *= 0.88;
+                    }
+                    draw();
+                    id = requestAnimationFrame(loop);
+                }
+            }["Globe3D.useEffect.loop"];
+            id = requestAnimationFrame(loop);
             return ({
-                "Globe3D.useEffect": ()=>{
-                    destroyed = true;
-                    cleanRef.current?.();
-                }
+                "Globe3D.useEffect": ()=>cancelAnimationFrame(id)
             })["Globe3D.useEffect"];
         }
     }["Globe3D.useEffect"], [
-        visible.length,
-        height
+        draw
     ]);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "Globe3D.useEffect": ()=>{
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+            const onClick = {
+                "Globe3D.useEffect.onClick": (e)=>{
+                    const rect = canvas.getBoundingClientRect();
+                    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+                    let best = null, bestDist = Infinity;
+                    for (const h of st.current.hits){
+                        const d = Math.hypot(h.x - mx, h.y - my);
+                        if (d < h.r && d < bestDist) {
+                            best = h;
+                            bestDist = d;
+                        }
+                    }
+                    if (best) {
+                        const x = Math.min(mx + 12, canvas.clientWidth - 290);
+                        const y = Math.max(my - 10, 8);
+                        setPopup({
+                            x,
+                            y,
+                            pt: best.pt
+                        });
+                        st.current.velY = 0;
+                    } else setPopup(null);
+                }
+            }["Globe3D.useEffect.onClick"];
+            canvas.addEventListener('click', onClick);
+            return ({
+                "Globe3D.useEffect": ()=>canvas.removeEventListener('click', onClick)
+            })["Globe3D.useEffect"];
+        }
+    }["Globe3D.useEffect"], []);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "Globe3D.useEffect": ()=>{
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+            const s = st.current;
+            const down = {
+                "Globe3D.useEffect.down": (cx, cy)=>{
+                    s.dragging = true;
+                    s.lx = cx;
+                    s.ly = cy;
+                    canvas.style.cursor = 'grabbing';
+                }
+            }["Globe3D.useEffect.down"];
+            const up = {
+                "Globe3D.useEffect.up": ()=>{
+                    s.dragging = false;
+                    canvas.style.cursor = 'grab';
+                }
+            }["Globe3D.useEffect.up"];
+            const move = {
+                "Globe3D.useEffect.move": (cx, cy)=>{
+                    if (!s.dragging) return;
+                    s.velY = (cx - s.lx) * 0.007;
+                    s.velX = (cy - s.ly) * 0.005;
+                    s.rotY += s.velY;
+                    s.rotX += s.velX;
+                    s.rotX = Math.max(-1.2, Math.min(1.2, s.rotX));
+                    s.lx = cx;
+                    s.ly = cy;
+                }
+            }["Globe3D.useEffect.move"];
+            canvas.style.cursor = 'grab';
+            canvas.addEventListener('mousedown', {
+                "Globe3D.useEffect": (e)=>down(e.clientX, e.clientY)
+            }["Globe3D.useEffect"]);
+            canvas.addEventListener('touchstart', {
+                "Globe3D.useEffect": (e)=>down(e.touches[0].clientX, e.touches[0].clientY)
+            }["Globe3D.useEffect"], {
+                passive: true
+            });
+            window.addEventListener('mouseup', up);
+            window.addEventListener('touchend', up);
+            window.addEventListener('mousemove', {
+                "Globe3D.useEffect": (e)=>move(e.clientX, e.clientY)
+            }["Globe3D.useEffect"]);
+            canvas.addEventListener('touchmove', {
+                "Globe3D.useEffect": (e)=>{
+                    e.preventDefault();
+                    move(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }["Globe3D.useEffect"], {
+                passive: false
+            });
+            return ({
+                "Globe3D.useEffect": ()=>{
+                    window.removeEventListener('mouseup', up);
+                    window.removeEventListener('touchend', up);
+                }
+            })["Globe3D.useEffect"];
+        }
+    }["Globe3D.useEffect"], []);
+    const popupColor = popup ? tc(popup.pt.type) : '#00ffaa';
+    const popupIcon = popup ? TYPE_ICON[popup.pt.type] ?? '⚠️' : '';
+    const sevLabel = (s)=>s >= 5 ? 'CRITICAL' : s >= 4 ? 'HIGH' : s >= 3 ? 'MEDIUM' : s >= 2 ? 'LOW' : 'INFO';
+    const sevColor = (s)=>s >= 5 ? '#ff3a5c' : s >= 4 ? '#ff6b35' : s >= 3 ? '#facc15' : s >= 2 ? '#38bdf8' : '#64748b';
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        ref: mountRef,
-        className: "w-full h-full relative",
+        className: "relative w-full h-full",
         style: {
-            background: 'radial-gradient(ellipse at center, #020e18 0%, #010810 100%)'
+            background: 'radial-gradient(ellipse at 50% 50%, #030f1e 0%, #010912 100%)'
         },
-        children: !ready && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "absolute inset-0 flex items-center justify-center",
-            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                className: "font-mono text-[12px] animate-pulse",
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("canvas", {
+                ref: canvasRef,
                 style: {
-                    color: '#00ffaa'
-                },
-                children: "⟳ Rendering 3D globe..."
+                    width: '100%',
+                    height: '100%',
+                    display: 'block'
+                }
             }, void 0, false, {
                 fileName: "[project]/src/components/map/Globe3D.tsx",
-                lineNumber: 446,
-                columnNumber: 11
+                lineNumber: 318,
+                columnNumber: 7
+            }, this),
+            !loaded && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "absolute inset-0 flex items-center justify-center pointer-events-none",
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "flex flex-col items-center gap-2",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "w-7 h-7 border-2 border-accent/30 border-t-accent rounded-full animate-spin"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                            lineNumber: 323,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "font-mono text-[11px] text-accent/60",
+                            children: "Loading geo data…"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                            lineNumber: 324,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                    lineNumber: 322,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/src/components/map/Globe3D.tsx",
+                lineNumber: 321,
+                columnNumber: 9
+            }, this),
+            popup && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                ref: popupRef,
+                className: "absolute z-50 pointer-events-auto",
+                style: {
+                    left: popup.x,
+                    top: popup.y,
+                    width: '276px'
+                },
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "rounded-2xl overflow-hidden",
+                    style: {
+                        background: 'rgba(4,8,18,0.97)',
+                        border: `1px solid ${rgba(popupColor, 0.40)}`,
+                        backdropFilter: 'blur(24px)',
+                        boxShadow: `0 0 40px ${rgba(popupColor, 0.12)}, 0 8px 32px rgba(0,0,0,0.65)`
+                    },
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "flex items-center justify-between px-4 py-3",
+                            style: {
+                                borderBottom: `1px solid ${rgba(popupColor, 0.18)}`,
+                                background: rgba(popupColor, 0.07)
+                            },
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex items-center gap-2.5",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            style: {
+                                                fontSize: '18px'
+                                            },
+                                            children: popupIcon
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 345,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "font-mono text-[11px] font-bold tracking-[0.15em]",
+                                                    style: {
+                                                        color: popupColor
+                                                    },
+                                                    children: popup.pt.type.toUpperCase()
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                                    lineNumber: 347,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "font-mono text-[9px] text-slate-600 tracking-wider",
+                                                    children: "THREAT EVENT"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                                    lineNumber: 350,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 346,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                    lineNumber: 344,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: ()=>setPopup(null),
+                                    className: "w-6 h-6 flex items-center justify-center rounded-lg cursor-pointer",
+                                    style: {
+                                        background: 'rgba(255,255,255,0.05)',
+                                        border: '1px solid rgba(255,255,255,0.09)',
+                                        color: '#475569'
+                                    },
+                                    onMouseEnter: (e)=>e.currentTarget.style.color = '#e2e8f0',
+                                    onMouseLeave: (e)=>e.currentTarget.style.color = '#475569',
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        style: {
+                                            fontSize: '10px'
+                                        },
+                                        children: "✕"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/map/Globe3D.tsx",
+                                        lineNumber: 358,
+                                        columnNumber: 17
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                    lineNumber: 353,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                            lineNumber: 342,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "px-4 pt-3 pb-2.5",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex items-center justify-between mb-2",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "font-mono text-[9px] text-slate-600 uppercase tracking-wider",
+                                            children: "Severity"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 365,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "font-mono text-[10px] font-bold tracking-wider",
+                                            style: {
+                                                color: sevColor(popup.pt.severity)
+                                            },
+                                            children: sevLabel(popup.pt.severity)
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 366,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                    lineNumber: 364,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex gap-1.5",
+                                    children: [
+                                        1,
+                                        2,
+                                        3,
+                                        4,
+                                        5
+                                    ].map((i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex-1 h-1.5 rounded-full",
+                                            style: {
+                                                background: i <= popup.pt.severity ? sevColor(popup.pt.severity) : 'rgba(255,255,255,0.07)',
+                                                boxShadow: i <= popup.pt.severity ? `0 0 8px ${rgba(sevColor(popup.pt.severity), 0.55)}` : 'none',
+                                                transition: 'all 0.2s'
+                                            }
+                                        }, i, false, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 372,
+                                            columnNumber: 19
+                                        }, this))
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                    lineNumber: 370,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                            lineNumber: 363,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "mx-4 mb-3 rounded-xl overflow-hidden",
+                            style: {
+                                border: '1px solid rgba(255,255,255,0.07)',
+                                background: 'rgba(255,255,255,0.02)'
+                            },
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex items-center gap-3 px-3 py-2",
+                                    style: {
+                                        borderBottom: '1px solid rgba(255,255,255,0.04)'
+                                    },
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex items-center gap-2 shrink-0",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "w-2 h-2 rounded-full",
+                                                    style: {
+                                                        background: popupColor,
+                                                        boxShadow: `0 0 6px ${popupColor}`
+                                                    }
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                                    lineNumber: 388,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-[9px] text-slate-600 uppercase tracking-wider w-10",
+                                                    children: "Origin"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                                    lineNumber: 390,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 387,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "font-mono text-[11px] text-slate-200 tabular-nums",
+                                            children: [
+                                                Math.abs(popup.pt.srcLat).toFixed(2),
+                                                "°",
+                                                popup.pt.srcLat >= 0 ? 'N' : 'S',
+                                                "  ",
+                                                Math.abs(popup.pt.srcLng).toFixed(2),
+                                                "°",
+                                                popup.pt.srcLng >= 0 ? 'E' : 'W'
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 392,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                    lineNumber: 385,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex justify-center py-0.5",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "font-mono text-[13px]",
+                                        style: {
+                                            color: rgba(popupColor, 0.5)
+                                        },
+                                        children: "↓"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/map/Globe3D.tsx",
+                                        lineNumber: 398,
+                                        columnNumber: 17
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                    lineNumber: 397,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex items-center gap-3 px-3 py-2",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex items-center gap-2 shrink-0",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "w-2 h-2 rounded-sm",
+                                                    style: {
+                                                        background: rgba(popupColor, 0.5),
+                                                        border: `1px solid ${popupColor}`
+                                                    }
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                                    lineNumber: 402,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-[9px] text-slate-600 uppercase tracking-wider w-10",
+                                                    children: "Target"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                                    lineNumber: 404,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 401,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "font-mono text-[11px] text-slate-200 tabular-nums",
+                                            children: [
+                                                Math.abs(popup.pt.dstLat).toFixed(2),
+                                                "°",
+                                                popup.pt.dstLat >= 0 ? 'N' : 'S',
+                                                "  ",
+                                                Math.abs(popup.pt.dstLng).toFixed(2),
+                                                "°",
+                                                popup.pt.dstLng >= 0 ? 'E' : 'W'
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 406,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                    lineNumber: 400,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                            lineNumber: 383,
+                            columnNumber: 13
+                        }, this),
+                        popup.pt.label && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "px-4 pb-3",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "font-mono text-[9px] text-slate-600 uppercase tracking-wider mb-1.5",
+                                    children: "Details"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                    lineNumber: 416,
+                                    columnNumber: 17
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "font-mono text-[10px] text-slate-400 leading-relaxed line-clamp-3",
+                                    children: popup.pt.label
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                    lineNumber: 417,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                            lineNumber: 415,
+                            columnNumber: 15
+                        }, this),
+                        popup.pt.sourceUrl && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "px-4 pb-3",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                href: popup.pt.sourceUrl,
+                                target: "_blank",
+                                rel: "noreferrer",
+                                className: "flex items-center gap-1.5 font-mono text-[10px] hover:underline",
+                                style: {
+                                    color: popupColor
+                                },
+                                children: [
+                                    "View source report ",
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        children: "↗"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/map/Globe3D.tsx",
+                                        lineNumber: 427,
+                                        columnNumber: 38
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/map/Globe3D.tsx",
+                                lineNumber: 424,
+                                columnNumber: 17
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                            lineNumber: 423,
+                            columnNumber: 15
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "h-px",
+                            style: {
+                                background: `linear-gradient(90deg,transparent,${popupColor},transparent)`,
+                                opacity: 0.35
+                            }
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                            lineNumber: 433,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                    lineNumber: 333,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/src/components/map/Globe3D.tsx",
+                lineNumber: 331,
+                columnNumber: 9
             }, this)
-        }, void 0, false, {
-            fileName: "[project]/src/components/map/Globe3D.tsx",
-            lineNumber: 445,
-            columnNumber: 9
-        }, this)
-    }, void 0, false, {
+        ]
+    }, void 0, true, {
         fileName: "[project]/src/components/map/Globe3D.tsx",
-        lineNumber: 439,
+        lineNumber: 316,
         columnNumber: 5
     }, this);
 }
-_s(Globe3D, "Ha2MQjVJnxWc6rHBG+kovk1KbDw=");
+_s(Globe3D, "HjWTmhCuAzWSVMfDzffu18lMTcE=");
 _c = Globe3D;
 var _c;
 __turbopack_refresh__.register(_c, "Globe3D");
@@ -2174,7 +1074,6 @@ function ThreatMapPage() {
     });
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [activeLayers, setActiveLayers] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(new Set(ALL_TYPES));
-    const [globeKey, setGlobeKey] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0);
     const [layerOpen, setLayerOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [isMobile, setIsMobile] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
@@ -2256,14 +1155,12 @@ function ThreatMapPage() {
         setActiveLayers((prev)=>{
             const n = new Set(prev);
             n.has(type) ? n.delete(type) : n.add(type);
-            setGlobeKey((k)=>k + 1);
             return n;
         });
     }
     function toggleAll() {
         setActiveLayers((prev)=>{
             const n = prev.size === ALL_TYPES.length ? new Set() : new Set(ALL_TYPES);
-            setGlobeKey((k)=>k + 1);
             return n;
         });
     }
@@ -2290,12 +1187,12 @@ function ThreatMapPage() {
                         children: "THREAT TYPES"
                     }, void 0, false, {
                         fileName: "[project]/src/app/threat-map/page.tsx",
-                        lineNumber: 68,
+                        lineNumber: 67,
                         columnNumber: 9
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/app/threat-map/page.tsx",
-                    lineNumber: 67,
+                    lineNumber: 66,
                     columnNumber: 7
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2331,7 +1228,7 @@ function ThreatMapPage() {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/threat-map/page.tsx",
-                                    lineNumber: 72,
+                                    lineNumber: 71,
                                     columnNumber: 11
                                 }, this),
                                 activeLayers.size === ALL_TYPES.length && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2344,13 +1241,13 @@ function ThreatMapPage() {
                                     }
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/threat-map/page.tsx",
-                                    lineNumber: 73,
+                                    lineNumber: 72,
                                     columnNumber: 52
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 71,
+                            lineNumber: 70,
                             columnNumber: 9
                         }, this),
                         compact ? /* Compact: horizontal chips for mobile dropdown */ /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2385,7 +1282,7 @@ function ThreatMapPage() {
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/threat-map/page.tsx",
-                                            lineNumber: 82,
+                                            lineNumber: 81,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2397,7 +1294,7 @@ function ThreatMapPage() {
                                             children: type
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/threat-map/page.tsx",
-                                            lineNumber: 83,
+                                            lineNumber: 82,
                                             columnNumber: 19
                                         }, this),
                                         count > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2413,19 +1310,19 @@ function ThreatMapPage() {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/threat-map/page.tsx",
-                                            lineNumber: 84,
+                                            lineNumber: 83,
                                             columnNumber: 29
                                         }, this)
                                     ]
                                 }, type, true, {
                                     fileName: "[project]/src/app/threat-map/page.tsx",
-                                    lineNumber: 81,
+                                    lineNumber: 80,
                                     columnNumber: 17
                                 }, this);
                             })
                         }, void 0, false, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 77,
+                            lineNumber: 76,
                             columnNumber: 11
                         }, this) : /* Full: vertical list for desktop */ ALL_TYPES.map((type)=>{
                             const count = typeCounts[type] ?? 0, active = activeLayers.has(type), color = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$map$2f$Globe3D$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["TYPE_COLOR"][type];
@@ -2453,7 +1350,7 @@ function ThreatMapPage() {
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 95,
+                                        lineNumber: 94,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2467,7 +1364,7 @@ function ThreatMapPage() {
                                         children: type
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 96,
+                                        lineNumber: 95,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2483,20 +1380,20 @@ function ThreatMapPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 97,
+                                        lineNumber: 96,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, type, true, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 94,
+                                lineNumber: 93,
                                 columnNumber: 15
                             }, this);
                         })
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/threat-map/page.tsx",
-                    lineNumber: 70,
+                    lineNumber: 69,
                     columnNumber: 7
                 }, this),
                 !compact && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2517,7 +1414,7 @@ function ThreatMapPage() {
                             children: "SEVERITY"
                         }, void 0, false, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 105,
+                            lineNumber: 104,
                             columnNumber: 11
                         }, this),
                         [
@@ -2555,7 +1452,7 @@ function ThreatMapPage() {
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 108,
+                                        lineNumber: 107,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2567,25 +1464,25 @@ function ThreatMapPage() {
                                         children: l
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 109,
+                                        lineNumber: 108,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, l, true, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 107,
+                                lineNumber: 106,
                                 columnNumber: 13
                             }, this))
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/threat-map/page.tsx",
-                    lineNumber: 104,
+                    lineNumber: 103,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/threat-map/page.tsx",
-            lineNumber: 66,
+            lineNumber: 65,
             columnNumber: 5
         }, this);
     const OTXFeed = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -2601,7 +1498,7 @@ function ThreatMapPage() {
                     children: "Loading OTX..."
                 }, void 0, false, {
                     fileName: "[project]/src/app/threat-map/page.tsx",
-                    lineNumber: 119,
+                    lineNumber: 118,
                     columnNumber: 26
                 }, this),
                 pulses.map((p)=>{
@@ -2636,7 +1533,7 @@ function ThreatMapPage() {
                                 children: p.name
                             }, void 0, false, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 126,
+                                lineNumber: 125,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2660,7 +1557,7 @@ function ThreatMapPage() {
                                         children: type.toUpperCase()
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 128,
+                                        lineNumber: 127,
                                         columnNumber: 15
                                     }, this),
                                     p.targeted_countries?.slice(0, 2).map((c)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2672,7 +1569,7 @@ function ThreatMapPage() {
                                             children: c
                                         }, c, false, {
                                             fileName: "[project]/src/app/threat-map/page.tsx",
-                                            lineNumber: 129,
+                                            lineNumber: 128,
                                             columnNumber: 56
                                         }, this)),
                                     p.adversary && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2684,7 +1581,7 @@ function ThreatMapPage() {
                                         children: p.adversary
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 130,
+                                        lineNumber: 129,
                                         columnNumber: 29
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2697,19 +1594,19 @@ function ThreatMapPage() {
                                         children: (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$utils$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["timeAgo"])(p.modified ?? p.created)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 131,
+                                        lineNumber: 130,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 127,
+                                lineNumber: 126,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, p.id, true, {
                         fileName: "[project]/src/app/threat-map/page.tsx",
-                        lineNumber: 124,
+                        lineNumber: 123,
                         columnNumber: 11
                     }, this);
                 })
@@ -2747,7 +1644,7 @@ function ThreatMapPage() {
                                     className: "live-dot live-dot-red"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/threat-map/page.tsx",
-                                    lineNumber: 146,
+                                    lineNumber: 145,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2760,13 +1657,13 @@ function ThreatMapPage() {
                                     children: "GLOBAL SITUATION"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/threat-map/page.tsx",
-                                    lineNumber: 147,
+                                    lineNumber: 146,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 145,
+                            lineNumber: 144,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2790,7 +1687,7 @@ function ThreatMapPage() {
                                             children: visiblePts.length
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/threat-map/page.tsx",
-                                            lineNumber: 151,
+                                            lineNumber: 150,
                                             columnNumber: 15
                                         }, this),
                                         "/",
@@ -2798,7 +1695,7 @@ function ThreatMapPage() {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/threat-map/page.tsx",
-                                    lineNumber: 150,
+                                    lineNumber: 149,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2816,7 +1713,7 @@ function ThreatMapPage() {
                                     children: "⚡ Layers"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/threat-map/page.tsx",
-                                    lineNumber: 153,
+                                    lineNumber: 152,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2834,19 +1731,19 @@ function ThreatMapPage() {
                                     children: loading ? '⟳' : '↻'
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/threat-map/page.tsx",
-                                    lineNumber: 156,
+                                    lineNumber: 155,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 149,
+                            lineNumber: 148,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/threat-map/page.tsx",
-                    lineNumber: 144,
+                    lineNumber: 143,
                     columnNumber: 9
                 }, this),
                 layerOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2861,12 +1758,12 @@ function ThreatMapPage() {
                         compact: true
                     }, void 0, false, {
                         fileName: "[project]/src/app/threat-map/page.tsx",
-                        lineNumber: 163,
+                        lineNumber: 162,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/app/threat-map/page.tsx",
-                    lineNumber: 162,
+                    lineNumber: 161,
                     columnNumber: 11
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2880,9 +1777,9 @@ function ThreatMapPage() {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$map$2f$Globe3D$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Globe3D"], {
                             points: points,
                             activeLayers: activeLayers
-                        }, globeKey, false, {
+                        }, void 0, false, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 169,
+                            lineNumber: 168,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2926,7 +1823,7 @@ function ThreatMapPage() {
                                             children: s.v
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/threat-map/page.tsx",
-                                            lineNumber: 174,
+                                            lineNumber: 173,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2936,24 +1833,24 @@ function ThreatMapPage() {
                                             children: s.l
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/threat-map/page.tsx",
-                                            lineNumber: 174,
+                                            lineNumber: 173,
                                             columnNumber: 70
                                         }, this)
                                     ]
                                 }, s.l, true, {
                                     fileName: "[project]/src/app/threat-map/page.tsx",
-                                    lineNumber: 173,
+                                    lineNumber: 172,
                                     columnNumber: 15
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 171,
+                            lineNumber: 170,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/threat-map/page.tsx",
-                    lineNumber: 168,
+                    lineNumber: 167,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2970,7 +1867,7 @@ function ThreatMapPage() {
                             className: "live-dot"
                         }, void 0, false, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 182,
+                            lineNumber: 181,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2984,7 +1881,7 @@ function ThreatMapPage() {
                             children: "OTX Pulses"
                         }, void 0, false, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 183,
+                            lineNumber: 182,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -3001,13 +1898,13 @@ function ThreatMapPage() {
                             children: "OTX ↗"
                         }, void 0, false, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 184,
+                            lineNumber: 183,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/threat-map/page.tsx",
-                    lineNumber: 181,
+                    lineNumber: 180,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3016,12 +1913,12 @@ function ThreatMapPage() {
                     },
                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(OTXFeed, {}, void 0, false, {
                         fileName: "[project]/src/app/threat-map/page.tsx",
-                        lineNumber: 189,
+                        lineNumber: 188,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/app/threat-map/page.tsx",
-                    lineNumber: 188,
+                    lineNumber: 187,
                     columnNumber: 9
                 }, this),
                 stats.cveIds?.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3043,7 +1940,7 @@ function ThreatMapPage() {
                             children: "CVEs IN OTX"
                         }, void 0, false, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 195,
+                            lineNumber: 194,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3067,24 +1964,24 @@ function ThreatMapPage() {
                                     children: cve
                                 }, cve, false, {
                                     fileName: "[project]/src/app/threat-map/page.tsx",
-                                    lineNumber: 198,
+                                    lineNumber: 197,
                                     columnNumber: 17
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 196,
+                            lineNumber: 195,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/threat-map/page.tsx",
-                    lineNumber: 194,
+                    lineNumber: 193,
                     columnNumber: 11
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/threat-map/page.tsx",
-            lineNumber: 142,
+            lineNumber: 141,
             columnNumber: 7
         }, this);
     }
@@ -3124,7 +2021,7 @@ function ThreatMapPage() {
                                 className: "live-dot live-dot-red"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 215,
+                                lineNumber: 214,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3138,7 +2035,7 @@ function ThreatMapPage() {
                                 children: "GLOBAL SITUATION"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 216,
+                                lineNumber: 215,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3150,13 +2047,13 @@ function ThreatMapPage() {
                                 children: new Date().toUTCString().replace('GMT', 'UTC')
                             }, void 0, false, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 217,
+                                lineNumber: 216,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/threat-map/page.tsx",
-                        lineNumber: 214,
+                        lineNumber: 213,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3179,7 +2076,7 @@ function ThreatMapPage() {
                                         children: visiblePts.length
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 221,
+                                        lineNumber: 220,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3193,13 +2090,13 @@ function ThreatMapPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 221,
+                                        lineNumber: 220,
                                         columnNumber: 71
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 220,
+                                lineNumber: 219,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3217,19 +2114,19 @@ function ThreatMapPage() {
                                 children: loading ? '⟳' : '↻'
                             }, void 0, false, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 223,
+                                lineNumber: 222,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/threat-map/page.tsx",
-                        lineNumber: 219,
+                        lineNumber: 218,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/threat-map/page.tsx",
-                lineNumber: 213,
+                lineNumber: 212,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3252,12 +2149,12 @@ function ThreatMapPage() {
                         },
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LayerPanel, {}, void 0, false, {
                             fileName: "[project]/src/app/threat-map/page.tsx",
-                            lineNumber: 232,
+                            lineNumber: 231,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/app/threat-map/page.tsx",
-                        lineNumber: 231,
+                        lineNumber: 230,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3272,9 +2169,9 @@ function ThreatMapPage() {
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$map$2f$Globe3D$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Globe3D"], {
                                 points: points,
                                 activeLayers: activeLayers
-                            }, globeKey, false, {
+                            }, void 0, false, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 237,
+                                lineNumber: 236,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3323,7 +2220,7 @@ function ThreatMapPage() {
                                                 children: s.v
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                                lineNumber: 241,
+                                                lineNumber: 240,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3333,24 +2230,24 @@ function ThreatMapPage() {
                                                 children: s.l
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                                lineNumber: 241,
+                                                lineNumber: 240,
                                                 columnNumber: 70
                                             }, this)
                                         ]
                                     }, s.l, true, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 240,
+                                        lineNumber: 239,
                                         columnNumber: 15
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 238,
+                                lineNumber: 237,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/threat-map/page.tsx",
-                        lineNumber: 236,
+                        lineNumber: 235,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3378,7 +2275,7 @@ function ThreatMapPage() {
                                         className: "live-dot"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 250,
+                                        lineNumber: 249,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3392,7 +2289,7 @@ function ThreatMapPage() {
                                         children: "OTX Pulses"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 251,
+                                        lineNumber: 250,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -3409,13 +2306,13 @@ function ThreatMapPage() {
                                         children: "OTX ↗"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 252,
+                                        lineNumber: 251,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 249,
+                                lineNumber: 248,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3425,12 +2322,12 @@ function ThreatMapPage() {
                                 },
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(OTXFeed, {}, void 0, false, {
                                     fileName: "[project]/src/app/threat-map/page.tsx",
-                                    lineNumber: 254,
+                                    lineNumber: 253,
                                     columnNumber: 52
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 254,
+                                lineNumber: 253,
                                 columnNumber: 11
                             }, this),
                             stats.cveIds?.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3452,7 +2349,7 @@ function ThreatMapPage() {
                                         children: "CVEs IN OTX"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 257,
+                                        lineNumber: 256,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3476,40 +2373,40 @@ function ThreatMapPage() {
                                                 children: cve
                                             }, cve, false, {
                                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                                lineNumber: 260,
+                                                lineNumber: 259,
                                                 columnNumber: 19
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/threat-map/page.tsx",
-                                        lineNumber: 258,
+                                        lineNumber: 257,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/threat-map/page.tsx",
-                                lineNumber: 256,
+                                lineNumber: 255,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/threat-map/page.tsx",
-                        lineNumber: 248,
+                        lineNumber: 247,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/threat-map/page.tsx",
-                lineNumber: 228,
+                lineNumber: 227,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/threat-map/page.tsx",
-        lineNumber: 210,
+        lineNumber: 209,
         columnNumber: 5
     }, this);
 }
-_s(ThreatMapPage, "/f5wWZ/jNSnVQ+yldIMiKUQl3vg=");
+_s(ThreatMapPage, "AKAHj9xsos5aE1h+Ig2W9mOuaHI=");
 _c1 = ThreatMapPage;
 var _c, _c1;
 __turbopack_refresh__.register(_c, "ALL_TYPES");

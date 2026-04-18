@@ -95,12 +95,6 @@ function LoginForm() {
             </p>
           </div>
         </div>
-
-        {process.env.NODE_ENV === 'development' && (
-          <div className="mt-3 p-2.5 rounded-xl border border-white/[0.05] text-center">
-            <p className="font-mono text-[9px] text-slate-700">Dev: dev@example.com / dev_password</p>
-          </div>
-        )}
       </div>
     </div>
   )

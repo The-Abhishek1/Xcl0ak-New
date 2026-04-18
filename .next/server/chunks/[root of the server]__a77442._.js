@@ -161,15 +161,18 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$adminAuth$2e$t
 ;
 ;
 async function POST(req) {
-    const { alias, password } = await req.json();
+    const body = await req.json();
+    // Accept both {alias} and {email} for compatibility with login page
+    const alias = (body.alias ?? body.email ?? '').trim();
+    const password = body.password ?? '';
     if (!alias || !password) {
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            error: 'alias and password required'
+            error: 'email/alias and password required'
         }, {
             status: 400
         });
     }
-    // First-time setup: if no admins exist, create one
+    // First-time setup: if no admins exist, create one automatically
     const count = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].adminUser.count();
     if (count === 0) {
         await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].adminUser.create({
@@ -191,14 +194,22 @@ async function POST(req) {
         });
         return res;
     }
-    const admin = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].adminUser.findUnique({
+    // Try alias match first, then email-style match (alias contains @)
+    const admin = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$prisma$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["prisma"].adminUser.findFirst({
         where: {
-            alias
+            OR: [
+                {
+                    alias
+                },
+                {
+                    alias: alias.split('@')[0]
+                }
+            ]
         }
     });
     if (!admin || !(0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$adminAuth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["checkPassword"])(password, admin.passwordHash)) {
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
-            error: 'Invalid credentials'
+            error: 'Invalid email or password'
         }, {
             status: 401
         });

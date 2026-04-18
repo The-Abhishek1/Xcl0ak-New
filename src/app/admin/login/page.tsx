@@ -24,18 +24,30 @@ export default function AdminLoginPage() {
     setLoading(true); setError('')
     try {
       const res = await fetch('/api/eso/auth/login', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ email, password }),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password }),
       })
       const d = await res.json()
-      if (!res.ok) throw new Error(d.detail || 'Login failed')
-      if (d.user?.role !== 'admin') throw new Error('Access denied — admin account required')
+
+      if (!res.ok) {
+        // Show the actual error from ESO (e.g. locked account, wrong password)
+        throw new Error(d.detail ?? d.error ?? 'Invalid email or password')
+      }
+      if (d.user?.role !== 'admin') {
+        throw new Error('Access denied — this account does not have admin privileges')
+      }
+
       saveSession(d.access_token, d.user)
-      // Also set xcloak legacy key
-      sessionStorage.setItem('xcloak-admin-alias', d.user.username ?? 'admin')
+      sessionStorage.setItem('xcloak-admin-alias', d.user.username ?? email.split('@')[0])
+      // Store ESO token so admin API calls can authenticate
+      sessionStorage.setItem('xcloak-admin-token', d.access_token)
       router.push('/admin')
-    } catch(e:any) { setError(e.message) }
-    finally { setLoading(false) }
+    } catch (e: any) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const inp = "w-full bg-white/[0.04] border border-white/[0.08] rounded-xl px-4 py-3 font-mono text-[13px] text-slate-200 outline-none focus:border-red-500/40 transition-all placeholder-slate-700"

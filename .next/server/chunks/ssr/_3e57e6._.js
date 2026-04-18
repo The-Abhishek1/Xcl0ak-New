@@ -10,9 +10,11 @@ __turbopack_esm__({
     "TYPE_COLOR": (()=>TYPE_COLOR)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
-// src/components/map/Globe3D.tsx
-// World-Monitor-style 3D globe — Canvas2D + orthographic projection
-// Real country borders from naturalearth GeoJSON, animated threat arcs
+// src/components/map/Globe3D.tsx — Fixed:
+// 1. FILTER: activeLayers changes now correctly re-filter visible points
+// 2. COLORS: proper rgba() instead of hex+alpha concat (canvas compat)
+// 3. POPUP: click on arc/dot shows threat detail popup
+// 4. HIT TEST: tracks arc midpoints for click detection
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
 'use client';
 ;
@@ -28,35 +30,45 @@ const TYPE_COLOR = {
     RAT: '#f472b6',
     WORM: '#fb923c'
 };
+// Parse hex color → {r,g,b}
+function hexRGB(hex) {
+    const h = hex.replace('#', '');
+    return {
+        r: parseInt(h.slice(0, 2), 16),
+        g: parseInt(h.slice(2, 4), 16),
+        b: parseInt(h.slice(4, 6), 16)
+    };
+}
+// Return rgba() string — works in all canvas contexts
+function rgba(hex, alpha) {
+    const { r, g, b } = hexRGB(hex);
+    return `rgba(${r},${g},${b},${alpha})`;
+}
 const tc = (t)=>TYPE_COLOR[t] ?? '#94a3b8';
 const DEG = Math.PI / 180;
-// ── Project lat/lng → canvas [x,y] with rotation ──────────────────────────
+// ── Projection ────────────────────────────────────────────────────────────────
 function project(lat, lng, rotX, rotY, cx, cy, R) {
     const phi = lat * DEG, lam = lng * DEG;
-    let vx = Math.cos(phi) * Math.sin(lam);
-    let vy = Math.sin(phi);
-    let vz = Math.cos(phi) * Math.cos(lam);
-    // Rotate Y (spin)
+    const vx = Math.cos(phi) * Math.sin(lam);
+    const vy = Math.sin(phi);
+    const vz = Math.cos(phi) * Math.cos(lam);
     const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
     const vx1 = vx * cosY - vz * sinY;
     const vz1 = vx * sinY + vz * cosY;
-    // Rotate X (tilt)
     const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
     const vy2 = vy * cosX - vz1 * sinX;
     const vz2 = vy * sinX + vz1 * cosX;
-    if (vz2 < 0) return null // back of globe
-    ;
+    if (vz2 < 0) return null;
     return [
         cx + vx1 * R,
         cy - vy2 * R
     ];
 }
-// ── Same but returns raw components (for lifted arcs) ─────────────────────
 function projectRaw(lat, lng, rotX, rotY, cx, cy, effR) {
     const phi = lat * DEG, lam = lng * DEG;
-    let vx = Math.cos(phi) * Math.sin(lam);
-    let vy = Math.sin(phi);
-    let vz = Math.cos(phi) * Math.cos(lam);
+    const vx = Math.cos(phi) * Math.sin(lam);
+    const vy = Math.sin(phi);
+    const vz = Math.cos(phi) * Math.cos(lam);
     const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
     const vx1 = vx * cosY - vz * sinY;
     const vz1 = vx * sinY + vz * cosY;
@@ -71,13 +83,11 @@ function projectRaw(lat, lng, rotX, rotY, cx, cy, effR) {
         vis: vz2 >= -0.04
     };
 }
-// ── Slerp great-circle path ─────────────────────────────────────────────────
 function greatCircle(lat1, lng1, lat2, lng2, steps) {
     const p1 = [
         lat1 * DEG,
         lng1 * DEG
-    ];
-    const p2 = [
+    ], p2 = [
         lat2 * DEG,
         lng2 * DEG
     ];
@@ -108,34 +118,25 @@ function greatCircle(lat1, lng1, lat2, lng2, steps) {
         const t = i / steps;
         const sa = Math.sin((1 - t) * omega) / Math.sin(omega);
         const sb = Math.sin(t * omega) / Math.sin(omega);
-        const vx = sa * v1[0] + sb * v2[0];
-        const vy = sa * v1[1] + sb * v2[1];
-        const vz = sa * v1[2] + sb * v2[2];
-        const lat = Math.atan2(vy, Math.sqrt(vx * vx + vz * vz)) / DEG;
-        const lng = Math.atan2(vz, vx) / DEG;
+        const vx = sa * v1[0] + sb * v2[0], vy = sa * v1[1] + sb * v2[1], vz = sa * v1[2] + sb * v2[2];
         out.push([
-            lat,
-            lng
+            Math.atan2(vy, Math.sqrt(vx * vx + vz * vz)) / DEG,
+            Math.atan2(vz, vx) / DEG
         ]);
     }
     return out;
 }
-// ── Draw one GeoJSON geometry onto the globe ─────────────────────────────────
 function drawGeometry(ctx, geom, rotX, rotY, cx, cy, R, fill, stroke, lw) {
     const polys = geom.type === 'Polygon' ? geom.coordinates : geom.type === 'MultiPolygon' ? geom.coordinates.flat() : [];
     for (const ring of polys){
         ctx.beginPath();
-        let prevVis = false;
-        for(let i = 0; i < ring.length; i++){
-            const [lng, lat] = ring[i];
+        let prev = false;
+        for (const [lng, lat] of ring){
             const pt = project(lat, lng, rotX, rotY, cx, cy, R);
             if (pt) {
-                if (!prevVis) ctx.moveTo(pt[0], pt[1]);
-                else ctx.lineTo(pt[0], pt[1]);
-                prevVis = true;
-            } else {
-                prevVis = false;
-            }
+                prev ? ctx.lineTo(pt[0], pt[1]) : ctx.moveTo(pt[0], pt[1]);
+                prev = true;
+            } else prev = false;
         }
         ctx.closePath();
         ctx.fillStyle = fill;
@@ -156,36 +157,40 @@ function Globe3D({ points, height = 420, activeLayers }) {
         lx: 0,
         ly: 0,
         geo: null,
-        arcT: 0
+        arcT: 0,
+        hits: []
     });
     const [loaded, setLoaded] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
-    const visible = (activeLayers?.size ? points.filter((p)=>activeLayers.has(p.type)) : points).filter((p)=>p && typeof p.srcLat === 'number');
-    // ── Fetch real country GeoJSON ─────────────────────────────────────────────
+    const [popup, setPopup] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(null);
+    const popupRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
+    // ── FIX 1: convert activeLayers to a stable string key for memoization ──────
+    const layerKey = activeLayers ? [
+        ...activeLayers
+    ].sort().join(',') : 'all';
+    const visible = (()=>{
+        const base = points.filter((p)=>p && typeof p.srcLat === 'number');
+        if (!activeLayers || activeLayers.size === 0) return base;
+        return base.filter((p)=>activeLayers.has(p.type));
+    })();
+    // ── GeoJSON fetch ─────────────────────────────────────────────────────────
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        // ne_110m = naturalearth 110m resolution — small file, exact country borders
         const URLS = [
-            'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json',
             'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson',
+            'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json',
             'https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson'
         ];
         async function tryLoad() {
             for (const url of URLS){
                 try {
-                    const r = await fetch(url);
-                    const raw = await r.json();
-                    // world-atlas returns TopoJSON — we need GeoJSON
-                    if (raw.type === 'Topology' && raw.objects) {
-                        continue;
-                    }
-                    // Validate it looks like GeoJSON FeatureCollection
-                    if (raw.type === 'FeatureCollection' && Array.isArray(raw.features)) {
+                    const raw = await (await fetch(url)).json();
+                    if (raw.type === 'Topology') continue; // skip TopoJSON
+                    if (raw.type === 'FeatureCollection' && raw.features) {
                         st.current.geo = raw;
                         setLoaded(true);
                         return;
                     }
                 } catch  {}
             }
-            // Even if all URLs fail, mark loaded so globe renders without countries
             setLoaded(true);
         }
         tryLoad();
@@ -197,16 +202,15 @@ function Globe3D({ points, height = 420, activeLayers }) {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
         const dpr = window.devicePixelRatio || 1;
-        const W = canvas.clientWidth;
-        const H = canvas.clientHeight;
+        const W = canvas.clientWidth, H = canvas.clientHeight;
         canvas.width = W * dpr;
         canvas.height = H * dpr;
         ctx.scale(dpr, dpr);
         const s = st.current;
-        const cx = W / 2, cy = H / 2;
-        const R = Math.min(W, H) * 0.44;
+        const cx = W / 2, cy = H / 2, R = Math.min(W, H) * 0.44;
+        const hits = [];
         ctx.clearRect(0, 0, W, H);
-        // ── Atmosphere halo ──────────────────────────────────────────────────────
+        // Atmosphere
         const halo = ctx.createRadialGradient(cx, cy, R * 0.88, cx, cy, R * 1.20);
         halo.addColorStop(0, 'rgba(0,200,120,0.00)');
         halo.addColorStop(0.55, 'rgba(0,220,140,0.06)');
@@ -215,7 +219,7 @@ function Globe3D({ points, height = 420, activeLayers }) {
         ctx.beginPath();
         ctx.arc(cx, cy, R * 1.20, 0, Math.PI * 2);
         ctx.fill();
-        // ── Ocean ────────────────────────────────────────────────────────────────
+        // Ocean
         const ocean = ctx.createRadialGradient(cx - R * 0.2, cy - R * 0.25, 0, cx, cy, R);
         ocean.addColorStop(0, '#0d2d4a');
         ocean.addColorStop(0.6, '#081e33');
@@ -224,12 +228,12 @@ function Globe3D({ points, height = 420, activeLayers }) {
         ctx.beginPath();
         ctx.arc(cx, cy, R, 0, Math.PI * 2);
         ctx.fill();
-        // ── Clip to globe ────────────────────────────────────────────────────────
+        // Clip to globe
         ctx.save();
         ctx.beginPath();
         ctx.arc(cx, cy, R, 0, Math.PI * 2);
         ctx.clip();
-        // ── Grid lines ───────────────────────────────────────────────────────────
+        // Grid
         ctx.strokeStyle = 'rgba(0,180,110,0.10)';
         ctx.lineWidth = 0.5;
         for(let lat = -80; lat <= 80; lat += 20){
@@ -244,6 +248,7 @@ function Globe3D({ points, height = 420, activeLayers }) {
                 f ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
                 f = false;
             }
+            ;
             ctx.stroke();
         }
         for(let lng = -180; lng < 180; lng += 20){
@@ -258,27 +263,24 @@ function Globe3D({ points, height = 420, activeLayers }) {
                 f ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
                 f = false;
             }
+            ;
             ctx.stroke();
         }
-        // ── Countries ────────────────────────────────────────────────────────────
+        // Countries
         if (s.geo?.features) {
             for (const feat of s.geo.features){
                 if (!feat.geometry) continue;
                 const name = (feat.properties?.NAME ?? feat.properties?.name ?? feat.properties?.ADMIN ?? '').toLowerCase();
-                // Threat-origin countries slightly brighter
                 const isThreat = /russia|china|iran|north.korea|dprk/.test(name);
-                const isWest = /united states|uk|united kingdom|germany|france|japan|australia|canada/.test(name);
-                const fill = isThreat ? 'rgba(30,110,65,0.88)' : isWest ? 'rgba(14,88,52,0.82)' : 'rgba(18,95,56,0.80)';
-                const stroke = isThreat ? 'rgba(0,255,130,0.75)' : 'rgba(0,240,130,0.58)';
-                drawGeometry(ctx, feat.geometry, s.rotX, s.rotY, cx, cy, R, fill, stroke, 0.65);
+                drawGeometry(ctx, feat.geometry, s.rotX, s.rotY, cx, cy, R, isThreat ? 'rgba(30,110,65,0.88)' : 'rgba(18,95,56,0.80)', isThreat ? 'rgba(0,255,130,0.75)' : 'rgba(0,240,130,0.58)', 0.65);
             }
         }
-        // ── Equator line ─────────────────────────────────────────────────────────
+        // Equator
         ctx.strokeStyle = 'rgba(0,255,150,0.22)';
         ctx.lineWidth = 1.2;
         ctx.beginPath();
         let feq = true;
-        for(let lng = -180; lng <= 180; lng += 1){
+        for(let lng = -180; lng <= 180; lng++){
             const p = project(0, lng, s.rotX, s.rotY, cx, cy, R);
             if (!p) {
                 feq = true;
@@ -287,22 +289,25 @@ function Globe3D({ points, height = 420, activeLayers }) {
             feq ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
             feq = false;
         }
+        ;
         ctx.stroke();
-        // ── Threat arcs ──────────────────────────────────────────────────────────
+        // ── FIX 2: Threat arcs with correct rgba() colors ────────────────────────
         s.arcT = (s.arcT + 0.006) % 1;
         for (const pt of visible){
             const color = tc(pt.type);
             const isCrit = pt.severity >= 4;
             const STEPS = 80;
             const gc = greatCircle(pt.srcLat, pt.srcLng, pt.dstLat, pt.dstLng, STEPS);
-            // Draw arc with arc-lift (arcs curve above the surface)
             let prevPt = null;
             let prevVis = false;
+            let midPt = null;
             for(let i = 0; i < gc.length; i++){
                 const [lat, lng] = gc[i];
                 const t = i / (STEPS - 1);
                 const lift = 1 + Math.sin(t * Math.PI) * (isCrit ? 0.14 : 0.09);
                 const { pt: px, vis } = projectRaw(lat, lng, s.rotX, s.rotY, cx, cy, R * lift);
+                // Save midpoint for hit testing
+                if (Math.abs(t - 0.5) < 0.02) midPt = px;
                 if (vis && prevPt && prevVis) {
                     const tMid = (i - 0.5) / STEPS;
                     const diff = Math.abs(tMid - s.arcT);
@@ -311,7 +316,8 @@ function Globe3D({ points, height = 420, activeLayers }) {
                     ctx.beginPath();
                     ctx.moveTo(prevPt[0], prevPt[1]);
                     ctx.lineTo(px[0], px[1]);
-                    ctx.strokeStyle = color + '55';
+                    ctx.strokeStyle = rgba(color, 0.35) // FIX: rgba() not hex concat
+                    ;
                     ctx.lineWidth = isCrit ? 6 : 4;
                     ctx.stroke();
                     // Core line
@@ -323,7 +329,8 @@ function Globe3D({ points, height = 420, activeLayers }) {
                         ctx.strokeStyle = `rgba(255,255,255,${0.55 + d * 0.45})`;
                         ctx.lineWidth = isCrit ? 2.8 : 2.0;
                     } else {
-                        ctx.strokeStyle = color + 'dd';
+                        ctx.strokeStyle = rgba(color, 0.85) // FIX: rgba() not hex concat
+                        ;
                         ctx.lineWidth = isCrit ? 1.8 : 1.2;
                     }
                     ctx.stroke();
@@ -331,54 +338,71 @@ function Globe3D({ points, height = 420, activeLayers }) {
                 prevPt = px;
                 prevVis = vis;
             }
-            // ── Source pulse ────────────────────────────────────────────────────────
+            // Source dot + ring
             const src = project(pt.srcLat, pt.srcLng, s.rotX, s.rotY, cx, cy, R);
             if (src) {
                 const pR = s.arcT * (isCrit ? 20 : 14);
-                const alp = Math.round((1 - s.arcT) * 180).toString(16).padStart(2, '0');
+                const alp = 1 - s.arcT;
                 ctx.beginPath();
                 ctx.arc(src[0], src[1], pR, 0, Math.PI * 2);
-                ctx.strokeStyle = color + alp;
+                ctx.strokeStyle = rgba(color, alp);
                 ctx.lineWidth = 1.5;
                 ctx.stroke();
-                // Second ring offset by 0.5
                 const pR2 = (s.arcT + 0.5) % 1 * (isCrit ? 20 : 14);
-                const alp2 = Math.round((1 - (s.arcT + 0.5) % 1) * 120).toString(16).padStart(2, '0');
+                const alp2 = 1 - (s.arcT + 0.5) % 1;
                 ctx.beginPath();
                 ctx.arc(src[0], src[1], pR2, 0, Math.PI * 2);
-                ctx.strokeStyle = color + alp2;
+                ctx.strokeStyle = rgba(color, alp2 * 0.7);
                 ctx.lineWidth = 1;
                 ctx.stroke();
                 // Solid dot
+                const dotR = isCrit ? 5.5 : 4;
                 ctx.beginPath();
-                ctx.arc(src[0], src[1], isCrit ? 5.5 : 4, 0, Math.PI * 2);
+                ctx.arc(src[0], src[1], dotR, 0, Math.PI * 2);
                 ctx.fillStyle = color;
                 ctx.fill();
                 ctx.beginPath();
                 ctx.arc(src[0], src[1], isCrit ? 2.2 : 1.6, 0, Math.PI * 2);
                 ctx.fillStyle = '#ffffff';
                 ctx.fill();
+                // Register hit record at source dot
+                hits.push({
+                    x: src[0],
+                    y: src[1],
+                    r: dotR + 6,
+                    pt
+                });
             }
-            // ── Destination marker ──────────────────────────────────────────────────
+            // Destination dot
             const dst = project(pt.dstLat, pt.dstLng, s.rotX, s.rotY, cx, cy, R);
             if (dst) {
                 ctx.beginPath();
                 ctx.arc(dst[0], dst[1], isCrit ? 4.5 : 3, 0, Math.PI * 2);
-                ctx.fillStyle = color + 'cc';
+                ctx.fillStyle = rgba(color, 0.8);
                 ctx.fill();
-                ctx.strokeStyle = '#ffffffaa';
+                ctx.strokeStyle = 'rgba(255,255,255,0.5)';
                 ctx.lineWidth = 1;
                 ctx.stroke();
-                // Inner white
-                ctx.beginPath();
-                ctx.arc(dst[0], dst[1], 1.2, 0, Math.PI * 2);
-                ctx.fillStyle = '#ffffff99';
-                ctx.fill();
+                hits.push({
+                    x: dst[0],
+                    y: dst[1],
+                    r: 10,
+                    pt
+                });
             }
+            // Register mid-arc hit
+            if (midPt) hits.push({
+                x: midPt[0],
+                y: midPt[1],
+                r: 12,
+                pt
+            });
         }
-        ctx.restore() // end globe clip
+        s.hits = hits // store for click handler
         ;
-        // ── Rim highlight ────────────────────────────────────────────────────────
+        ctx.restore() // end clip
+        ;
+        // Rim
         const rim = ctx.createRadialGradient(cx, cy, R * 0.82, cx, cy, R);
         rim.addColorStop(0, 'rgba(0,255,170,0.00)');
         rim.addColorStop(0.88, 'rgba(0,255,170,0.05)');
@@ -387,7 +411,6 @@ function Globe3D({ points, height = 420, activeLayers }) {
         ctx.beginPath();
         ctx.arc(cx, cy, R, 0, Math.PI * 2);
         ctx.fill();
-        // Specular glint
         const spec = ctx.createRadialGradient(cx - R * 0.32, cy - R * 0.32, 0, cx - R * 0.32, cy - R * 0.32, R * 0.5);
         spec.addColorStop(0, 'rgba(200,255,230,0.10)');
         spec.addColorStop(0.6, 'rgba(100,255,180,0.03)');
@@ -398,9 +421,11 @@ function Globe3D({ points, height = 420, activeLayers }) {
         ctx.fill();
     }, [
         loaded,
-        visible
-    ]);
-    // ── Render loop ────────────────────────────────────────────────────────────
+        layerKey,
+        visible.length
+    ]) // FIX 1: layerKey in deps
+    ;
+    // ── Animation loop ────────────────────────────────────────────────────────
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         let id = 0;
         const loop = ()=>{
@@ -423,7 +448,40 @@ function Globe3D({ points, height = 420, activeLayers }) {
     }, [
         draw
     ]);
-    // ── Mouse / touch ─────────────────────────────────────────────────────────
+    // ── FIX 3: Click handler for popup ────────────────────────────────────────
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const onClick = (e)=>{
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            const s = st.current;
+            // Find closest hit within radius
+            let best = null, bestDist = Infinity;
+            for (const h of s.hits){
+                const d = Math.hypot(h.x - mx, h.y - my);
+                if (d < h.r && d < bestDist) {
+                    best = h;
+                    bestDist = d;
+                }
+            }
+            if (best) {
+                setPopup({
+                    x: Math.min(mx, canvas.clientWidth - 260),
+                    y: Math.max(my - 120, 8),
+                    pt: best.pt
+                });
+                // Pause auto-spin briefly
+                st.current.velY = 0;
+            } else {
+                setPopup(null);
+            }
+        };
+        canvas.addEventListener('click', onClick);
+        return ()=>canvas.removeEventListener('click', onClick);
+    }, []);
+    // ── Drag / touch ──────────────────────────────────────────────────────────
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -467,6 +525,7 @@ function Globe3D({ points, height = 420, activeLayers }) {
             window.removeEventListener('touchend', up);
         };
     }, []);
+    const color = popup ? tc(popup.pt.type) : '#00ffaa';
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "relative w-full h-full",
         style: {
@@ -482,7 +541,7 @@ function Globe3D({ points, height = 420, activeLayers }) {
                 }
             }, void 0, false, {
                 fileName: "[project]/src/components/map/Globe3D.tsx",
-                lineNumber: 415,
+                lineNumber: 397,
                 columnNumber: 7
             }, this),
             !loaded && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -494,7 +553,7 @@ function Globe3D({ points, height = 420, activeLayers }) {
                             className: "w-7 h-7 border-2 border-accent/30 border-t-accent rounded-full animate-spin"
                         }, void 0, false, {
                             fileName: "[project]/src/components/map/Globe3D.tsx",
-                            lineNumber: 419,
+                            lineNumber: 402,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -502,24 +561,270 @@ function Globe3D({ points, height = 420, activeLayers }) {
                             children: "Loading country data..."
                         }, void 0, false, {
                             fileName: "[project]/src/components/map/Globe3D.tsx",
-                            lineNumber: 420,
+                            lineNumber: 403,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/map/Globe3D.tsx",
-                    lineNumber: 418,
+                    lineNumber: 401,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/map/Globe3D.tsx",
-                lineNumber: 417,
+                lineNumber: 400,
+                columnNumber: 9
+            }, this),
+            popup && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                ref: popupRef,
+                className: "absolute z-50 pointer-events-auto",
+                style: {
+                    left: popup.x,
+                    top: popup.y,
+                    width: '240px'
+                },
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "rounded-xl overflow-hidden shadow-2xl",
+                    style: {
+                        background: 'rgba(6,10,20,0.97)',
+                        border: `1px solid ${rgba(color, 0.35)}`,
+                        backdropFilter: 'blur(20px)'
+                    },
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "flex items-center justify-between px-3 py-2.5",
+                            style: {
+                                borderBottom: `1px solid ${rgba(color, 0.15)}`,
+                                background: rgba(color, 0.08)
+                            },
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex items-center gap-2",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "w-2 h-2 rounded-sm",
+                                            style: {
+                                                background: color
+                                            }
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 427,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "font-mono text-[10px] font-bold tracking-wider",
+                                            style: {
+                                                color
+                                            },
+                                            children: popup.pt.type.toUpperCase()
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 428,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                    lineNumber: 426,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    onClick: ()=>setPopup(null),
+                                    className: "font-mono text-[11px] text-slate-600 hover:text-slate-300 cursor-pointer",
+                                    children: "✕"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                    lineNumber: 432,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                            lineNumber: 424,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "px-3 py-2.5 space-y-2",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex items-center justify-between",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "font-mono text-[9px] text-slate-600 uppercase tracking-wider",
+                                            children: "Severity"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 442,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex gap-1",
+                                            children: [
+                                                1,
+                                                2,
+                                                3,
+                                                4,
+                                                5
+                                            ].map((i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "w-2.5 h-2.5 rounded-sm",
+                                                    style: {
+                                                        background: i <= popup.pt.severity ? color : 'rgba(255,255,255,0.06)'
+                                                    }
+                                                }, i, false, {
+                                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                                    lineNumber: 445,
+                                                    columnNumber: 21
+                                                }, this))
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 443,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                    lineNumber: 441,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex items-center gap-2",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex flex-col items-center flex-1 min-w-0",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-[8px] text-slate-600 uppercase tracking-wider mb-0.5",
+                                                    children: "Source"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                                    lineNumber: 455,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-[9px] text-slate-300 text-center",
+                                                    children: [
+                                                        popup.pt.srcLat.toFixed(1),
+                                                        "°, ",
+                                                        popup.pt.srcLng.toFixed(1),
+                                                        "°"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                                    lineNumber: 456,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 454,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "font-mono text-[10px]",
+                                            style: {
+                                                color
+                                            },
+                                            children: "→"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 460,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex flex-col items-center flex-1 min-w-0",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-[8px] text-slate-600 uppercase tracking-wider mb-0.5",
+                                                    children: "Target"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                                    lineNumber: 462,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "font-mono text-[9px] text-slate-300 text-center",
+                                                    children: [
+                                                        popup.pt.dstLat.toFixed(1),
+                                                        "°, ",
+                                                        popup.pt.dstLng.toFixed(1),
+                                                        "°"
+                                                    ]
+                                                }, void 0, true, {
+                                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                                    lineNumber: 463,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 461,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                    lineNumber: 453,
+                                    columnNumber: 15
+                                }, this),
+                                popup.pt.label && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                            className: "font-mono text-[8px] text-slate-600 uppercase tracking-wider",
+                                            children: "Details"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 472,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "font-mono text-[10px] text-slate-400 mt-0.5 leading-snug line-clamp-3",
+                                            children: popup.pt.label
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                                            lineNumber: 473,
+                                            columnNumber: 19
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                    lineNumber: 471,
+                                    columnNumber: 17
+                                }, this),
+                                popup.pt.sourceUrl && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                    href: popup.pt.sourceUrl,
+                                    target: "_blank",
+                                    rel: "noreferrer",
+                                    className: "block font-mono text-[9px] hover:underline truncate",
+                                    style: {
+                                        color
+                                    },
+                                    children: "View source ↗"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                                    lineNumber: 481,
+                                    columnNumber: 17
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                            lineNumber: 439,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                    lineNumber: 415,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/src/components/map/Globe3D.tsx",
+                lineNumber: 410,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/map/Globe3D.tsx",
-        lineNumber: 413,
+        lineNumber: 395,
         columnNumber: 5
     }, this);
 }

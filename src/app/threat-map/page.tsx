@@ -16,8 +16,7 @@ export default function ThreatMapPage() {
   const [stats,        setStats]        = useState({ total:0, critical:0, cveIds:[] as string[] })
   const [loading,      setLoading]      = useState(true)
   const [activeLayers, setActiveLayers] = useState<Set<string>>(new Set(ALL_TYPES))
-  const [globeKey,     setGlobeKey]     = useState(0)
-  const [layerOpen,    setLayerOpen]    = useState(false)
+    const [layerOpen,    setLayerOpen]    = useState(false)
   const [isMobile,     setIsMobile]     = useState(false)
 
   useEffect(() => {
@@ -56,10 +55,10 @@ export default function ThreatMapPage() {
   const visiblePts = activeLayers.size>0 ? points.filter(p=>activeLayers.has(p.type)) : points
 
   function toggleLayer(type:string) {
-    setActiveLayers(prev=>{ const n=new Set(prev); n.has(type)?n.delete(type):n.add(type); setGlobeKey(k=>k+1); return n })
+    setActiveLayers(prev=>{ const n=new Set(prev); n.has(type)?n.delete(type):n.add(type); return n })
   }
   function toggleAll() {
-    setActiveLayers(prev=>{ const n=prev.size===ALL_TYPES.length?new Set<string>():new Set(ALL_TYPES); setGlobeKey(k=>k+1); return n })
+    setActiveLayers(prev=>{ const n=prev.size===ALL_TYPES.length?new Set<string>():new Set(ALL_TYPES); return n })
   }
 
   const LayerPanel = ({ compact=false }:{compact?:boolean}) => (
@@ -166,7 +165,7 @@ export default function ThreatMapPage() {
 
         {/* ROW 1: Globe — full width, decent height */}
         <div style={{ width:'100%', height:'320px', position:'relative', background:'#020608' }}>
-          <Globe3D key={globeKey} points={points} activeLayers={activeLayers} />
+          <Globe3D points={points} activeLayers={activeLayers} />
           {/* Stats overlay */}
           <div style={{ position:'absolute',bottom:'8px',right:'8px',display:'flex',flexDirection:'column',gap:'4px',alignItems:'flex-end' }}>
             {[{l:'Events',v:points.length,c:'#00ffaa'},{l:'Visible',v:visiblePts.length,c:'#00aaff'}].map(s=>(
@@ -234,7 +233,7 @@ export default function ThreatMapPage() {
 
         {/* CENTRE: Globe — fills remaining space */}
         <div style={{ flex:1,minWidth:0,position:'relative',background:'#020608',overflow:'hidden' }}>
-          <Globe3D key={globeKey} points={points} activeLayers={activeLayers} />
+          <Globe3D points={points} activeLayers={activeLayers} />
           <div style={{ position:'absolute',bottom:'12px',right:'12px',display:'flex',flexDirection:'column',gap:'5px',alignItems:'flex-end' }}>
             {[{l:'Events',v:points.length,c:'#00ffaa'},{l:'Critical',v:points.filter(p=>p.severity>=4).length,c:'#ff3a5c'},{l:'Visible',v:visiblePts.length,c:'#00aaff'}].map(s=>(
               <div key={s.l} style={{ fontFamily:"'Space Mono',monospace",fontSize:'10px',padding:'4px 10px',borderRadius:'7px',background:'rgba(0,0,0,0.75)',border:`1px solid ${s.c}22`,display:'flex',gap:'7px' }}>

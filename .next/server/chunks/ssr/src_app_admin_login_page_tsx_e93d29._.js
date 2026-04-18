@@ -45,16 +45,22 @@ function AdminLoginPage() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email,
+                    email: email.trim(),
                     password
                 })
             });
             const d = await res.json();
-            if (!res.ok) throw new Error(d.detail || 'Login failed');
-            if (d.user?.role !== 'admin') throw new Error('Access denied — admin account required');
+            if (!res.ok) {
+                // Show the actual error from ESO (e.g. locked account, wrong password)
+                throw new Error(d.detail ?? d.error ?? 'Invalid email or password');
+            }
+            if (d.user?.role !== 'admin') {
+                throw new Error('Access denied — this account does not have admin privileges');
+            }
             (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$eso$2d$auth$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["saveSession"])(d.access_token, d.user);
-            // Also set xcloak legacy key
-            sessionStorage.setItem('xcloak-admin-alias', d.user.username ?? 'admin');
+            sessionStorage.setItem('xcloak-admin-alias', d.user.username ?? email.split('@')[0]);
+            // Store ESO token so admin API calls can authenticate
+            sessionStorage.setItem('xcloak-admin-token', d.access_token);
             router.push('/admin');
         } catch (e) {
             setError(e.message);
@@ -86,7 +92,7 @@ function AdminLoginPage() {
                                     children: "🔑"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/admin/login/page.tsx",
-                                    lineNumber: 48,
+                                    lineNumber: 60,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -100,19 +106,19 @@ function AdminLoginPage() {
                                             children: "cloak"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/admin/login/page.tsx",
-                                            lineNumber: 50,
+                                            lineNumber: 62,
                                             columnNumber: 52
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/admin/login/page.tsx",
-                                    lineNumber: 50,
+                                    lineNumber: 62,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/admin/login/page.tsx",
-                            lineNumber: 47,
+                            lineNumber: 59,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -120,13 +126,13 @@ function AdminLoginPage() {
                             children: "Admin access only"
                         }, void 0, false, {
                             fileName: "[project]/src/app/admin/login/page.tsx",
-                            lineNumber: 52,
+                            lineNumber: 64,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/admin/login/page.tsx",
-                    lineNumber: 46,
+                    lineNumber: 58,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -140,7 +146,7 @@ function AdminLoginPage() {
                             children: "⚠ Restricted — Authorised Personnel Only"
                         }, void 0, false, {
                             fileName: "[project]/src/app/admin/login/page.tsx",
-                            lineNumber: 56,
+                            lineNumber: 68,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -155,7 +161,7 @@ function AdminLoginPage() {
                                             children: "Admin Email"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/admin/login/page.tsx",
-                                            lineNumber: 61,
+                                            lineNumber: 73,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -168,13 +174,13 @@ function AdminLoginPage() {
                                             autoFocus: true
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/admin/login/page.tsx",
-                                            lineNumber: 62,
+                                            lineNumber: 74,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/admin/login/page.tsx",
-                                    lineNumber: 60,
+                                    lineNumber: 72,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -185,7 +191,7 @@ function AdminLoginPage() {
                                             children: "Password"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/admin/login/page.tsx",
-                                            lineNumber: 66,
+                                            lineNumber: 78,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -197,13 +203,13 @@ function AdminLoginPage() {
                                             className: inp
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/admin/login/page.tsx",
-                                            lineNumber: 67,
+                                            lineNumber: 79,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/admin/login/page.tsx",
-                                    lineNumber: 65,
+                                    lineNumber: 77,
                                     columnNumber: 13
                                 }, this),
                                 error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -214,7 +220,7 @@ function AdminLoginPage() {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/admin/login/page.tsx",
-                                    lineNumber: 72,
+                                    lineNumber: 84,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -229,13 +235,13 @@ function AdminLoginPage() {
                                     children: loading ? '⟳ Verifying...' : 'Access Admin Panel →'
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/admin/login/page.tsx",
-                                    lineNumber: 77,
+                                    lineNumber: 89,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/admin/login/page.tsx",
-                            lineNumber: 59,
+                            lineNumber: 71,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -246,18 +252,18 @@ function AdminLoginPage() {
                                 children: "← Back to user login"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/admin/login/page.tsx",
-                                lineNumber: 85,
+                                lineNumber: 97,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/app/admin/login/page.tsx",
-                            lineNumber: 84,
+                            lineNumber: 96,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/admin/login/page.tsx",
-                    lineNumber: 55,
+                    lineNumber: 67,
                     columnNumber: 9
                 }, this),
                 ("TURBOPACK compile-time value", "development") === 'development' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -267,23 +273,23 @@ function AdminLoginPage() {
                         children: "Dev: dev@example.com / dev_password"
                     }, void 0, false, {
                         fileName: "[project]/src/app/admin/login/page.tsx",
-                        lineNumber: 93,
+                        lineNumber: 105,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/app/admin/login/page.tsx",
-                    lineNumber: 92,
+                    lineNumber: 104,
                     columnNumber: 11
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/app/admin/login/page.tsx",
-            lineNumber: 45,
+            lineNumber: 57,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/app/admin/login/page.tsx",
-        lineNumber: 44,
+        lineNumber: 56,
         columnNumber: 5
     }, this);
 }
