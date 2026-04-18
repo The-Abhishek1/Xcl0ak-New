@@ -143,13 +143,13 @@ export default function ScanDashboardPage() {
               {loading?'Connecting...':'ESO backend offline — start with: uvicorn src.api.app:app --port 8000'}
             </div>
           )}
-          <div className="mt-4 pt-3 border-t border-white/[0.06]">
+          {/*<div className="mt-4 pt-3 border-t border-white/[0.06]">
             <Link href="/scan/new"
               className="block w-full text-center py-2.5 rounded-lg border font-mono text-[11px] font-bold transition-all"
               style={{background:'rgba(0,255,170,0.08)',borderColor:'rgba(0,255,170,0.25)',color:'#00ffaa'}}>
               ⚡ Launch New Scan
             </Link>
-          </div>
+          </div>*/}
         </div>
       </div>
     </div>

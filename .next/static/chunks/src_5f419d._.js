@@ -250,7 +250,7 @@ function NewScanPage() {
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "glass p-3 mb-4 flex gap-3",
+                className: "glass p-3 mb-3 flex gap-3",
                 style: {
                     borderColor: 'rgba(255,58,92,0.2)',
                     background: 'rgba(255,58,92,0.04)'
@@ -289,6 +289,80 @@ function NewScanPage() {
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "glass p-3 mb-4 flex gap-3",
+                style: {
+                    borderColor: 'rgba(0,170,255,0.2)',
+                    background: 'rgba(0,170,255,0.04)'
+                },
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                        className: "text-base shrink-0",
+                        children: "🐳"
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/scan/new/page.tsx",
+                        lineNumber: 55,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "font-mono text-[10px] text-slate-500 space-y-0.5",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-accent2 font-bold",
+                                        children: "How scanning works:"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/scan/new/page.tsx",
+                                        lineNumber: 57,
+                                        columnNumber: 16
+                                    }, this),
+                                    " Security tools (nmap, nuclei, etc.) run as Docker containers ",
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-slate-400",
+                                        children: "on your local machine"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/scan/new/page.tsx",
+                                        lineNumber: 57,
+                                        columnNumber: 145
+                                    }, this),
+                                    ". Your machine does the scanning — our servers handle the AI analysis, report generation, and results storage."
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/scan/new/page.tsx",
+                                lineNumber: 57,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "text-slate-600",
+                                children: [
+                                    "This keeps your scan traffic private and reduces server costs. ",
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-slate-500",
+                                        children: "Docker must be running locally for scans to execute."
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/scan/new/page.tsx",
+                                        lineNumber: 58,
+                                        columnNumber: 106
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/scan/new/page.tsx",
+                                lineNumber: 58,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/scan/new/page.tsx",
+                        lineNumber: 56,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/app/scan/new/page.tsx",
+                lineNumber: 54,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "grid grid-cols-1 lg:grid-cols-2 gap-4",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -299,7 +373,7 @@ function NewScanPage() {
                                 children: "Target Configuration"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/scan/new/page.tsx",
-                                lineNumber: 56,
+                                lineNumber: 65,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -309,7 +383,7 @@ function NewScanPage() {
                                         children: "Target Host / IP *"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/scan/new/page.tsx",
-                                        lineNumber: 58,
+                                        lineNumber: 67,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -319,13 +393,13 @@ function NewScanPage() {
                                         className: "w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 font-mono text-[12px] text-slate-200 outline-none focus:border-accent/30 transition-colors placeholder-slate-700"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/scan/new/page.tsx",
-                                        lineNumber: 59,
+                                        lineNumber: 68,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/scan/new/page.tsx",
-                                lineNumber: 57,
+                                lineNumber: 66,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -335,7 +409,7 @@ function NewScanPage() {
                                         children: "Scan Goal"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/scan/new/page.tsx",
-                                        lineNumber: 63,
+                                        lineNumber: 72,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
@@ -345,7 +419,7 @@ function NewScanPage() {
                                         rows: 3
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/scan/new/page.tsx",
-                                        lineNumber: 64,
+                                        lineNumber: 73,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -353,13 +427,13 @@ function NewScanPage() {
                                         children: "The AI reads this and creates a scan plan automatically"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/scan/new/page.tsx",
-                                        lineNumber: 67,
+                                        lineNumber: 76,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/scan/new/page.tsx",
-                                lineNumber: 62,
+                                lineNumber: 71,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -371,7 +445,7 @@ function NewScanPage() {
                                         className: "accent-accent w-3.5 h-3.5"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/scan/new/page.tsx",
-                                        lineNumber: 70,
+                                        lineNumber: 79,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -380,13 +454,13 @@ function NewScanPage() {
                                         children: "I have authorization to scan this target"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/scan/new/page.tsx",
-                                        lineNumber: 71,
+                                        lineNumber: 80,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/scan/new/page.tsx",
-                                lineNumber: 69,
+                                lineNumber: 78,
                                 columnNumber: 11
                             }, this),
                             error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -397,7 +471,7 @@ function NewScanPage() {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/scan/new/page.tsx",
-                                lineNumber: 76,
+                                lineNumber: 85,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -412,13 +486,13 @@ function NewScanPage() {
                                 children: loading ? '⏳ Launching...' : '⚡ Launch Scan'
                             }, void 0, false, {
                                 fileName: "[project]/src/app/scan/new/page.tsx",
-                                lineNumber: 78,
+                                lineNumber: 87,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/scan/new/page.tsx",
-                        lineNumber: 55,
+                        lineNumber: 64,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -429,7 +503,7 @@ function NewScanPage() {
                                 children: "Available Tools (AI selects)"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/scan/new/page.tsx",
-                                lineNumber: 87,
+                                lineNumber: 96,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -448,7 +522,7 @@ function NewScanPage() {
                                                         children: t.name
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/scan/new/page.tsx",
-                                                        lineNumber: 92,
+                                                        lineNumber: 101,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -460,13 +534,13 @@ function NewScanPage() {
                                                         children: t.cat
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/scan/new/page.tsx",
-                                                        lineNumber: 93,
+                                                        lineNumber: 102,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/scan/new/page.tsx",
-                                                lineNumber: 91,
+                                                lineNumber: 100,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -474,18 +548,18 @@ function NewScanPage() {
                                                 children: t.desc
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/scan/new/page.tsx",
-                                                lineNumber: 95,
+                                                lineNumber: 104,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, t.name, true, {
                                         fileName: "[project]/src/app/scan/new/page.tsx",
-                                        lineNumber: 90,
+                                        lineNumber: 99,
                                         columnNumber: 15
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/app/scan/new/page.tsx",
-                                lineNumber: 88,
+                                lineNumber: 97,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -493,19 +567,19 @@ function NewScanPage() {
                                 children: "AI planner selects tools based on your goal. You approve before execution."
                             }, void 0, false, {
                                 fileName: "[project]/src/app/scan/new/page.tsx",
-                                lineNumber: 99,
+                                lineNumber: 108,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/scan/new/page.tsx",
-                        lineNumber: 86,
+                        lineNumber: 95,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/scan/new/page.tsx",
-                lineNumber: 53,
+                lineNumber: 62,
                 columnNumber: 7
             }, this)
         ]

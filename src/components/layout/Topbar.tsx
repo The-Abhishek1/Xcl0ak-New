@@ -31,9 +31,28 @@ export function Topbar() {
   const { user, loggedIn } = useAuth()
   const [sync,       setSync]       = useState<'idle'|'syncing'|'done'>('idle')
   const [notifOpen,  setNotifOpen]  = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [recentNotifs, setRecentNotifs] = useState<any[]>([])
   const [userOpen,   setUserOpen]   = useState(false)
   const notifRef = useRef<HTMLDivElement>(null)
   const userRef  = useRef<HTMLDivElement>(null)
+
+  // Poll unread notification count every 30s
+  useEffect(() => {
+    async function fetchUnread() {
+      const u = getUser()
+      if (!u?.username) return
+      try {
+        const res  = await fetch(`/api/v1/notifications?alias=${encodeURIComponent(u.username)}&limit=5`)
+        const data = await res.json()
+        setUnreadCount(data.unread ?? 0)
+        setRecentNotifs(data.notifications ?? [])
+      } catch {}
+    }
+    fetchUnread()
+    const t = setInterval(fetchUnread, 30000)
+    return () => clearInterval(t)
+  }, [loggedIn])
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -109,10 +128,13 @@ export function Topbar() {
             className="relative flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer transition-all"
             style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)'}}>
             <span style={{fontSize:'14px'}}>🔔</span>
-            {/* Unread dot */}
-            <span
-              className="absolute top-1 right-1 w-[6px] h-[6px] rounded-full"
-              style={{background:'#ff3a5c'}}/>
+            {/* Unread badge */}
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[14px] h-[14px] rounded-full flex items-center justify-center font-mono text-[7px] font-bold"
+                style={{background:'#ff3a5c',color:'#fff',padding:'0 2px'}}>
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
           </button>
 
           {notifOpen && (
@@ -121,21 +143,24 @@ export function Topbar() {
               style={{background:'rgba(6,9,16,0.98)',border:'1px solid rgba(255,255,255,0.1)',backdropFilter:'blur(24px)'}}>
               <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06]">
                 <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">Notifications</span>
-                <button className="font-mono text-[9px] text-accent cursor-pointer">Mark read</button>
+                <button onClick={async()=>{
+                  const u=getUser();if(!u?.username)return
+                  await fetch('/api/v1/notifications/read',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({alias:u.username})})
+                  setUnreadCount(0);setRecentNotifs(p=>p.map((n:any)=>({...n,read:true})))
+                }} className="font-mono text-[9px] text-accent cursor-pointer hover:underline">Mark read</button>
               </div>
-              {[
-                {icon:'🔴', msg:'New critical CVE: CVE-2024-3094 in xz-utils', time:'2m', unread:true},
-                {icon:'💉', msg:'Your exploit submission was approved',          time:'1h', unread:true},
-                {icon:'🏆', msg:'You solved a CTF challenge — +500 pts',         time:'3h', unread:false},
-                {icon:'📡', msg:'New threat pulse from OTX',                     time:'5h', unread:false},
-              ].map((n,i)=>(
-                <div key={i} className="flex items-start gap-3 px-4 py-3 hover:bg-white/[0.02] cursor-pointer transition-colors border-b border-white/[0.03] last:border-0">
-                  <span className="text-[13px] mt-0.5 shrink-0">{n.icon}</span>
+              {recentNotifs.length === 0 ? (
+                <div className="px-4 py-6 text-center font-mono text-[10px] text-slate-700">No notifications yet</div>
+              ) : recentNotifs.slice(0,4).map((n:any) => (
+                <div key={n.id} className="flex items-start gap-3 px-4 py-3 hover:bg-white/[0.02] cursor-pointer transition-colors border-b border-white/[0.03] last:border-0">
+                  <span className="text-[13px] mt-0.5 shrink-0">
+                    {n.type==='cve_alert'?'🚨':n.type==='ctf_solve'?'🏆':n.type==='exploit_upload'?'📦':n.type==='payment'?'💳':'📢'}
+                  </span>
                   <div className="flex-1 min-w-0">
-                    <p className="font-mono text-[11px] text-slate-300 leading-snug">{n.msg}</p>
-                    <p className="font-mono text-[9px] text-slate-600 mt-1">{n.time} ago</p>
+                    <p className="font-mono text-[11px] text-slate-300 leading-snug truncate">{n.title}</p>
+                    <p className="font-mono text-[9px] text-slate-600 mt-0.5">{n.body?.slice(0,60)}</p>
                   </div>
-                  {n.unread && <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{background:'#00ffaa'}}/>}
+                  {!n.read && <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{background:'#00ffaa'}}/>}
                 </div>
               ))}
               <div className="px-4 py-2 border-t border-white/[0.06] text-center">

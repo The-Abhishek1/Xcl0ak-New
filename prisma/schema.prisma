@@ -159,3 +159,27 @@ model CTFSolve {
   challenge   CTFChallenge @relation(fields: [challengeId], references: [id])
   @@unique([challengeId, userAlias])
 }
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  room      String
+  alias     String
+  tier      String   @default("free")
+  content   String
+  type      String   @default("message") // message | system | alert
+  createdAt DateTime @default(now())
+  @@index([room, createdAt(sort: Desc)])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userAlias String
+  type      String   // cve_alert | ctf_solve | exploit_upload | payment | scan_complete | system
+  title     String
+  body      String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  @@index([userAlias, createdAt(sort: Desc)])
+  @@index([userAlias, read])
+}

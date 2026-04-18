@@ -47,6 +47,8 @@ export default function SettingsPage() {
   const [model,       setModel]       = useState('qwen2.5:3b')
   const [openaiKey,   setOpenaiKey]   = useState('')
   const [anthropicKey,setAnthropicKey]= useState('')
+  const [llmTesting,   setLlmTesting]   = useState(false)
+  const [llmTestResult,setLlmTestResult]= useState<any>(null)
 
   useEffect(() => {
     if (!isLoggedIn()) { router.push('/login?from=settings'); return }
@@ -85,6 +87,15 @@ export default function SettingsPage() {
       setMsg('✓ LLM settings saved')
     } catch(e:any) { setMsg(`✗ ${e.message}`) }
     setLoading(false)
+  }
+
+  async function testLLM() {
+    setLlmTesting(true); setLlmTestResult(null)
+    try {
+      const r = await apiFetch('/system/llm/test')
+      setLlmTestResult(r)
+    } catch(e:any) { setLlmTestResult({status:'error', error: e.message}) }
+    setLlmTesting(false)
   }
 
   async function createKey() {
@@ -222,6 +233,17 @@ export default function SettingsPage() {
                   </div>
                 ))}
               </div>
+              {/* Local Docker mode notice */}
+              <div className="mt-3 p-3 rounded-xl" style={{background:'rgba(0,170,255,0.04)',border:'1px solid rgba(0,170,255,0.15)'}}>
+                <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-1.5">How scanning works</div>
+                <p className="font-mono text-[10px] text-slate-500 leading-5">
+                  Security tools run as <span className="text-accent2">Docker containers on your machine</span>. Our servers handle AI orchestration, analysis, and report storage — your machine handles the actual scanning. This keeps traffic private and keeps costs low for everyone.
+                </p>
+                <p className="font-mono text-[9px] text-slate-700 mt-1.5">
+                  Docker must be running locally · <a href="https://docs.docker.com/get-docker/" target="_blank" rel="noopener noreferrer" className="text-accent2 hover:underline">Install Docker →</a>
+                </p>
+              </div>
+
               <div className="mt-3 pt-3 border-t border-white/[0.06]">
                 <div className="font-mono text-[9px] text-slate-600 mb-1">Tools</div>
                 <div className="font-mono text-[10px] text-slate-400">{tierInfo.tools}</div>
@@ -286,17 +308,37 @@ export default function SettingsPage() {
             </div>
           )}
 
-          <button onClick={saveLLM} disabled={loading}
-            className="w-full py-2.5 rounded-xl font-mono text-[12px] font-bold cursor-pointer transition-all disabled:opacity-40"
-            style={{background:'rgba(0,255,170,0.1)',border:'1px solid rgba(0,255,170,0.3)',color:'#00ffaa'}}>
-            {loading ? '⟳ Saving...' : 'Save LLM Settings'}
-          </button>
+          <div className="flex gap-2">
+            <button onClick={saveLLM} disabled={loading}
+              className="flex-1 py-2.5 rounded-xl font-mono text-[12px] font-bold cursor-pointer transition-all disabled:opacity-40"
+              style={{background:'rgba(0,255,170,0.1)',border:'1px solid rgba(0,255,170,0.3)',color:'#00ffaa'}}>
+              {loading ? '⟳ Saving...' : 'Save LLM Settings'}
+            </button>
+            <button onClick={testLLM} disabled={llmTesting}
+              className="px-4 py-2.5 rounded-xl font-mono text-[11px] font-bold cursor-pointer transition-all disabled:opacity-40 shrink-0"
+              style={{background:'rgba(0,170,255,0.1)',border:'1px solid rgba(0,170,255,0.3)',color:'#00aaff'}}>
+              {llmTesting ? '⟳ Testing...' : '⚡ Test'}
+            </button>
+          </div>
+
+          {llmTestResult && (
+            <div className="p-3 rounded-xl border font-mono text-[10px]"
+              style={llmTestResult.status==='ok'
+                ?{borderColor:'rgba(0,255,170,0.2)',background:'rgba(0,255,170,0.05)',color:'#00ffaa'}
+                :{borderColor:'rgba(255,58,92,0.2)',background:'rgba(255,58,92,0.05)',color:'#ff3a5c'}}>
+              {llmTestResult.status==='ok'
+                ? `✓ Connected — ${llmTestResult.provider} · ${llmTestResult.model}`
+                : `✗ Failed — ${llmTestResult.error||llmTestResult.status}`}
+            </div>
+          )}
 
           {llmConfig && (
             <div className="p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]">
-              <div className="font-mono text-[9px] text-slate-600 mb-1">Active</div>
+              <div className="font-mono text-[9px] text-slate-600 mb-1">Active configuration</div>
               <div className="font-mono text-[10px] text-slate-400">
                 {llmConfig.provider} · {llmConfig.model}
+                {llmConfig.has_openai_key && <span className="ml-2 text-accent2">OpenAI key ✓</span>}
+                {llmConfig.has_anthropic_key && <span className="ml-2" style={{color:'#a78bfa'}}>Anthropic key ✓</span>}
               </div>
             </div>
           )}
@@ -306,6 +348,31 @@ export default function SettingsPage() {
       {/* ── API KEYS ── */}
       {tab==='apikeys' && (
         <div className="space-y-4">
+
+          {/* Usage instructions */}
+          <div className="glass p-4 rounded-xl" style={{borderColor:'rgba(0,170,255,0.2)',background:'rgba(0,170,255,0.04)'}}>
+            <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-3">How to use your API key</div>
+            <div className="space-y-2">
+              <p className="font-mono text-[10px] text-slate-500">Add the key as a request header:</p>
+              <code className="block font-mono text-[10px] text-accent2 p-2.5 rounded-lg break-all"
+                style={{background:'rgba(0,0,0,0.4)',border:'1px solid rgba(255,255,255,0.06)'}}>
+                X-API-Key: eso_xxxxxxxxxxxxxxxx
+              </code>
+              <p className="font-mono text-[10px] text-slate-500 mt-2">Example — start a scan:</p>
+              <code className="block font-mono text-[10px] text-slate-400 p-2.5 rounded-lg break-all"
+                style={{background:'rgba(0,0,0,0.4)',border:'1px solid rgba(255,255,255,0.06)'}}>
+                {`curl -X POST http://your-server:8000/api/v1/hybrid/execute \
+  -H "X-API-Key: eso_your_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"goal":"scan for vulnerabilities","target":"example.com"}'`}
+              </code>
+              <p className="font-mono text-[10px] text-slate-600 mt-1">
+                API access requires <span className="text-accent2">Pro</span> tier or above.
+              </p>
+            </div>
+          </div>
+
+          {/* Create key */}
           <div className="glass p-5">
             <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-3">Create New Key</div>
             <div className="flex gap-2">
@@ -321,27 +388,40 @@ export default function SettingsPage() {
             {newKey && (
               <div className="mt-3 p-3 rounded-xl border border-yellow-500/20 bg-yellow-500/[0.04]">
                 <div className="font-mono text-[9px] text-yellow-500/70 mb-2">⚠ Copy now — won't be shown again</div>
-                <code className="font-mono text-[11px] text-yellow-400 break-all">{newKey.api_key ?? newKey.key}</code>
+                <code className="font-mono text-[11px] text-yellow-400 break-all select-all">{newKey.api_key ?? newKey.key}</code>
               </div>
             )}
           </div>
 
+          {/* Active keys list */}
           <div className="glass overflow-hidden">
-            <div className="px-4 py-2.5 border-b border-white/[0.06]">
+            <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
               <span className="font-mono text-[10px] text-accent uppercase tracking-widest">Active Keys ({apiKeys.length})</span>
+              <span className="font-mono text-[9px] text-slate-700">Max 5 keys per account</span>
             </div>
             {apiKeys.length===0
-              ? <div className="p-8 text-center font-mono text-[11px] text-slate-600">No API keys yet</div>
+              ? (
+                <div className="p-8 text-center">
+                  <div className="font-mono text-[11px] text-slate-600 mb-1">No API keys yet</div>
+                  <div className="font-mono text-[10px] text-slate-700">Create a key above to access the API programmatically</div>
+                </div>
+              )
               : apiKeys.map(k => (
                 <div key={k.key_id} className="flex items-center justify-between px-4 py-3 border-b border-white/[0.03] last:border-0">
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <div className="font-mono text-[12px] text-slate-200 font-semibold">{k.name}</div>
-                    <div className="font-mono text-[9px] text-slate-600 mt-0.5">
-                      {k.key_prefix}... · {new Date(k.created_at).toLocaleDateString()}
+                    <div className="font-mono text-[9px] text-slate-600 mt-0.5 flex items-center gap-2">
+                      <code className="text-slate-500">{k.key_prefix}••••••••••••</code>
+                      <span>·</span>
+                      <span>Created {new Date(k.created_at).toLocaleDateString()}</span>
+                      {k.last_used_at && <><span>·</span><span>Last used {new Date(k.last_used_at).toLocaleDateString()}</span></>}
                     </div>
                   </div>
                   <button onClick={()=>revokeKey(k.key_id)}
-                    className="font-mono text-[9px] text-red-400 hover:text-red-300 cursor-pointer">Revoke</button>
+                    className="font-mono text-[9px] px-2.5 py-1 rounded-lg cursor-pointer transition-all hover:opacity-80 ml-3 shrink-0"
+                    style={{background:'rgba(255,58,92,0.08)',border:'1px solid rgba(255,58,92,0.2)',color:'#ff3a5c'}}>
+                    Revoke
+                  </button>
                 </div>
               ))
             }

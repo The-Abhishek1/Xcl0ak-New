@@ -1,3 +1,4 @@
+import { notifyEvent } from '@/lib/notify'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { createHash } from 'crypto'
@@ -37,6 +38,16 @@ export async function POST(
       where:  { alias: userAlias },
       create: { alias: userAlias, fp: userAlias, reputation: challenge.points },
       update: { reputation: { increment: challenge.points } },
+    }).catch(() => null)
+
+    // Fire notification + broadcast to ctf-help room
+    await notifyEvent({
+      userAlias,
+      type: 'ctf_solve',
+      title: `🏆 CTF Solved: ${challenge.title}`,
+      body:  `You solved "${challenge.title}" for ${challenge.points} points!`,
+      link:  '/ctf',
+      broadcastRoom: 'ctf-help',
     }).catch(() => null)
   }
 

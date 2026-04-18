@@ -129,6 +129,8 @@ function SettingsPage() {
     const [model, setModel] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('qwen2.5:3b');
     const [openaiKey, setOpenaiKey] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('');
     const [anthropicKey, setAnthropicKey] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])('');
+    const [llmTesting, setLlmTesting] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [llmTestResult, setLlmTestResult] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "SettingsPage.useEffect": ()=>{
             if (!(0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$eso$2d$auth$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["isLoggedIn"])()) {
@@ -198,6 +200,20 @@ function SettingsPage() {
         }
         setLoading(false);
     }
+    async function testLLM() {
+        setLlmTesting(true);
+        setLlmTestResult(null);
+        try {
+            const r = await apiFetch('/system/llm/test');
+            setLlmTestResult(r);
+        } catch (e) {
+            setLlmTestResult({
+                status: 'error',
+                error: e.message
+            });
+        }
+        setLlmTesting(false);
+    }
     async function createKey() {
         if (!newKeyName.trim()) return;
         setLoading(true);
@@ -236,12 +252,12 @@ function SettingsPage() {
             children: "Loading account..."
         }, void 0, false, {
             fileName: "[project]/src/app/settings/page.tsx",
-            lineNumber: 113,
+            lineNumber: 124,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/app/settings/page.tsx",
-        lineNumber: 112,
+        lineNumber: 123,
         columnNumber: 5
     }, this);
     const userTier = user?.role === 'admin' ? 'admin' : user?.tier ?? 'free';
@@ -284,7 +300,7 @@ function SettingsPage() {
                             children: "Settings"
                         }, void 0, false, {
                             fileName: "[project]/src/app/settings/page.tsx",
-                            lineNumber: 138,
+                            lineNumber: 149,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -296,7 +312,7 @@ function SettingsPage() {
                                     children: user?.username
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/settings/page.tsx",
-                                    lineNumber: 140,
+                                    lineNumber: 151,
                                     columnNumber: 22
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -304,7 +320,7 @@ function SettingsPage() {
                                     children: " · "
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/settings/page.tsx",
-                                    lineNumber: 141,
+                                    lineNumber: 152,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -317,24 +333,24 @@ function SettingsPage() {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/settings/page.tsx",
-                                    lineNumber: 142,
+                                    lineNumber: 153,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/settings/page.tsx",
-                            lineNumber: 139,
+                            lineNumber: 150,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/app/settings/page.tsx",
-                    lineNumber: 137,
+                    lineNumber: 148,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/app/settings/page.tsx",
-                lineNumber: 136,
+                lineNumber: 147,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -359,25 +375,25 @@ function SettingsPage() {
                                 children: t.icon
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 156,
+                                lineNumber: 167,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 children: t.label
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 156,
+                                lineNumber: 167,
                                 columnNumber: 34
                             }, this)
                         ]
                     }, t.id, true, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 151,
+                        lineNumber: 162,
                         columnNumber: 11
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/src/app/settings/page.tsx",
-                lineNumber: 148,
+                lineNumber: 159,
                 columnNumber: 7
             }, this),
             msg && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -400,13 +416,13 @@ function SettingsPage() {
                         children: "✕"
                     }, void 0, false, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 167,
+                        lineNumber: 178,
                         columnNumber: 17
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/settings/page.tsx",
-                lineNumber: 163,
+                lineNumber: 174,
                 columnNumber: 9
             }, this),
             tab === 'profile' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -420,7 +436,7 @@ function SettingsPage() {
                                 children: "Account Info"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 176,
+                                lineNumber: 187,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -469,7 +485,7 @@ function SettingsPage() {
                                                 children: label
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/settings/page.tsx",
-                                                lineNumber: 188,
+                                                lineNumber: 199,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -480,24 +496,24 @@ function SettingsPage() {
                                                 children: String(val ?? '—')
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/settings/page.tsx",
-                                                lineNumber: 189,
+                                                lineNumber: 200,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, String(label), true, {
                                         fileName: "[project]/src/app/settings/page.tsx",
-                                        lineNumber: 187,
+                                        lineNumber: 198,
                                         columnNumber: 17
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 177,
+                                lineNumber: 188,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 175,
+                        lineNumber: 186,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -508,7 +524,7 @@ function SettingsPage() {
                                 children: "Current Plan"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 199,
+                                lineNumber: 210,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -529,7 +545,7 @@ function SettingsPage() {
                                                 children: userTier
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/settings/page.tsx",
-                                                lineNumber: 202,
+                                                lineNumber: 213,
                                                 columnNumber: 17
                                             }, this),
                                             !isAdmin && userTier !== 'enterprise' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -543,13 +559,13 @@ function SettingsPage() {
                                                 children: "Upgrade →"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/settings/page.tsx",
-                                                lineNumber: 204,
+                                                lineNumber: 215,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/settings/page.tsx",
-                                        lineNumber: 201,
+                                        lineNumber: 212,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -579,7 +595,7 @@ function SettingsPage() {
                                                         children: s.label
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/settings/page.tsx",
-                                                        lineNumber: 220,
+                                                        lineNumber: 231,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -590,18 +606,79 @@ function SettingsPage() {
                                                         children: s.val
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/settings/page.tsx",
-                                                        lineNumber: 221,
+                                                        lineNumber: 232,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, s.label, true, {
                                                 fileName: "[project]/src/app/settings/page.tsx",
-                                                lineNumber: 219,
+                                                lineNumber: 230,
                                                 columnNumber: 19
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/settings/page.tsx",
-                                        lineNumber: 212,
+                                        lineNumber: 223,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mt-3 p-3 rounded-xl",
+                                        style: {
+                                            background: 'rgba(0,170,255,0.04)',
+                                            border: '1px solid rgba(0,170,255,0.15)'
+                                        },
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-1.5",
+                                                children: "How scanning works"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/settings/page.tsx",
+                                                lineNumber: 238,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "font-mono text-[10px] text-slate-500 leading-5",
+                                                children: [
+                                                    "Security tools run as ",
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        className: "text-accent2",
+                                                        children: "Docker containers on your machine"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/settings/page.tsx",
+                                                        lineNumber: 240,
+                                                        columnNumber: 41
+                                                    }, this),
+                                                    ". Our servers handle AI orchestration, analysis, and report storage — your machine handles the actual scanning. This keeps traffic private and keeps costs low for everyone."
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/settings/page.tsx",
+                                                lineNumber: 239,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "font-mono text-[9px] text-slate-700 mt-1.5",
+                                                children: [
+                                                    "Docker must be running locally · ",
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                                        href: "https://docs.docker.com/get-docker/",
+                                                        target: "_blank",
+                                                        rel: "noopener noreferrer",
+                                                        className: "text-accent2 hover:underline",
+                                                        children: "Install Docker →"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/settings/page.tsx",
+                                                        lineNumber: 243,
+                                                        columnNumber: 52
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/settings/page.tsx",
+                                                lineNumber: 242,
+                                                columnNumber: 17
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/settings/page.tsx",
+                                        lineNumber: 237,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -612,7 +689,7 @@ function SettingsPage() {
                                                 children: "Tools"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/settings/page.tsx",
-                                                lineNumber: 226,
+                                                lineNumber: 248,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -620,7 +697,7 @@ function SettingsPage() {
                                                 children: tierInfo.tools
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/settings/page.tsx",
-                                                lineNumber: 227,
+                                                lineNumber: 249,
                                                 columnNumber: 17
                                             }, this),
                                             tierInfo.extra.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -637,36 +714,36 @@ function SettingsPage() {
                                                         ]
                                                     }, f, true, {
                                                         fileName: "[project]/src/app/settings/page.tsx",
-                                                        lineNumber: 231,
+                                                        lineNumber: 253,
                                                         columnNumber: 23
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/settings/page.tsx",
-                                                lineNumber: 229,
+                                                lineNumber: 251,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/settings/page.tsx",
-                                        lineNumber: 225,
+                                        lineNumber: 247,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 200,
+                                lineNumber: 211,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 198,
+                        lineNumber: 209,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/settings/page.tsx",
-                lineNumber: 173,
+                lineNumber: 184,
                 columnNumber: 9
             }, this),
             tab === 'llm' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -677,7 +754,7 @@ function SettingsPage() {
                         children: "LLM Provider"
                     }, void 0, false, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 246,
+                        lineNumber: 268,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -716,7 +793,7 @@ function SettingsPage() {
                                         children: p.label
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/settings/page.tsx",
-                                        lineNumber: 258,
+                                        lineNumber: 280,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -724,18 +801,18 @@ function SettingsPage() {
                                         children: p.desc
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/settings/page.tsx",
-                                        lineNumber: 259,
+                                        lineNumber: 281,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, p.id, true, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 253,
+                                lineNumber: 275,
                                 columnNumber: 15
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 247,
+                        lineNumber: 269,
                         columnNumber: 11
                     }, this),
                     provider === 'local' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -746,7 +823,7 @@ function SettingsPage() {
                                 children: "Model"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 266,
+                                lineNumber: 288,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -764,18 +841,18 @@ function SettingsPage() {
                                         ]
                                     }, m.id, true, {
                                         fileName: "[project]/src/app/settings/page.tsx",
-                                        lineNumber: 268,
+                                        lineNumber: 290,
                                         columnNumber: 41
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 267,
+                                lineNumber: 289,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 265,
+                        lineNumber: 287,
                         columnNumber: 13
                     }, this),
                     provider === 'openai' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -794,12 +871,12 @@ function SettingsPage() {
                                         children: m
                                     }, m, false, {
                                         fileName: "[project]/src/app/settings/page.tsx",
-                                        lineNumber: 275,
+                                        lineNumber: 297,
                                         columnNumber: 80
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 274,
+                                lineNumber: 296,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -810,13 +887,13 @@ function SettingsPage() {
                                 className: inp
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 277,
+                                lineNumber: 299,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 273,
+                        lineNumber: 295,
                         columnNumber: 13
                     }, this),
                     provider === 'anthropic' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -834,12 +911,12 @@ function SettingsPage() {
                                         children: m
                                     }, m, false, {
                                         fileName: "[project]/src/app/settings/page.tsx",
-                                        lineNumber: 283,
+                                        lineNumber: 305,
                                         columnNumber: 93
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 282,
+                                lineNumber: 304,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -850,39 +927,80 @@ function SettingsPage() {
                                 className: inp
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 285,
+                                lineNumber: 307,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 281,
+                        lineNumber: 303,
                         columnNumber: 13
                     }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                        onClick: saveLLM,
-                        disabled: loading,
-                        className: "w-full py-2.5 rounded-xl font-mono text-[12px] font-bold cursor-pointer transition-all disabled:opacity-40",
-                        style: {
-                            background: 'rgba(0,255,170,0.1)',
-                            border: '1px solid rgba(0,255,170,0.3)',
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex gap-2",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                onClick: saveLLM,
+                                disabled: loading,
+                                className: "flex-1 py-2.5 rounded-xl font-mono text-[12px] font-bold cursor-pointer transition-all disabled:opacity-40",
+                                style: {
+                                    background: 'rgba(0,255,170,0.1)',
+                                    border: '1px solid rgba(0,255,170,0.3)',
+                                    color: '#00ffaa'
+                                },
+                                children: loading ? '⟳ Saving...' : 'Save LLM Settings'
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/settings/page.tsx",
+                                lineNumber: 312,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                onClick: testLLM,
+                                disabled: llmTesting,
+                                className: "px-4 py-2.5 rounded-xl font-mono text-[11px] font-bold cursor-pointer transition-all disabled:opacity-40 shrink-0",
+                                style: {
+                                    background: 'rgba(0,170,255,0.1)',
+                                    border: '1px solid rgba(0,170,255,0.3)',
+                                    color: '#00aaff'
+                                },
+                                children: llmTesting ? '⟳ Testing...' : '⚡ Test'
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/settings/page.tsx",
+                                lineNumber: 317,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/settings/page.tsx",
+                        lineNumber: 311,
+                        columnNumber: 11
+                    }, this),
+                    llmTestResult && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "p-3 rounded-xl border font-mono text-[10px]",
+                        style: llmTestResult.status === 'ok' ? {
+                            borderColor: 'rgba(0,255,170,0.2)',
+                            background: 'rgba(0,255,170,0.05)',
                             color: '#00ffaa'
+                        } : {
+                            borderColor: 'rgba(255,58,92,0.2)',
+                            background: 'rgba(255,58,92,0.05)',
+                            color: '#ff3a5c'
                         },
-                        children: loading ? '⟳ Saving...' : 'Save LLM Settings'
+                        children: llmTestResult.status === 'ok' ? `✓ Connected — ${llmTestResult.provider} · ${llmTestResult.model}` : `✗ Failed — ${llmTestResult.error || llmTestResult.status}`
                     }, void 0, false, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 289,
-                        columnNumber: 11
+                        lineNumber: 325,
+                        columnNumber: 13
                     }, this),
                     llmConfig && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "p-3 rounded-xl border border-white/[0.06] bg-white/[0.02]",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "font-mono text-[9px] text-slate-600 mb-1",
-                                children: "Active"
+                                children: "Active configuration"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 297,
+                                lineNumber: 337,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -890,28 +1008,139 @@ function SettingsPage() {
                                 children: [
                                     llmConfig.provider,
                                     " · ",
-                                    llmConfig.model
+                                    llmConfig.model,
+                                    llmConfig.has_openai_key && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "ml-2 text-accent2",
+                                        children: "OpenAI key ✓"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/settings/page.tsx",
+                                        lineNumber: 340,
+                                        columnNumber: 46
+                                    }, this),
+                                    llmConfig.has_anthropic_key && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "ml-2",
+                                        style: {
+                                            color: '#a78bfa'
+                                        },
+                                        children: "Anthropic key ✓"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/settings/page.tsx",
+                                        lineNumber: 341,
+                                        columnNumber: 49
+                                    }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 298,
+                                lineNumber: 338,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 296,
+                        lineNumber: 336,
                         columnNumber: 13
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/settings/page.tsx",
-                lineNumber: 245,
+                lineNumber: 267,
                 columnNumber: 9
             }, this),
             tab === 'apikeys' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "space-y-4",
                 children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "glass p-4 rounded-xl",
+                        style: {
+                            borderColor: 'rgba(0,170,255,0.2)',
+                            background: 'rgba(0,170,255,0.04)'
+                        },
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "font-mono text-[9px] uppercase tracking-widest text-slate-600 mb-3",
+                                children: "How to use your API key"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/settings/page.tsx",
+                                lineNumber: 354,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "space-y-2",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "font-mono text-[10px] text-slate-500",
+                                        children: "Add the key as a request header:"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/settings/page.tsx",
+                                        lineNumber: 356,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("code", {
+                                        className: "block font-mono text-[10px] text-accent2 p-2.5 rounded-lg break-all",
+                                        style: {
+                                            background: 'rgba(0,0,0,0.4)',
+                                            border: '1px solid rgba(255,255,255,0.06)'
+                                        },
+                                        children: "X-API-Key: eso_xxxxxxxxxxxxxxxx"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/settings/page.tsx",
+                                        lineNumber: 357,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "font-mono text-[10px] text-slate-500 mt-2",
+                                        children: "Example — start a scan:"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/settings/page.tsx",
+                                        lineNumber: 361,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("code", {
+                                        className: "block font-mono text-[10px] text-slate-400 p-2.5 rounded-lg break-all",
+                                        style: {
+                                            background: 'rgba(0,0,0,0.4)',
+                                            border: '1px solid rgba(255,255,255,0.06)'
+                                        },
+                                        children: `curl -X POST http://your-server:8000/api/v1/hybrid/execute \
+  -H "X-API-Key: eso_your_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"goal":"scan for vulnerabilities","target":"example.com"}'`
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/settings/page.tsx",
+                                        lineNumber: 362,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "font-mono text-[10px] text-slate-600 mt-1",
+                                        children: [
+                                            "API access requires ",
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "text-accent2",
+                                                children: "Pro"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/app/settings/page.tsx",
+                                                lineNumber: 370,
+                                                columnNumber: 37
+                                            }, this),
+                                            " tier or above."
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/settings/page.tsx",
+                                        lineNumber: 369,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/settings/page.tsx",
+                                lineNumber: 355,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/settings/page.tsx",
+                        lineNumber: 353,
+                        columnNumber: 11
+                    }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "glass p-5",
                         children: [
@@ -920,7 +1149,7 @@ function SettingsPage() {
                                 children: "Create New Key"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 310,
+                                lineNumber: 377,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -934,7 +1163,7 @@ function SettingsPage() {
                                         onKeyDown: (e)=>e.key === 'Enter' && createKey()
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/settings/page.tsx",
-                                        lineNumber: 312,
+                                        lineNumber: 379,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -949,13 +1178,13 @@ function SettingsPage() {
                                         children: "Create"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/settings/page.tsx",
-                                        lineNumber: 315,
+                                        lineNumber: 382,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 311,
+                                lineNumber: 378,
                                 columnNumber: 13
                             }, this),
                             newKey && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -966,114 +1195,193 @@ function SettingsPage() {
                                         children: "⚠ Copy now — won't be shown again"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/settings/page.tsx",
-                                        lineNumber: 323,
+                                        lineNumber: 390,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("code", {
-                                        className: "font-mono text-[11px] text-yellow-400 break-all",
+                                        className: "font-mono text-[11px] text-yellow-400 break-all select-all",
                                         children: newKey.api_key ?? newKey.key
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/settings/page.tsx",
-                                        lineNumber: 324,
+                                        lineNumber: 391,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 322,
+                                lineNumber: 389,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 309,
+                        lineNumber: 376,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "glass overflow-hidden",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "px-4 py-2.5 border-b border-white/[0.06]",
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    className: "font-mono text-[10px] text-accent uppercase tracking-widest",
-                                    children: [
-                                        "Active Keys (",
-                                        apiKeys.length,
-                                        ")"
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/app/settings/page.tsx",
-                                    lineNumber: 331,
-                                    columnNumber: 15
-                                }, this)
-                            }, void 0, false, {
+                                className: "px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "font-mono text-[10px] text-accent uppercase tracking-widest",
+                                        children: [
+                                            "Active Keys (",
+                                            apiKeys.length,
+                                            ")"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/app/settings/page.tsx",
+                                        lineNumber: 399,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "font-mono text-[9px] text-slate-700",
+                                        children: "Max 5 keys per account"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/settings/page.tsx",
+                                        lineNumber: 400,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 330,
+                                lineNumber: 398,
                                 columnNumber: 13
                             }, this),
                             apiKeys.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "p-8 text-center font-mono text-[11px] text-slate-600",
-                                children: "No API keys yet"
-                            }, void 0, false, {
+                                className: "p-8 text-center",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "font-mono text-[11px] text-slate-600 mb-1",
+                                        children: "No API keys yet"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/settings/page.tsx",
+                                        lineNumber: 405,
+                                        columnNumber: 19
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "font-mono text-[10px] text-slate-700",
+                                        children: "Create a key above to access the API programmatically"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/settings/page.tsx",
+                                        lineNumber: 406,
+                                        columnNumber: 19
+                                    }, this)
+                                ]
+                            }, void 0, true, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 334,
+                                lineNumber: 404,
                                 columnNumber: 17
                             }, this) : apiKeys.map((k)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "flex items-center justify-between px-4 py-3 border-b border-white/[0.03] last:border-0",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex-1 min-w-0",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "font-mono text-[12px] text-slate-200 font-semibold",
                                                     children: k.name
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/settings/page.tsx",
-                                                    lineNumber: 338,
+                                                    lineNumber: 412,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "font-mono text-[9px] text-slate-600 mt-0.5",
+                                                    className: "font-mono text-[9px] text-slate-600 mt-0.5 flex items-center gap-2",
                                                     children: [
-                                                        k.key_prefix,
-                                                        "... · ",
-                                                        new Date(k.created_at).toLocaleDateString()
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("code", {
+                                                            className: "text-slate-500",
+                                                            children: [
+                                                                k.key_prefix,
+                                                                "••••••••••••"
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/app/settings/page.tsx",
+                                                            lineNumber: 414,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            children: "·"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/app/settings/page.tsx",
+                                                            lineNumber: 415,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                            children: [
+                                                                "Created ",
+                                                                new Date(k.created_at).toLocaleDateString()
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/app/settings/page.tsx",
+                                                            lineNumber: 416,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        k.last_used_at && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    children: "·"
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/app/settings/page.tsx",
+                                                                    lineNumber: 417,
+                                                                    columnNumber: 44
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                    children: [
+                                                                        "Last used ",
+                                                                        new Date(k.last_used_at).toLocaleDateString()
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/src/app/settings/page.tsx",
+                                                                    lineNumber: 417,
+                                                                    columnNumber: 58
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/settings/page.tsx",
-                                                    lineNumber: 339,
+                                                    lineNumber: 413,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/settings/page.tsx",
-                                            lineNumber: 337,
+                                            lineNumber: 411,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                             onClick: ()=>revokeKey(k.key_id),
-                                            className: "font-mono text-[9px] text-red-400 hover:text-red-300 cursor-pointer",
+                                            className: "font-mono text-[9px] px-2.5 py-1 rounded-lg cursor-pointer transition-all hover:opacity-80 ml-3 shrink-0",
+                                            style: {
+                                                background: 'rgba(255,58,92,0.08)',
+                                                border: '1px solid rgba(255,58,92,0.2)',
+                                                color: '#ff3a5c'
+                                            },
                                             children: "Revoke"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/settings/page.tsx",
-                                            lineNumber: 343,
+                                            lineNumber: 420,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, k.key_id, true, {
                                     fileName: "[project]/src/app/settings/page.tsx",
-                                    lineNumber: 336,
+                                    lineNumber: 410,
                                     columnNumber: 17
                                 }, this))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 329,
+                        lineNumber: 397,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/settings/page.tsx",
-                lineNumber: 308,
+                lineNumber: 350,
                 columnNumber: 9
             }, this),
             tab === 'billing' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1087,7 +1395,7 @@ function SettingsPage() {
                                 children: "Subscription"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 356,
+                                lineNumber: 436,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1109,7 +1417,7 @@ function SettingsPage() {
                                                     children: userTier
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/settings/page.tsx",
-                                                    lineNumber: 360,
+                                                    lineNumber: 440,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1117,13 +1425,13 @@ function SettingsPage() {
                                                     children: userTier === 'free' ? '$0 / month' : userTier === 'pro' ? '$29 / month' : userTier === 'enterprise' ? '$99 / month' : userTier === 'admin' ? 'Admin — no billing' : '—'
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/settings/page.tsx",
-                                                    lineNumber: 361,
+                                                    lineNumber: 441,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/settings/page.tsx",
-                                            lineNumber: 359,
+                                            lineNumber: 439,
                                             columnNumber: 17
                                         }, this),
                                         !isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1134,7 +1442,7 @@ function SettingsPage() {
                                                     children: "Renews"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/settings/page.tsx",
-                                                    lineNumber: 367,
+                                                    lineNumber: 447,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1142,30 +1450,30 @@ function SettingsPage() {
                                                     children: "—"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/settings/page.tsx",
-                                                    lineNumber: 368,
+                                                    lineNumber: 448,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/settings/page.tsx",
-                                            lineNumber: 366,
+                                            lineNumber: 446,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/settings/page.tsx",
-                                    lineNumber: 358,
+                                    lineNumber: 438,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 357,
+                                lineNumber: 437,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 355,
+                        lineNumber: 435,
                         columnNumber: 11
                     }, this),
                     !isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1176,7 +1484,7 @@ function SettingsPage() {
                                 children: "Available Plans"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/settings/page.tsx",
-                                lineNumber: 377,
+                                lineNumber: 457,
                                 columnNumber: 15
                             }, this),
                             [
@@ -1212,7 +1520,7 @@ function SettingsPage() {
                                                     children: plan.label
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/settings/page.tsx",
-                                                    lineNumber: 385,
+                                                    lineNumber: 465,
                                                     columnNumber: 21
                                                 }, this),
                                                 plan.tier === userTier && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1224,13 +1532,13 @@ function SettingsPage() {
                                                     children: "CURRENT"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/settings/page.tsx",
-                                                    lineNumber: 387,
+                                                    lineNumber: 467,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/settings/page.tsx",
-                                            lineNumber: 384,
+                                            lineNumber: 464,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1248,13 +1556,13 @@ function SettingsPage() {
                                                             children: "/mo"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/settings/page.tsx",
-                                                            lineNumber: 391,
+                                                            lineNumber: 471,
                                                             columnNumber: 110
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/settings/page.tsx",
-                                                    lineNumber: 391,
+                                                    lineNumber: 471,
                                                     columnNumber: 21
                                                 }, this),
                                                 plan.tier !== userTier && plan.tier !== 'free' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1274,25 +1582,25 @@ function SettingsPage() {
                                                     ].indexOf(userTier) ? 'Upgrade' : 'Downgrade'
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/settings/page.tsx",
-                                                    lineNumber: 393,
+                                                    lineNumber: 473,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/settings/page.tsx",
-                                            lineNumber: 390,
+                                            lineNumber: 470,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, plan.tier, true, {
                                     fileName: "[project]/src/app/settings/page.tsx",
-                                    lineNumber: 383,
+                                    lineNumber: 463,
                                     columnNumber: 17
                                 }, this))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 376,
+                        lineNumber: 456,
                         columnNumber: 13
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1308,34 +1616,34 @@ function SettingsPage() {
                                     children: "Contact billing"
                                 }, void 0, false, {
                                     fileName: "[project]/src/app/settings/page.tsx",
-                                    lineNumber: 408,
+                                    lineNumber: 488,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/app/settings/page.tsx",
-                            lineNumber: 406,
+                            lineNumber: 486,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/app/settings/page.tsx",
-                        lineNumber: 405,
+                        lineNumber: 485,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/settings/page.tsx",
-                lineNumber: 354,
+                lineNumber: 434,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/settings/page.tsx",
-        lineNumber: 135,
+        lineNumber: 146,
         columnNumber: 5
     }, this);
 }
-_s(SettingsPage, "1mI+PqtVkKAGQwCGbH2yy5w6NuY=", false, function() {
+_s(SettingsPage, "d3AG89qdYF3eH6RKaR7G07RTYPk=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
     ];

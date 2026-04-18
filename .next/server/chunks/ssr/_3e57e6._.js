@@ -10,1477 +10,516 @@ __turbopack_esm__({
     "TYPE_COLOR": (()=>TYPE_COLOR)
 });
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
+// src/components/map/Globe3D.tsx
+// World-Monitor-style 3D globe — Canvas2D + orthographic projection
+// Real country borders from naturalearth GeoJSON, animated threat arcs
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_import__("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react.js [app-ssr] (ecmascript)");
 'use client';
 ;
 ;
 const TYPE_COLOR = {
     Ransomware: '#ff3a5c',
-    APT: '#a78bfa',
-    Phishing: '#ff8c42',
-    DDoS: '#ffd700',
-    Malware: '#ff3a5c',
-    Scanner: '#00aaff',
-    Threat: '#4a7fa5',
-    RAT: '#ff6b9d',
-    WORM: '#ff8c42'
+    APT: '#c084fc',
+    Phishing: '#fb923c',
+    DDoS: '#facc15',
+    Malware: '#f87171',
+    Scanner: '#38bdf8',
+    Threat: '#94a3b8',
+    RAT: '#f472b6',
+    WORM: '#fb923c'
 };
-const tc = (t)=>TYPE_COLOR[t] ?? '#4a7fa5';
-function ll2v(lat, lng, r) {
-    const phi = lat * (Math.PI / 180), theta = lng * (Math.PI / 180);
+const tc = (t)=>TYPE_COLOR[t] ?? '#94a3b8';
+const DEG = Math.PI / 180;
+// ── Project lat/lng → canvas [x,y] with rotation ──────────────────────────
+function project(lat, lng, rotX, rotY, cx, cy, R) {
+    const phi = lat * DEG, lam = lng * DEG;
+    let vx = Math.cos(phi) * Math.sin(lam);
+    let vy = Math.sin(phi);
+    let vz = Math.cos(phi) * Math.cos(lam);
+    // Rotate Y (spin)
+    const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+    const vx1 = vx * cosY - vz * sinY;
+    const vz1 = vx * sinY + vz * cosY;
+    // Rotate X (tilt)
+    const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+    const vy2 = vy * cosX - vz1 * sinX;
+    const vz2 = vy * sinX + vz1 * cosX;
+    if (vz2 < 0) return null // back of globe
+    ;
     return [
-        r * Math.cos(phi) * Math.sin(theta),
-        r * Math.sin(phi),
-        r * Math.cos(phi) * Math.cos(theta)
+        cx + vx1 * R,
+        cy - vy2 * R
     ];
 }
-// Draw a much more accurate world map using polygon data
-function drawEarth(ctx, W, H) {
-    // Background ocean
-    ctx.fillStyle = '#04090f';
-    ctx.fillRect(0, 0, W, H);
-    // Grid lines
-    ctx.strokeStyle = 'rgba(0,255,170,0.07)';
-    ctx.lineWidth = 0.5;
-    for(let la = -80; la <= 80; la += 20){
-        const y = (90 - la) / 180 * H;
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(W, y);
-        ctx.stroke();
+// ── Same but returns raw components (for lifted arcs) ─────────────────────
+function projectRaw(lat, lng, rotX, rotY, cx, cy, effR) {
+    const phi = lat * DEG, lam = lng * DEG;
+    let vx = Math.cos(phi) * Math.sin(lam);
+    let vy = Math.sin(phi);
+    let vz = Math.cos(phi) * Math.cos(lam);
+    const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+    const vx1 = vx * cosY - vz * sinY;
+    const vz1 = vx * sinY + vz * cosY;
+    const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+    const vy2 = vy * cosX - vz1 * sinX;
+    const vz2 = vy * sinX + vz1 * cosX;
+    return {
+        pt: [
+            cx + vx1 * effR,
+            cy - vy2 * effR
+        ],
+        vis: vz2 >= -0.04
+    };
+}
+// ── Slerp great-circle path ─────────────────────────────────────────────────
+function greatCircle(lat1, lng1, lat2, lng2, steps) {
+    const p1 = [
+        lat1 * DEG,
+        lng1 * DEG
+    ];
+    const p2 = [
+        lat2 * DEG,
+        lng2 * DEG
+    ];
+    const v1 = [
+        Math.cos(p1[0]) * Math.cos(p1[1]),
+        Math.sin(p1[0]),
+        Math.cos(p1[0]) * Math.sin(p1[1])
+    ];
+    const v2 = [
+        Math.cos(p2[0]) * Math.cos(p2[1]),
+        Math.sin(p2[0]),
+        Math.cos(p2[0]) * Math.sin(p2[1])
+    ];
+    const dot = Math.min(1, Math.max(-1, v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]));
+    const omega = Math.acos(dot);
+    if (omega < 0.001) return [
+        [
+            lat1,
+            lng1
+        ],
+        [
+            lat2,
+            lng2
+        ]
+    ];
+    const out = [];
+    for(let i = 0; i <= steps; i++){
+        const t = i / steps;
+        const sa = Math.sin((1 - t) * omega) / Math.sin(omega);
+        const sb = Math.sin(t * omega) / Math.sin(omega);
+        const vx = sa * v1[0] + sb * v2[0];
+        const vy = sa * v1[1] + sb * v2[1];
+        const vz = sa * v1[2] + sb * v2[2];
+        const lat = Math.atan2(vy, Math.sqrt(vx * vx + vz * vz)) / DEG;
+        const lng = Math.atan2(vz, vx) / DEG;
+        out.push([
+            lat,
+            lng
+        ]);
     }
-    for(let lo = -180; lo <= 180; lo += 20){
-        const x = (lo + 180) / 360 * W;
+    return out;
+}
+// ── Draw one GeoJSON geometry onto the globe ─────────────────────────────────
+function drawGeometry(ctx, geom, rotX, rotY, cx, cy, R, fill, stroke, lw) {
+    const polys = geom.type === 'Polygon' ? geom.coordinates : geom.type === 'MultiPolygon' ? geom.coordinates.flat() : [];
+    for (const ring of polys){
         ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, H);
-        ctx.stroke();
-    }
-    // fn: draw land polygon from [lng,lat] pairs
-    function land(coords, fill = 'rgba(0,180,90,0.28)', stroke = 'rgba(0,255,140,0.35)') {
-        if (!coords.length) return;
-        ctx.beginPath();
-        coords.forEach(([lo, la], i)=>{
-            const x = (lo + 180) / 360 * W, y = (90 - la) / 180 * H;
-            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-        });
+        let prevVis = false;
+        for(let i = 0; i < ring.length; i++){
+            const [lng, lat] = ring[i];
+            const pt = project(lat, lng, rotX, rotY, cx, cy, R);
+            if (pt) {
+                if (!prevVis) ctx.moveTo(pt[0], pt[1]);
+                else ctx.lineTo(pt[0], pt[1]);
+                prevVis = true;
+            } else {
+                prevVis = false;
+            }
+        }
         ctx.closePath();
         ctx.fillStyle = fill;
         ctx.fill();
         ctx.strokeStyle = stroke;
-        ctx.lineWidth = 0.8;
+        ctx.lineWidth = lw;
         ctx.stroke();
     }
-    // Simplified but recognisable continent polygons
-    // North America
-    land([
-        [
-            -168,
-            72
-        ],
-        [
-            -140,
-            72
-        ],
-        [
-            -95,
-            75
-        ],
-        [
-            -82,
-            72
-        ],
-        [
-            -62,
-            45
-        ],
-        [
-            -52,
-            46
-        ],
-        [
-            -55,
-            36
-        ],
-        [
-            -80,
-            25
-        ],
-        [
-            -87,
-            15
-        ],
-        [
-            -83,
-            8
-        ],
-        [
-            -75,
-            8
-        ],
-        [
-            -76,
-            18
-        ],
-        [
-            -72,
-            19
-        ],
-        [
-            -72,
-            18
-        ],
-        [
-            -80,
-            10
-        ],
-        [
-            -83,
-            8
-        ],
-        [
-            -90,
-            14
-        ],
-        [
-            -92,
-            14
-        ],
-        [
-            -97,
-            20
-        ],
-        [
-            -105,
-            22
-        ],
-        [
-            -110,
-            23
-        ],
-        [
-            -118,
-            30
-        ],
-        [
-            -120,
-            34
-        ],
-        [
-            -125,
-            48
-        ],
-        [
-            -124,
-            60
-        ],
-        [
-            -140,
-            60
-        ],
-        [
-            -141,
-            68
-        ],
-        [
-            -168,
-            72
-        ]
-    ]);
-    // South America
-    land([
-        [
-            -80,
-            10
-        ],
-        [
-            -76,
-            8
-        ],
-        [
-            -62,
-            8
-        ],
-        [
-            -50,
-            5
-        ],
-        [
-            -35,
-            -5
-        ],
-        [
-            -35,
-            -10
-        ],
-        [
-            -38,
-            -14
-        ],
-        [
-            -40,
-            -22
-        ],
-        [
-            -45,
-            -24
-        ],
-        [
-            -48,
-            -28
-        ],
-        [
-            -52,
-            -33
-        ],
-        [
-            -58,
-            -38
-        ],
-        [
-            -62,
-            -42
-        ],
-        [
-            -65,
-            -46
-        ],
-        [
-            -68,
-            -55
-        ],
-        [
-            -68,
-            -58
-        ],
-        [
-            -72,
-            -50
-        ],
-        [
-            -75,
-            -40
-        ],
-        [
-            -75,
-            -30
-        ],
-        [
-            -75,
-            -20
-        ],
-        [
-            -80,
-            0
-        ],
-        [
-            -80,
-            10
-        ]
-    ]);
-    // Europe
-    land([
-        [
-            0,
-            50
-        ],
-        [
-            10,
-            55
-        ],
-        [
-            20,
-            60
-        ],
-        [
-            30,
-            60
-        ],
-        [
-            28,
-            70
-        ],
-        [
-            20,
-            72
-        ],
-        [
-            10,
-            62
-        ],
-        [
-            0,
-            58
-        ],
-        [
-            -5,
-            56
-        ],
-        [
-            -10,
-            52
-        ],
-        [
-            -8,
-            38
-        ],
-        [
-            0,
-            36
-        ],
-        [
-            5,
-            36
-        ],
-        [
-            8,
-            38
-        ],
-        [
-            10,
-            45
-        ],
-        [
-            8,
-            46
-        ],
-        [
-            10,
-            50
-        ],
-        [
-            15,
-            50
-        ],
-        [
-            18,
-            55
-        ],
-        [
-            20,
-            55
-        ],
-        [
-            25,
-            52
-        ],
-        [
-            30,
-            50
-        ],
-        [
-            32,
-            45
-        ],
-        [
-            28,
-            40
-        ],
-        [
-            22,
-            38
-        ],
-        [
-            18,
-            40
-        ],
-        [
-            15,
-            38
-        ],
-        [
-            12,
-            44
-        ],
-        [
-            8,
-            46
-        ],
-        [
-            5,
-            45
-        ],
-        [
-            0,
-            50
-        ]
-    ]);
-    // Africa
-    land([
-        [
-            -5,
-            36
-        ],
-        [
-            5,
-            36
-        ],
-        [
-            10,
-            37
-        ],
-        [
-            20,
-            38
-        ],
-        [
-            30,
-            32
-        ],
-        [
-            32,
-            30
-        ],
-        [
-            36,
-            22
-        ],
-        [
-            42,
-            12
-        ],
-        [
-            44,
-            12
-        ],
-        [
-            50,
-            12
-        ],
-        [
-            44,
-            10
-        ],
-        [
-            42,
-            12
-        ],
-        [
-            36,
-            12
-        ],
-        [
-            32,
-            5
-        ],
-        [
-            30,
-            0
-        ],
-        [
-            32,
-            -5
-        ],
-        [
-            35,
-            -12
-        ],
-        [
-            32,
-            -22
-        ],
-        [
-            28,
-            -34
-        ],
-        [
-            18,
-            -34
-        ],
-        [
-            15,
-            -22
-        ],
-        [
-            10,
-            -5
-        ],
-        [
-            5,
-            5
-        ],
-        [
-            0,
-            5
-        ],
-        [
-            -5,
-            5
-        ],
-        [
-            -10,
-            8
-        ],
-        [
-            -15,
-            10
-        ],
-        [
-            -18,
-            15
-        ],
-        [
-            -17,
-            22
-        ],
-        [
-            -14,
-            28
-        ],
-        [
-            -8,
-            32
-        ],
-        [
-            -5,
-            36
-        ]
-    ]);
-    // Asia (simplified West to East)
-    land([
-        [
-            30,
-            72
-        ],
-        [
-            50,
-            72
-        ],
-        [
-            60,
-            70
-        ],
-        [
-            70,
-            68
-        ],
-        [
-            80,
-            72
-        ],
-        [
-            90,
-            72
-        ],
-        [
-            100,
-            68
-        ],
-        [
-            110,
-            70
-        ],
-        [
-            120,
-            70
-        ],
-        [
-            130,
-            65
-        ],
-        [
-            140,
-            60
-        ],
-        [
-            142,
-            48
-        ],
-        [
-            140,
-            36
-        ],
-        [
-            130,
-            32
-        ],
-        [
-            120,
-            22
-        ],
-        [
-            108,
-            20
-        ],
-        [
-            100,
-            6
-        ],
-        [
-            100,
-            0
-        ],
-        [
-            105,
-            -5
-        ],
-        [
-            110,
-            -8
-        ],
-        [
-            115,
-            -8
-        ],
-        [
-            120,
-            15
-        ],
-        [
-            115,
-            22
-        ],
-        [
-            110,
-            20
-        ],
-        [
-            108,
-            20
-        ],
-        [
-            100,
-            6
-        ],
-        [
-            90,
-            8
-        ],
-        [
-            80,
-            20
-        ],
-        [
-            72,
-            22
-        ],
-        [
-            62,
-            22
-        ],
-        [
-            56,
-            25
-        ],
-        [
-            50,
-            30
-        ],
-        [
-            44,
-            38
-        ],
-        [
-            36,
-            46
-        ],
-        [
-            30,
-            50
-        ],
-        [
-            28,
-            40
-        ],
-        [
-            32,
-            32
-        ],
-        [
-            36,
-            22
-        ],
-        [
-            42,
-            12
-        ],
-        [
-            50,
-            14
-        ],
-        [
-            56,
-            22
-        ],
-        [
-            60,
-            22
-        ],
-        [
-            62,
-            25
-        ],
-        [
-            70,
-            22
-        ],
-        [
-            72,
-            25
-        ],
-        [
-            78,
-            30
-        ],
-        [
-            80,
-            38
-        ],
-        [
-            78,
-            44
-        ],
-        [
-            70,
-            42
-        ],
-        [
-            60,
-            46
-        ],
-        [
-            50,
-            50
-        ],
-        [
-            44,
-            55
-        ],
-        [
-            40,
-            60
-        ],
-        [
-            30,
-            60
-        ],
-        [
-            20,
-            60
-        ],
-        [
-            10,
-            55
-        ],
-        [
-            0,
-            50
-        ],
-        [
-            10,
-            45
-        ],
-        [
-            20,
-            42
-        ],
-        [
-            30,
-            45
-        ],
-        [
-            38,
-            48
-        ],
-        [
-            46,
-            46
-        ],
-        [
-            50,
-            50
-        ],
-        [
-            60,
-            46
-        ],
-        [
-            70,
-            42
-        ],
-        [
-            80,
-            38
-        ],
-        [
-            90,
-            50
-        ],
-        [
-            100,
-            56
-        ],
-        [
-            110,
-            52
-        ],
-        [
-            120,
-            56
-        ],
-        [
-            130,
-            50
-        ],
-        [
-            138,
-            46
-        ],
-        [
-            142,
-            46
-        ],
-        [
-            148,
-            50
-        ],
-        [
-            152,
-            56
-        ],
-        [
-            158,
-            60
-        ],
-        [
-            160,
-            68
-        ],
-        [
-            155,
-            70
-        ],
-        [
-            140,
-            62
-        ],
-        [
-            130,
-            65
-        ],
-        [
-            120,
-            70
-        ],
-        [
-            110,
-            70
-        ],
-        [
-            100,
-            68
-        ],
-        [
-            90,
-            72
-        ],
-        [
-            80,
-            72
-        ],
-        [
-            70,
-            68
-        ],
-        [
-            60,
-            70
-        ],
-        [
-            50,
-            72
-        ],
-        [
-            40,
-            72
-        ],
-        [
-            30,
-            72
-        ]
-    ]);
-    // Australia
-    land([
-        [
-            114,
-            -22
-        ],
-        [
-            118,
-            -20
-        ],
-        [
-            126,
-            -14
-        ],
-        [
-            132,
-            -12
-        ],
-        [
-            136,
-            -12
-        ],
-        [
-            140,
-            -16
-        ],
-        [
-            142,
-            -10
-        ],
-        [
-            144,
-            -14
-        ],
-        [
-            148,
-            -18
-        ],
-        [
-            152,
-            -24
-        ],
-        [
-            152,
-            -28
-        ],
-        [
-            150,
-            -34
-        ],
-        [
-            144,
-            -38
-        ],
-        [
-            138,
-            -36
-        ],
-        [
-            132,
-            -32
-        ],
-        [
-            126,
-            -34
-        ],
-        [
-            114,
-            -26
-        ],
-        [
-            114,
-            -22
-        ]
-    ]);
-    // Greenland
-    land([
-        [
-            -52,
-            60
-        ],
-        [
-            -42,
-            56
-        ],
-        [
-            -22,
-            60
-        ],
-        [
-            -20,
-            70
-        ],
-        [
-            -22,
-            80
-        ],
-        [
-            -40,
-            84
-        ],
-        [
-            -58,
-            82
-        ],
-        [
-            -68,
-            76
-        ],
-        [
-            -58,
-            70
-        ],
-        [
-            -52,
-            62
-        ],
-        [
-            -52,
-            60
-        ]
-    ]);
-    // Japan (simplified)
-    land([
-        [
-            130,
-            31
-        ],
-        [
-            132,
-            33
-        ],
-        [
-            134,
-            34
-        ],
-        [
-            136,
-            36
-        ],
-        [
-            138,
-            37
-        ],
-        [
-            140,
-            40
-        ],
-        [
-            142,
-            44
-        ],
-        [
-            144,
-            44
-        ],
-        [
-            142,
-            42
-        ],
-        [
-            140,
-            38
-        ],
-        [
-            140,
-            36
-        ],
-        [
-            138,
-            34
-        ],
-        [
-            136,
-            34
-        ],
-        [
-            130,
-            31
-        ]
-    ]);
-    // UK
-    land([
-        [
-            -6,
-            50
-        ],
-        [
-            0,
-            50
-        ],
-        [
-            2,
-            51
-        ],
-        [
-            2,
-            53
-        ],
-        [
-            0,
-            58
-        ],
-        [
-            -4,
-            58
-        ],
-        [
-            -6,
-            56
-        ],
-        [
-            -4,
-            54
-        ],
-        [
-            -4,
-            52
-        ],
-        [
-            -6,
-            50
-        ]
-    ]);
-    // Indonesia (Sumatra+Java rough)
-    land([
-        [
-            96,
-            6
-        ],
-        [
-            100,
-            4
-        ],
-        [
-            104,
-            1
-        ],
-        [
-            106,
-            -4
-        ],
-        [
-            108,
-            -8
-        ],
-        [
-            110,
-            -8
-        ],
-        [
-            112,
-            -6
-        ],
-        [
-            110,
-            -2
-        ],
-        [
-            108,
-            2
-        ],
-        [
-            104,
-            3
-        ],
-        [
-            100,
-            4
-        ],
-        [
-            96,
-            6
-        ]
-    ]);
-    // New Zealand (North)
-    land([
-        [
-            173,
-            -41
-        ],
-        [
-            175,
-            -38
-        ],
-        [
-            176,
-            -36
-        ],
-        [
-            174,
-            -34
-        ],
-        [
-            172,
-            -36
-        ],
-        [
-            170,
-            -40
-        ],
-        [
-            173,
-            -41
-        ]
-    ]);
-    // Antarctica hint
-    land([
-        [
-            -180,
-            -70
-        ],
-        [
-            -120,
-            -68
-        ],
-        [
-            -60,
-            -68
-        ],
-        [
-            0,
-            -70
-        ],
-        [
-            60,
-            -68
-        ],
-        [
-            120,
-            -66
-        ],
-        [
-            180,
-            -70
-        ],
-        [
-            180,
-            -90
-        ],
-        [
-            -180,
-            -90
-        ],
-        [
-            -180,
-            -70
-        ]
-    ]);
 }
 function Globe3D({ points, height = 420, activeLayers }) {
-    const mountRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
-    const cleanRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
-    const [ready, setReady] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
-    const visible = activeLayers && activeLayers.size > 0 ? points.filter((p)=>activeLayers.has(p.type)) : points;
+    const canvasRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
+    const st = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])({
+        rotX: 0.18,
+        rotY: 0.5,
+        velX: 0,
+        velY: 0.0028,
+        dragging: false,
+        lx: 0,
+        ly: 0,
+        geo: null,
+        arcT: 0
+    });
+    const [loaded, setLoaded] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
+    const visible = (activeLayers?.size ? points.filter((p)=>activeLayers.has(p.type)) : points).filter((p)=>p && typeof p.srcLat === 'number');
+    // ── Fetch real country GeoJSON ─────────────────────────────────────────────
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
-        cleanRef.current?.();
-        cleanRef.current = null;
-        const container = mountRef.current;
-        if (!container) return;
-        let destroyed = false, animId = 0;
-        __turbopack_require__("[project]/node_modules/three/build/three.module.js [app-ssr] (ecmascript, async loader)")(__turbopack_import__).then((THREE)=>{
-            if (destroyed || !container) return;
-            const cW = container.clientWidth || 800;
-            const cH = container.clientHeight || height;
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(40, cW / cH, 0.01, 100);
-            camera.position.set(0, 0, 3.2);
-            const renderer = new THREE.WebGLRenderer({
-                antialias: true,
-                alpha: true
-            });
-            renderer.setSize(cW, cH);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.setClearColor(0x000000, 0);
-            container.appendChild(renderer.domElement);
-            // Earth texture from canvas
-            const TW = 4096, TH = 2048;
-            const cv = document.createElement('canvas');
-            cv.width = TW;
-            cv.height = TH;
-            const ctx = cv.getContext('2d');
-            drawEarth(ctx, TW, TH);
-            // Subtle specular highlight
-            const radGrd = ctx.createRadialGradient(TW * 0.65, TH * 0.35, 0, TW * 0.65, TH * 0.35, TW * 0.5);
-            radGrd.addColorStop(0, 'rgba(0,255,170,0.04)');
-            radGrd.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = radGrd;
-            ctx.fillRect(0, 0, TW, TH);
-            const earthTex = new THREE.CanvasTexture(cv);
-            earthTex.anisotropy = renderer.capabilities.getMaxAnisotropy();
-            const R = 1;
-            const globe = new THREE.Mesh(new THREE.SphereGeometry(R, 96, 96), new THREE.MeshPhongMaterial({
-                map: earthTex,
-                shininess: 20,
-                specular: new THREE.Color(0x001a06),
-                emissive: new THREE.Color(0x001408),
-                emissiveIntensity: 0.15
-            }));
-            scene.add(globe);
-            // Atmosphere glow
-            scene.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.05, 32, 32), new THREE.MeshPhongMaterial({
-                color: 0x00cc66,
-                transparent: true,
-                opacity: 0.06,
-                side: THREE.BackSide
-            })));
-            // Inner atmosphere
-            scene.add(new THREE.Mesh(new THREE.SphereGeometry(R * 1.02, 32, 32), new THREE.MeshPhongMaterial({
-                color: 0x002200,
-                transparent: true,
-                opacity: 0.08,
-                side: THREE.FrontSide
-            })));
-            // Lights
-            scene.add(new THREE.AmbientLight(0x203040, 3.5));
-            const sun = new THREE.DirectionalLight(0xaaffcc, 1.4);
-            sun.position.set(5, 3, 5);
-            scene.add(sun);
-            const fill = new THREE.DirectionalLight(0x002244, 0.5);
-            fill.position.set(-5, -2, -3);
-            scene.add(fill);
-            // Stars
-            const sp = new Float32Array(3000 * 3);
-            for(let i = 0; i < 3000 * 3; i++)sp[i] = (Math.random() - 0.5) * 30;
-            const sg = new THREE.BufferGeometry();
-            sg.setAttribute('position', new THREE.BufferAttribute(sp, 3));
-            scene.add(new THREE.Points(sg, new THREE.PointsMaterial({
-                color: 0xffffff,
-                size: 0.012,
-                transparent: true,
-                opacity: 0.55
-            })));
-            // Attack arcs
-            const arcGroup = new THREE.Group();
-            scene.add(arcGroup);
-            visible.forEach((pt)=>{
-                const color = new THREE.Color(tc(pt.type));
-                const [sx, sy, sz] = ll2v(pt.srcLat, pt.srcLng, R);
-                const [dx, dy, dz] = ll2v(pt.dstLat, pt.dstLng, R);
-                const vS = new THREE.Vector3(sx, sy, sz), vD = new THREE.Vector3(dx, dy, dz);
-                const vM = vS.clone().add(vD).normalize().multiplyScalar(R * 1.55);
-                const curve = new THREE.QuadraticBezierCurve3(vS, vM, vD);
-                const op = 0.35 + pt.severity / 5 * 0.55;
-                // Glow tube
-                arcGroup.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 40, 0.005, 4, false), new THREE.MeshBasicMaterial({
-                    color,
-                    transparent: true,
-                    opacity: op * 0.2
-                })));
-                // Line
-                arcGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve.getPoints(64)), new THREE.LineBasicMaterial({
-                    color,
-                    transparent: true,
-                    opacity: op
-                })));
-                // Src dot
-                const [sx2, sy2, sz2] = ll2v(pt.srcLat, pt.srcLng, R + 0.015);
-                const dot = new THREE.Mesh(new THREE.SphereGeometry(pt.severity >= 4 ? 0.028 : 0.018, 8, 8), new THREE.MeshBasicMaterial({
-                    color
-                }));
-                dot.position.set(sx2, sy2, sz2);
-                arcGroup.add(dot);
-                // Dst dot
-                const [dx2, dy2, dz2] = ll2v(pt.dstLat, pt.dstLng, R + 0.008);
-                const dd = new THREE.Mesh(new THREE.SphereGeometry(0.01, 6, 6), new THREE.MeshBasicMaterial({
-                    color,
-                    transparent: true,
-                    opacity: 0.6
-                }));
-                dd.position.set(dx2, dy2, dz2);
-                arcGroup.add(dd);
-            });
-            // Drag interaction
-            let dragging = false, lx = 0, ly = 0, rotY = 0.6, rotX = 0.15, velY = 0.0025, velX = 0;
-            const el = renderer.domElement;
-            el.style.cursor = 'grab';
-            const down = (x, y)=>{
-                dragging = true;
-                lx = x;
-                ly = y;
-                el.style.cursor = 'grabbing';
-            };
-            const up = ()=>{
-                dragging = false;
-                el.style.cursor = 'grab';
-            };
-            const move = (x, y)=>{
-                if (!dragging) return;
-                velY = (x - lx) * 0.006;
-                velX = (y - ly) * 0.004;
-                rotY += velY;
-                rotX += velX;
-                rotX = Math.max(-1.1, Math.min(1.1, rotX));
-                lx = x;
-                ly = y;
-            };
-            el.addEventListener('mousedown', (e)=>down(e.clientX, e.clientY));
-            el.addEventListener('touchstart', (e)=>down(e.touches[0].clientX, e.touches[0].clientY), {
-                passive: true
-            });
-            window.addEventListener('mouseup', up);
-            window.addEventListener('touchend', up);
-            window.addEventListener('mousemove', (e)=>move(e.clientX, e.clientY));
-            el.addEventListener('touchmove', (e)=>{
-                e.preventDefault();
-                move(e.touches[0].clientX, e.touches[0].clientY);
-            }, {
-                passive: false
-            });
-            const onResize = ()=>{
-                const nW = container.clientWidth || 800, nH = container.clientHeight || height;
-                camera.aspect = nW / nH;
-                camera.updateProjectionMatrix();
-                renderer.setSize(nW, nH);
-            };
-            window.addEventListener('resize', onResize);
-            const animate = ()=>{
-                if (destroyed) return;
-                animId = requestAnimationFrame(animate);
-                if (!dragging) {
-                    velY += (0.0022 - velY) * 0.025;
-                    velX *= 0.92;
-                    rotY += velY;
-                    rotX += velX;
-                    rotX = Math.max(-1.1, Math.min(1.1, rotX));
-                } else {
-                    velY *= 0.9;
-                    velX *= 0.9;
+        // ne_110m = naturalearth 110m resolution — small file, exact country borders
+        const URLS = [
+            'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json',
+            'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson',
+            'https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson'
+        ];
+        async function tryLoad() {
+            for (const url of URLS){
+                try {
+                    const r = await fetch(url);
+                    const raw = await r.json();
+                    // world-atlas returns TopoJSON — we need GeoJSON
+                    if (raw.type === 'Topology' && raw.objects) {
+                        continue;
+                    }
+                    // Validate it looks like GeoJSON FeatureCollection
+                    if (raw.type === 'FeatureCollection' && Array.isArray(raw.features)) {
+                        st.current.geo = raw;
+                        setLoaded(true);
+                        return;
+                    }
+                } catch  {}
+            }
+            // Even if all URLs fail, mark loaded so globe renders without countries
+            setLoaded(true);
+        }
+        tryLoad();
+    }, []);
+    // ── Draw ──────────────────────────────────────────────────────────────────
+    const draw = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])(()=>{
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        const dpr = window.devicePixelRatio || 1;
+        const W = canvas.clientWidth;
+        const H = canvas.clientHeight;
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        ctx.scale(dpr, dpr);
+        const s = st.current;
+        const cx = W / 2, cy = H / 2;
+        const R = Math.min(W, H) * 0.44;
+        ctx.clearRect(0, 0, W, H);
+        // ── Atmosphere halo ──────────────────────────────────────────────────────
+        const halo = ctx.createRadialGradient(cx, cy, R * 0.88, cx, cy, R * 1.20);
+        halo.addColorStop(0, 'rgba(0,200,120,0.00)');
+        halo.addColorStop(0.55, 'rgba(0,220,140,0.06)');
+        halo.addColorStop(1, 'rgba(0,255,170,0.00)');
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(cx, cy, R * 1.20, 0, Math.PI * 2);
+        ctx.fill();
+        // ── Ocean ────────────────────────────────────────────────────────────────
+        const ocean = ctx.createRadialGradient(cx - R * 0.2, cy - R * 0.25, 0, cx, cy, R);
+        ocean.addColorStop(0, '#0d2d4a');
+        ocean.addColorStop(0.6, '#081e33');
+        ocean.addColorStop(1, '#040f1c');
+        ctx.fillStyle = ocean;
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.fill();
+        // ── Clip to globe ────────────────────────────────────────────────────────
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.clip();
+        // ── Grid lines ───────────────────────────────────────────────────────────
+        ctx.strokeStyle = 'rgba(0,180,110,0.10)';
+        ctx.lineWidth = 0.5;
+        for(let lat = -80; lat <= 80; lat += 20){
+            ctx.beginPath();
+            let f = true;
+            for(let lng = -180; lng <= 180; lng += 2){
+                const p = project(lat, lng, s.rotX, s.rotY, cx, cy, R);
+                if (!p) {
+                    f = true;
+                    continue;
                 }
-                globe.rotation.set(rotX, rotY, 0);
-                arcGroup.rotation.set(rotX, rotY, 0);
-                renderer.render(scene, camera);
-            };
-            animate();
-            setReady(true);
-            cleanRef.current = ()=>{
-                destroyed = true;
-                cancelAnimationFrame(animId);
-                window.removeEventListener('mouseup', up);
-                window.removeEventListener('touchend', up);
-                window.removeEventListener('resize', onResize);
-                renderer.dispose();
-                earthTex.dispose();
-                if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
-            };
-        }).catch(()=>setReady(true));
-        return ()=>{
-            destroyed = true;
-            cleanRef.current?.();
-        };
+                f ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
+                f = false;
+            }
+            ctx.stroke();
+        }
+        for(let lng = -180; lng < 180; lng += 20){
+            ctx.beginPath();
+            let f = true;
+            for(let lat = -88; lat <= 88; lat += 2){
+                const p = project(lat, lng, s.rotX, s.rotY, cx, cy, R);
+                if (!p) {
+                    f = true;
+                    continue;
+                }
+                f ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
+                f = false;
+            }
+            ctx.stroke();
+        }
+        // ── Countries ────────────────────────────────────────────────────────────
+        if (s.geo?.features) {
+            for (const feat of s.geo.features){
+                if (!feat.geometry) continue;
+                const name = (feat.properties?.NAME ?? feat.properties?.name ?? feat.properties?.ADMIN ?? '').toLowerCase();
+                // Threat-origin countries slightly brighter
+                const isThreat = /russia|china|iran|north.korea|dprk/.test(name);
+                const isWest = /united states|uk|united kingdom|germany|france|japan|australia|canada/.test(name);
+                const fill = isThreat ? 'rgba(30,110,65,0.88)' : isWest ? 'rgba(14,88,52,0.82)' : 'rgba(18,95,56,0.80)';
+                const stroke = isThreat ? 'rgba(0,255,130,0.75)' : 'rgba(0,240,130,0.58)';
+                drawGeometry(ctx, feat.geometry, s.rotX, s.rotY, cx, cy, R, fill, stroke, 0.65);
+            }
+        }
+        // ── Equator line ─────────────────────────────────────────────────────────
+        ctx.strokeStyle = 'rgba(0,255,150,0.22)';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        let feq = true;
+        for(let lng = -180; lng <= 180; lng += 1){
+            const p = project(0, lng, s.rotX, s.rotY, cx, cy, R);
+            if (!p) {
+                feq = true;
+                continue;
+            }
+            feq ? ctx.moveTo(p[0], p[1]) : ctx.lineTo(p[0], p[1]);
+            feq = false;
+        }
+        ctx.stroke();
+        // ── Threat arcs ──────────────────────────────────────────────────────────
+        s.arcT = (s.arcT + 0.006) % 1;
+        for (const pt of visible){
+            const color = tc(pt.type);
+            const isCrit = pt.severity >= 4;
+            const STEPS = 80;
+            const gc = greatCircle(pt.srcLat, pt.srcLng, pt.dstLat, pt.dstLng, STEPS);
+            // Draw arc with arc-lift (arcs curve above the surface)
+            let prevPt = null;
+            let prevVis = false;
+            for(let i = 0; i < gc.length; i++){
+                const [lat, lng] = gc[i];
+                const t = i / (STEPS - 1);
+                const lift = 1 + Math.sin(t * Math.PI) * (isCrit ? 0.14 : 0.09);
+                const { pt: px, vis } = projectRaw(lat, lng, s.rotX, s.rotY, cx, cy, R * lift);
+                if (vis && prevPt && prevVis) {
+                    const tMid = (i - 0.5) / STEPS;
+                    const diff = Math.abs(tMid - s.arcT);
+                    const inPulse = diff < 0.15 || 1 - diff < 0.15;
+                    // Glow
+                    ctx.beginPath();
+                    ctx.moveTo(prevPt[0], prevPt[1]);
+                    ctx.lineTo(px[0], px[1]);
+                    ctx.strokeStyle = color + '55';
+                    ctx.lineWidth = isCrit ? 6 : 4;
+                    ctx.stroke();
+                    // Core line
+                    ctx.beginPath();
+                    ctx.moveTo(prevPt[0], prevPt[1]);
+                    ctx.lineTo(px[0], px[1]);
+                    if (inPulse) {
+                        const d = 1 - Math.min(diff, 1 - diff) / 0.15;
+                        ctx.strokeStyle = `rgba(255,255,255,${0.55 + d * 0.45})`;
+                        ctx.lineWidth = isCrit ? 2.8 : 2.0;
+                    } else {
+                        ctx.strokeStyle = color + 'dd';
+                        ctx.lineWidth = isCrit ? 1.8 : 1.2;
+                    }
+                    ctx.stroke();
+                }
+                prevPt = px;
+                prevVis = vis;
+            }
+            // ── Source pulse ────────────────────────────────────────────────────────
+            const src = project(pt.srcLat, pt.srcLng, s.rotX, s.rotY, cx, cy, R);
+            if (src) {
+                const pR = s.arcT * (isCrit ? 20 : 14);
+                const alp = Math.round((1 - s.arcT) * 180).toString(16).padStart(2, '0');
+                ctx.beginPath();
+                ctx.arc(src[0], src[1], pR, 0, Math.PI * 2);
+                ctx.strokeStyle = color + alp;
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                // Second ring offset by 0.5
+                const pR2 = (s.arcT + 0.5) % 1 * (isCrit ? 20 : 14);
+                const alp2 = Math.round((1 - (s.arcT + 0.5) % 1) * 120).toString(16).padStart(2, '0');
+                ctx.beginPath();
+                ctx.arc(src[0], src[1], pR2, 0, Math.PI * 2);
+                ctx.strokeStyle = color + alp2;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                // Solid dot
+                ctx.beginPath();
+                ctx.arc(src[0], src[1], isCrit ? 5.5 : 4, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(src[0], src[1], isCrit ? 2.2 : 1.6, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+            }
+            // ── Destination marker ──────────────────────────────────────────────────
+            const dst = project(pt.dstLat, pt.dstLng, s.rotX, s.rotY, cx, cy, R);
+            if (dst) {
+                ctx.beginPath();
+                ctx.arc(dst[0], dst[1], isCrit ? 4.5 : 3, 0, Math.PI * 2);
+                ctx.fillStyle = color + 'cc';
+                ctx.fill();
+                ctx.strokeStyle = '#ffffffaa';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                // Inner white
+                ctx.beginPath();
+                ctx.arc(dst[0], dst[1], 1.2, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff99';
+                ctx.fill();
+            }
+        }
+        ctx.restore() // end globe clip
+        ;
+        // ── Rim highlight ────────────────────────────────────────────────────────
+        const rim = ctx.createRadialGradient(cx, cy, R * 0.82, cx, cy, R);
+        rim.addColorStop(0, 'rgba(0,255,170,0.00)');
+        rim.addColorStop(0.88, 'rgba(0,255,170,0.05)');
+        rim.addColorStop(1, 'rgba(0,255,170,0.30)');
+        ctx.fillStyle = rim;
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.fill();
+        // Specular glint
+        const spec = ctx.createRadialGradient(cx - R * 0.32, cy - R * 0.32, 0, cx - R * 0.32, cy - R * 0.32, R * 0.5);
+        spec.addColorStop(0, 'rgba(200,255,230,0.10)');
+        spec.addColorStop(0.6, 'rgba(100,255,180,0.03)');
+        spec.addColorStop(1, 'rgba(0,0,0,0.00)');
+        ctx.fillStyle = spec;
+        ctx.beginPath();
+        ctx.arc(cx, cy, R, 0, Math.PI * 2);
+        ctx.fill();
     }, [
-        visible.length,
-        height
+        loaded,
+        visible
     ]);
+    // ── Render loop ────────────────────────────────────────────────────────────
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        let id = 0;
+        const loop = ()=>{
+            const s = st.current;
+            if (!s.dragging) {
+                s.velY += (0.0028 - s.velY) * 0.025;
+                s.velX *= 0.94;
+                s.rotY += s.velY;
+                s.rotX += s.velX;
+                s.rotX = Math.max(-1.2, Math.min(1.2, s.rotX));
+            } else {
+                s.velY *= 0.88;
+                s.velX *= 0.88;
+            }
+            draw();
+            id = requestAnimationFrame(loop);
+        };
+        id = requestAnimationFrame(loop);
+        return ()=>cancelAnimationFrame(id);
+    }, [
+        draw
+    ]);
+    // ── Mouse / touch ─────────────────────────────────────────────────────────
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const s = st.current;
+        const down = (cx, cy)=>{
+            s.dragging = true;
+            s.lx = cx;
+            s.ly = cy;
+            canvas.style.cursor = 'grabbing';
+        };
+        const up = ()=>{
+            s.dragging = false;
+            canvas.style.cursor = 'grab';
+        };
+        const move = (cx, cy)=>{
+            if (!s.dragging) return;
+            s.velY = (cx - s.lx) * 0.007;
+            s.velX = (cy - s.ly) * 0.005;
+            s.rotY += s.velY;
+            s.rotX += s.velX;
+            s.rotX = Math.max(-1.2, Math.min(1.2, s.rotX));
+            s.lx = cx;
+            s.ly = cy;
+        };
+        canvas.style.cursor = 'grab';
+        canvas.addEventListener('mousedown', (e)=>down(e.clientX, e.clientY));
+        canvas.addEventListener('touchstart', (e)=>down(e.touches[0].clientX, e.touches[0].clientY), {
+            passive: true
+        });
+        window.addEventListener('mouseup', up);
+        window.addEventListener('touchend', up);
+        window.addEventListener('mousemove', (e)=>move(e.clientX, e.clientY));
+        canvas.addEventListener('touchmove', (e)=>{
+            e.preventDefault();
+            move(e.touches[0].clientX, e.touches[0].clientY);
+        }, {
+            passive: false
+        });
+        return ()=>{
+            window.removeEventListener('mouseup', up);
+            window.removeEventListener('touchend', up);
+        };
+    }, []);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        ref: mountRef,
-        className: "w-full h-full relative",
+        className: "relative w-full h-full",
         style: {
-            background: '#020608'
+            background: 'radial-gradient(ellipse at 50% 50%, #030f1e 0%, #010912 100%)'
         },
-        children: !ready && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "absolute inset-0 flex items-center justify-center",
-            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                className: "font-mono text-[12px] animate-pulse",
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("canvas", {
+                ref: canvasRef,
                 style: {
-                    color: '#00ffaa'
-                },
-                children: "⟳ Rendering 3D globe..."
+                    width: '100%',
+                    height: '100%',
+                    display: 'block'
+                }
             }, void 0, false, {
                 fileName: "[project]/src/components/map/Globe3D.tsx",
-                lineNumber: 236,
-                columnNumber: 11
+                lineNumber: 415,
+                columnNumber: 7
+            }, this),
+            !loaded && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "absolute inset-0 flex items-center justify-center pointer-events-none",
+                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "flex flex-col items-center gap-2",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "w-7 h-7 border-2 border-accent/30 border-t-accent rounded-full animate-spin"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                            lineNumber: 419,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            className: "font-mono text-[11px] text-accent/60",
+                            children: "Loading country data..."
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/map/Globe3D.tsx",
+                            lineNumber: 420,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/map/Globe3D.tsx",
+                    lineNumber: 418,
+                    columnNumber: 11
+                }, this)
+            }, void 0, false, {
+                fileName: "[project]/src/components/map/Globe3D.tsx",
+                lineNumber: 417,
+                columnNumber: 9
             }, this)
-        }, void 0, false, {
-            fileName: "[project]/src/components/map/Globe3D.tsx",
-            lineNumber: 235,
-            columnNumber: 9
-        }, this)
-    }, void 0, false, {
+        ]
+    }, void 0, true, {
         fileName: "[project]/src/components/map/Globe3D.tsx",
-        lineNumber: 233,
+        lineNumber: 413,
         columnNumber: 5
     }, this);
 }

@@ -88,6 +88,11 @@ function LoginForm() {
               {' · '}
               <Link href="/admin/login" className="text-slate-600 hover:text-slate-400 transition-colors">Admin login →</Link>
             </p>
+            <p className="font-mono text-[10px] text-slate-700">
+              <Link href="/terms" className="text-slate-600 hover:text-slate-400 transition-colors">Terms</Link>
+              {' · '}
+              <Link href="/privacy" className="text-slate-600 hover:text-slate-400 transition-colors">Privacy</Link>
+            </p>
           </div>
         </div>
 

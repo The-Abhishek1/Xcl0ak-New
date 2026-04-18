@@ -343,27 +343,61 @@ function RegisterPage() {
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "mt-5 pt-5 border-t border-white/[0.06] text-center",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                className: "font-mono text-[11px] text-slate-600",
-                                children: [
-                                    "Already have an account? ",
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                                        href: "/login",
-                                        className: "text-accent hover:underline",
-                                        children: "Sign in"
-                                    }, void 0, false, {
-                                        fileName: "[project]/src/app/register/page.tsx",
-                                        lineNumber: 104,
-                                        columnNumber: 40
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/src/app/register/page.tsx",
-                                lineNumber: 103,
-                                columnNumber: 13
-                            }, this)
-                        }, void 0, false, {
+                            className: "mt-5 pt-5 border-t border-white/[0.06] text-center space-y-2",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "font-mono text-[11px] text-slate-600",
+                                    children: [
+                                        "Already have an account? ",
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                            href: "/login",
+                                            className: "text-accent hover:underline",
+                                            children: "Sign in"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/register/page.tsx",
+                                            lineNumber: 104,
+                                            columnNumber: 40
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/app/register/page.tsx",
+                                    lineNumber: 103,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                    className: "font-mono text-[10px] text-slate-700",
+                                    children: [
+                                        "By registering you agree to our",
+                                        ' ',
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                            href: "/terms",
+                                            className: "text-slate-500 hover:text-slate-300 transition-colors",
+                                            children: "Terms of Service"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/register/page.tsx",
+                                            lineNumber: 108,
+                                            columnNumber: 15
+                                        }, this),
+                                        ' ',
+                                        "and",
+                                        ' ',
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                                            href: "/privacy",
+                                            className: "text-slate-500 hover:text-slate-300 transition-colors",
+                                            children: "Privacy Policy"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/register/page.tsx",
+                                            lineNumber: 110,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/app/register/page.tsx",
+                                    lineNumber: 106,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
                             fileName: "[project]/src/app/register/page.tsx",
                             lineNumber: 102,
                             columnNumber: 11

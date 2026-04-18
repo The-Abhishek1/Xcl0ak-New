@@ -99,9 +99,15 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <div className="mt-5 pt-5 border-t border-white/[0.06] text-center">
+          <div className="mt-5 pt-5 border-t border-white/[0.06] text-center space-y-2">
             <p className="font-mono text-[11px] text-slate-600">
               Already have an account? <Link href="/login" className="text-accent hover:underline">Sign in</Link>
+            </p>
+            <p className="font-mono text-[10px] text-slate-700">
+              By registering you agree to our{' '}
+              <Link href="/terms" className="text-slate-500 hover:text-slate-300 transition-colors">Terms of Service</Link>
+              {' '}and{' '}
+              <Link href="/privacy" className="text-slate-500 hover:text-slate-300 transition-colors">Privacy Policy</Link>
             </p>
           </div>
         </div>

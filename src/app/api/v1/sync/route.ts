@@ -1,81 +1,114 @@
+// src/app/api/v1/sync/route.ts
+// FIXED: ThreatEvent.create uses correct fields that match Prisma schema
+// Old code passed ThreatMapPoint shape (lat/lng) but schema needs srcLat/srcLng/dstLat/dstLng
+
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { fetchRecentCVEs, NVDVuln } from '@/lib/nvd'
-import { getSubscribedPulses, getLiveThreatPoints } from '@/lib/otx'
+import { prisma }                    from '@/lib/prisma'
+import { fetchRecentCVEs }           from '@/lib/nvd'
+import { getThreatEvents }           from '@/lib/otx'
 
-function toDBRecord(cve: NVDVuln) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { references: _r, ...rest } = cve
-  return { ...rest, exploitableNow: false, syncedAt: new Date() }
-}
+export const runtime = 'nodejs'
 
+// POST /api/v1/sync — manually trigger a full data sync (Topbar SYNC button)
 export async function POST(_req: NextRequest) {
   const results: Record<string, any> = {}
 
-  // 1. NVD CVEs
+  // 1. Sync CVEs from NVD → CVECache table
   try {
-    const { vulns, total } = await fetchRecentCVEs({ daysBack: 30, limit: 200 })
+    console.log('[Sync] Fetching CVEs from NVD...')
+    const { vulns } = await fetchRecentCVEs({ daysBack: 30, limit: 200 })
     let upserted = 0
+
     for (const cve of vulns) {
-      await prisma.cVECache.upsert({
-        where:  { cveId: cve.cveId },
-        create: toDBRecord(cve),
-        update: toDBRecord(cve),
-      }).catch(() => null)
-      upserted++
+      try {
+        await prisma.cVECache.upsert({
+          where:  { cveId: cve.cveId },
+          create: {
+            cveId:            cve.cveId,
+            description:      cve.description,
+            cvssScore:        cve.cvssScore,
+            cvssVector:       cve.cvssVector,
+            severity:         cve.severity,
+            vendor:           cve.vendor,
+            product:          cve.product,
+            affectedVersions: cve.affectedVersions,
+            patchAvailable:   cve.patchAvailable,
+            publishedAt:      cve.publishedAt,
+            modifiedAt:       cve.modifiedAt,
+            syncedAt:         new Date(),
+          },
+          update: {
+            description:      cve.description,
+            cvssScore:        cve.cvssScore,
+            severity:         cve.severity,
+            patchAvailable:   cve.patchAvailable,
+            modifiedAt:       cve.modifiedAt,
+            syncedAt:         new Date(),
+          },
+        })
+        upserted++
+      } catch { /* skip duplicates */ }
     }
-    results.cves = { fetched: vulns.length, total, upserted }
-  } catch (err: any) { results.cves = { error: err.message } }
 
-  // 2. OTX threat points
+    results.cves = { fetched: vulns.length, upserted }
+  } catch (err: any) {
+    console.error('[Sync] CVE error:', err)
+    results.cves = { error: err.message }
+  }
+
+  // 2. Sync threat events from OTX → ThreatEvent table
   try {
-    const points = await getLiveThreatPoints()
+    console.log('[Sync] Fetching threat events from OTX...')
+    const events = await getThreatEvents(50)
     let created = 0
-    for (const pt of points) {
-      await prisma.threatEvent.create({
-        data: {
-          type: pt.type, srcCountry: pt.country, dstCountry: pt.country,
-          srcLat: pt.lat, srcLng: pt.lng,
-          dstLat: pt.lat + (Math.random() - 0.5) * 20,
-          dstLng: pt.lng + (Math.random() - 0.5) * 20,
-          severity: pt.severity, details: pt.label,
-        },
-      }).catch(() => null)
-      created++
-    }
-    results.threats = { fetched: points.length, created }
-  } catch (err: any) { results.threats = { error: err.message } }
 
-  // 3. OTX news
-  try {
-    const pulses = await getSubscribedPulses(30)
-    let newsCreated = 0
-    for (const p of pulses) {
-      const text = [...(p.tags ?? []), ...(p.malware_families ?? []), p.adversary ?? ''].join(' ').toLowerCase()
-      const category = /ransomware/.test(text) ? 'malware' : /breach|leak/.test(text) ? 'breach' : /cve|exploit|vuln/.test(text) ? 'vulnerability' : 'threat'
-      await prisma.newsArticle.upsert({
-        where: { url: `https://otx.alienvault.com/pulse/${p.id}` },
-        create: {
-          title: p.name, url: `https://otx.alienvault.com/pulse/${p.id}`,
-          source: `OTX · ${p.author_name}`, category,
-          country: p.targeted_countries?.[0] ?? null,
-          summary: p.description?.substring(0, 300) ?? '',
-          publishedAt: new Date(p.created),
-        },
-        update: { title: p.name },
-      }).catch(() => null)
-      newsCreated++
+    for (const ev of events) {
+      try {
+        await prisma.threatEvent.create({
+          data: {
+            type:       ev.type,
+            srcCountry: ev.srcCountry,
+            dstCountry: ev.dstCountry,
+            srcLat:     ev.srcLat,
+            srcLng:     ev.srcLng,
+            dstLat:     ev.dstLat,
+            dstLng:     ev.dstLng,
+            severity:   ev.severity,
+            details:    ev.details,
+            sourceUrl:  ev.sourceUrl,
+          },
+        })
+        created++
+      } catch { /* skip duplicates */ }
     }
-    results.news = { fetched: pulses.length, created: newsCreated }
-  } catch (err: any) { results.news = { error: err.message } }
 
-  return NextResponse.json({ ok: true, syncedAt: new Date().toISOString(), results })
+    results.threats = { fetched: events.length, created }
+  } catch (err: any) {
+    console.error('[Sync] Threat error:', err)
+    results.threats = { error: err.message }
+  }
+
+  return NextResponse.json({
+    ok:       true,
+    syncedAt: new Date().toISOString(),
+    results,
+  })
 }
 
+// GET /api/v1/sync — sync status
 export async function GET() {
-  const [cveCount, threatCount, newsCount] = await Promise.all([
-    prisma.cVECache.count(), prisma.threatEvent.count(), prisma.newsArticle.count(),
+  const [cveCount, threatCount] = await Promise.all([
+    prisma.cVECache.count(),
+    prisma.threatEvent.count(),
   ])
-  const lastCVE = await prisma.cVECache.findFirst({ orderBy: { syncedAt: 'desc' } })
-  return NextResponse.json({ cves: { count: cveCount, lastSync: lastCVE?.syncedAt }, threats: { count: threatCount }, news: { count: newsCount } })
+
+  const [lastCVE, lastThreat] = await Promise.all([
+    prisma.cVECache.findFirst({ orderBy: { syncedAt: 'desc' } }),
+    prisma.threatEvent.findFirst({ orderBy: { createdAt: 'desc' } }),
+  ])
+
+  return NextResponse.json({
+    cves:    { count: cveCount,    lastSync: lastCVE?.syncedAt ?? null },
+    threats: { count: threatCount, lastSync: lastThreat?.createdAt ?? null },
+  })
 }

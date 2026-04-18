@@ -43,10 +43,19 @@ export default function NewScanPage() {
       </div>
 
       {/* Authorization notice */}
-      <div className="glass p-3 mb-4 flex gap-3" style={{borderColor:'rgba(255,58,92,0.2)',background:'rgba(255,58,92,0.04)'}}>
+      <div className="glass p-3 mb-3 flex gap-3" style={{borderColor:'rgba(255,58,92,0.2)',background:'rgba(255,58,92,0.04)'}}>
         <span className="text-lg shrink-0">⚠</span>
         <div className="font-mono text-[10px] text-slate-500">
           <span className="text-red-400 font-bold">Authorization required.</span> Only scan targets you own or have explicit written permission to test. Unauthorized scanning is illegal.
+        </div>
+      </div>
+
+      {/* Local Docker mode info */}
+      <div className="glass p-3 mb-4 flex gap-3" style={{borderColor:'rgba(0,170,255,0.2)',background:'rgba(0,170,255,0.04)'}}>
+        <span className="text-base shrink-0">🐳</span>
+        <div className="font-mono text-[10px] text-slate-500 space-y-0.5">
+          <div><span className="text-accent2 font-bold">How scanning works:</span> Security tools (nmap, nuclei, etc.) run as Docker containers <span className="text-slate-400">on your local machine</span>. Your machine does the scanning — our servers handle the AI analysis, report generation, and results storage.</div>
+          <div className="text-slate-600">This keeps your scan traffic private and reduces server costs. <span className="text-slate-500">Docker must be running locally for scans to execute.</span></div>
         </div>
       </div>
 

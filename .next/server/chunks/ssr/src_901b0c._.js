@@ -1097,7 +1097,7 @@ function ScanDetailPage() {
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "flex items-center gap-3",
+                        className: "flex items-center gap-2 flex-wrap",
                         children: [
                             !fromDb && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "w-2 h-2 rounded-full",
@@ -1121,7 +1121,59 @@ function ScanDetailPage() {
                                 fileName: "[project]/src/app/scan/[id]/page.tsx",
                                 lineNumber: 85,
                                 columnNumber: 11
-                            }, this)
+                            }, this),
+                            scan.status === 'completed' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                        href: `/api/eso/reports/pdf/${id}`,
+                                        target: "_blank",
+                                        rel: "noopener noreferrer",
+                                        className: "font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-80",
+                                        style: {
+                                            background: 'rgba(0,170,255,0.1)',
+                                            border: '1px solid rgba(0,170,255,0.3)',
+                                            color: '#00aaff'
+                                        },
+                                        children: "PDF ↓"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/scan/[id]/page.tsx",
+                                        lineNumber: 91,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                        href: `/api/eso/reports/compliance/${id}?framework=iso27001`,
+                                        target: "_blank",
+                                        rel: "noopener noreferrer",
+                                        className: "font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-80",
+                                        style: {
+                                            background: 'rgba(167,139,250,0.1)',
+                                            border: '1px solid rgba(167,139,250,0.3)',
+                                            color: '#a78bfa'
+                                        },
+                                        children: "ISO27001 ↓"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/scan/[id]/page.tsx",
+                                        lineNumber: 96,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                        href: `/api/eso/reports/compliance/${id}?framework=soc2`,
+                                        target: "_blank",
+                                        rel: "noopener noreferrer",
+                                        className: "font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-80",
+                                        style: {
+                                            background: 'rgba(167,139,250,0.08)',
+                                            border: '1px solid rgba(167,139,250,0.2)',
+                                            color: '#a78bfa'
+                                        },
+                                        children: "SOC2 ↓"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/scan/[id]/page.tsx",
+                                        lineNumber: 101,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/scan/[id]/page.tsx",
@@ -1173,7 +1225,7 @@ function ScanDetailPage() {
                                 children: s.val
                             }, void 0, false, {
                                 fileName: "[project]/src/app/scan/[id]/page.tsx",
-                                lineNumber: 102,
+                                lineNumber: 121,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1181,18 +1233,18 @@ function ScanDetailPage() {
                                 children: s.label
                             }, void 0, false, {
                                 fileName: "[project]/src/app/scan/[id]/page.tsx",
-                                lineNumber: 103,
+                                lineNumber: 122,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, i, true, {
                         fileName: "[project]/src/app/scan/[id]/page.tsx",
-                        lineNumber: 101,
+                        lineNumber: 120,
                         columnNumber: 11
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/src/app/scan/[id]/page.tsx",
-                lineNumber: 93,
+                lineNumber: 112,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1208,12 +1260,12 @@ function ScanDetailPage() {
                     }
                 }, void 0, false, {
                     fileName: "[project]/src/app/scan/[id]/page.tsx",
-                    lineNumber: 110,
+                    lineNumber: 129,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/app/scan/[id]/page.tsx",
-                lineNumber: 109,
+                lineNumber: 128,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1227,7 +1279,7 @@ function ScanDetailPage() {
                                 wsStep: wsStep() > 0 ? wsStep() : undefined
                             }, void 0, false, {
                                 fileName: "[project]/src/app/scan/[id]/page.tsx",
-                                lineNumber: 117,
+                                lineNumber: 136,
                                 columnNumber: 11
                             }, this),
                             scan.awaiting_approval && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$scan$2f$ProposalPanel$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -1237,13 +1289,13 @@ function ScanDetailPage() {
                                     })
                             }, void 0, false, {
                                 fileName: "[project]/src/app/scan/[id]/page.tsx",
-                                lineNumber: 118,
+                                lineNumber: 137,
                                 columnNumber: 36
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/scan/[id]/page.tsx",
-                        lineNumber: 116,
+                        lineNumber: 135,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1253,7 +1305,7 @@ function ScanDetailPage() {
                                 events: events
                             }, void 0, false, {
                                 fileName: "[project]/src/app/scan/[id]/page.tsx",
-                                lineNumber: 122,
+                                lineNumber: 141,
                                 columnNumber: 13
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "glass p-4 font-mono text-[11px]",
@@ -1278,7 +1330,7 @@ function ScanDetailPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/scan/[id]/page.tsx",
-                                        lineNumber: 125,
+                                        lineNumber: 144,
                                         columnNumber: 15
                                     }, this),
                                     scan.goal && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1291,7 +1343,7 @@ function ScanDetailPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/scan/[id]/page.tsx",
-                                        lineNumber: 126,
+                                        lineNumber: 145,
                                         columnNumber: 27
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1307,7 +1359,7 @@ function ScanDetailPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/scan/[id]/page.tsx",
-                                        lineNumber: 127,
+                                        lineNumber: 146,
                                         columnNumber: 15
                                     }, this),
                                     findings > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1320,7 +1372,7 @@ function ScanDetailPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/scan/[id]/page.tsx",
-                                        lineNumber: 128,
+                                        lineNumber: 147,
                                         columnNumber: 28
                                     }, this),
                                     fromDb && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1330,13 +1382,13 @@ function ScanDetailPage() {
                                         children: "Loaded from scan history"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/scan/[id]/page.tsx",
-                                        lineNumber: 129,
+                                        lineNumber: 148,
                                         columnNumber: 24
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/scan/[id]/page.tsx",
-                                lineNumber: 124,
+                                lineNumber: 143,
                                 columnNumber: 13
                             }, this),
                             scan.report && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$scan$2f$ReportViewer$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -1344,19 +1396,19 @@ function ScanDetailPage() {
                                 processId: id
                             }, void 0, false, {
                                 fileName: "[project]/src/app/scan/[id]/page.tsx",
-                                lineNumber: 132,
+                                lineNumber: 151,
                                 columnNumber: 25
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/scan/[id]/page.tsx",
-                        lineNumber: 120,
+                        lineNumber: 139,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/scan/[id]/page.tsx",
-                lineNumber: 115,
+                lineNumber: 134,
                 columnNumber: 7
             }, this)
         ]

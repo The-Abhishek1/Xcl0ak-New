@@ -89,12 +89,12 @@ export default function CTFPage() {
             <div className="font-mono text-lg font-bold text-accent">{challenges.filter(c=>c.solved).length}</div>
             <div className="font-mono text-[9px] text-slate-600 uppercase">Solved</div>
           </div>
-          {/* PROMINENT Submit button */}
+          {/* PROMINENT Submit button 
           <Link href="/ctf/submit"
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl border font-mono text-[12px] font-bold transition-all"
             style={{ background:'rgba(0,255,170,0.1)', borderColor:'rgba(0,255,170,0.35)', color:'#00ffaa' }}>
             📤 Submit Challenge
-          </Link>
+          </Link>*/}
         </div>
       </div>
 

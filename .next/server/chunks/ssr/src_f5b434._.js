@@ -585,27 +585,6 @@ function ScanDashboardPage() {
                                 fileName: "[project]/src/app/scan/page.tsx",
                                 lineNumber: 142,
                                 columnNumber: 13
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "mt-4 pt-3 border-t border-white/[0.06]",
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
-                                    href: "/scan/new",
-                                    className: "block w-full text-center py-2.5 rounded-lg border font-mono text-[11px] font-bold transition-all",
-                                    style: {
-                                        background: 'rgba(0,255,170,0.08)',
-                                        borderColor: 'rgba(0,255,170,0.25)',
-                                        color: '#00ffaa'
-                                    },
-                                    children: "⚡ Launch New Scan"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/app/scan/page.tsx",
-                                    lineNumber: 147,
-                                    columnNumber: 13
-                                }, this)
-                            }, void 0, false, {
-                                fileName: "[project]/src/app/scan/page.tsx",
-                                lineNumber: 146,
-                                columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {

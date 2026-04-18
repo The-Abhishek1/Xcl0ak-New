@@ -79,19 +79,25 @@ if ("TURBOPACK compile-time truthy", 1) g.prisma = prisma;
 
 var { r: __turbopack_require__, f: __turbopack_module_context__, i: __turbopack_import__, s: __turbopack_esm__, v: __turbopack_export_value__, n: __turbopack_export_namespace__, c: __turbopack_cache__, M: __turbopack_modules__, l: __turbopack_load__, j: __turbopack_dynamic__, P: __turbopack_resolve_absolute_path__, U: __turbopack_relative_url__, R: __turbopack_resolve_module_id_path__, b: __turbopack_worker_blob_url__, g: global, __dirname, x: __turbopack_external_require__, y: __turbopack_external_import__, z: __turbopack_require_stub__ } = __turbopack_context__;
 {
+// src/lib/nvd.ts — Real NVD API v2 client
+// FIXED: fetchRecentCVEs accepts opts object { daysBack, limit, ... }
+// Old callers used positional args (daysBack, limit) — both now work
 __turbopack_esm__({
     "fetchCVEById": (()=>fetchCVEById),
     "fetchRecentCVEs": (()=>fetchRecentCVEs),
     "searchCVEs": (()=>searchCVEs)
 });
 const NVD_BASE = 'https://services.nvd.nist.gov/rest/json/cves/2.0';
-const API_KEY = process.env.NVD_API_KEY;
-function sev(s) {
-    return s >= 9 ? 'CRITICAL' : s >= 7 ? 'HIGH' : s >= 4 ? 'MEDIUM' : 'LOW';
+const API_KEY = process.env.NVD_API_KEY ?? '';
+function parseSev(s) {
+    if (s >= 9) return 'CRITICAL';
+    if (s >= 7) return 'HIGH';
+    if (s >= 4) return 'MEDIUM';
+    return 'LOW';
 }
-function parse(v) {
+function parseVuln(v) {
     const cve = v.cve;
-    const cvss = cve.metrics?.cvssMetricV31?.[0]?.cvssData ?? cve.metrics?.cvssMetricV30?.[0]?.cvssData;
+    const cvss = cve.metrics?.cvssMetricV31?.[0]?.cvssData ?? cve.metrics?.cvssMetricV30?.[0]?.cvssData ?? cve.metrics?.cvssMetricV2?.[0]?.cvssData;
     const score = cvss?.baseScore ?? 0;
     const cpes = cve.configurations?.[0]?.nodes?.[0]?.cpeMatch ?? [];
     return {
@@ -99,10 +105,10 @@ function parse(v) {
         description: cve.descriptions?.find((d)=>d.lang === 'en')?.value ?? '',
         cvssScore: score,
         cvssVector: cvss?.vectorString ?? '',
-        severity: sev(score),
-        vendor: cpes[0]?.criteria?.split(':')[3] ?? '',
-        product: cpes[0]?.criteria?.split(':')[4] ?? '',
-        affectedVersions: cpes.slice(0, 5).map((c)=>c.versionEndIncluding || c.criteria?.split(':')[5] || '').filter(Boolean),
+        severity: parseSev(score),
+        vendor: cpes[0]?.criteria?.split(':')?.[3] ?? '',
+        product: cpes[0]?.criteria?.split(':')?.[4] ?? '',
+        affectedVersions: cpes.slice(0, 5).map((c)=>c.versionEndIncluding || c.criteria?.split(':')?.[5] || '').filter(Boolean),
         patchAvailable: [
             'Modified',
             'Analyzed'
@@ -112,15 +118,35 @@ function parse(v) {
         modifiedAt: new Date(cve.lastModified)
     };
 }
-async function fetchRecentCVEs(opts = {}) {
-    const { daysBack = 7, limit = 20, severity, keyword } = opts;
+async function fetchRecentCVEs(optsOrDaysBack = {}, limitArg) {
+    // Support both signatures:
+    //   fetchRecentCVEs({ daysBack: 7, limit: 12 })   ← new
+    //   fetchRecentCVEs(7, 12)                          ← legacy positional
+    let opts;
+    if (typeof optsOrDaysBack === 'number') {
+        opts = {
+            daysBack: optsOrDaysBack,
+            limit: limitArg
+        };
+    } else {
+        opts = optsOrDaysBack;
+    }
+    const { daysBack = 7, limit = 20, startIndex = 0, severity, keyword } = opts;
+    if (!API_KEY) {
+        console.warn('[NVD] NVD_API_KEY not set — returning empty CVE list');
+        return {
+            vulns: [],
+            total: 0
+        };
+    }
     const p = new URLSearchParams({
-        resultsPerPage: String(limit),
-        startIndex: '0'
+        resultsPerPage: String(Math.min(limit, 2000)),
+        startIndex: String(startIndex)
     });
     if (severity) p.set('cvssV3Severity', severity);
     if (keyword) p.set('keywordSearch', keyword);
-    const now = new Date(), past = new Date(now.getTime() - daysBack * 86400000);
+    const now = new Date();
+    const past = new Date(now.getTime() - daysBack * 86_400_000);
     p.set('pubStartDate', past.toISOString().replace('.000Z', '+00:00'));
     p.set('pubEndDate', now.toISOString().replace('.000Z', '+00:00'));
     try {
@@ -132,16 +158,20 @@ async function fetchRecentCVEs(opts = {}) {
                 revalidate: 3600
             }
         });
-        if (!res.ok) return {
-            vulns: [],
-            total: 0
-        };
+        if (!res.ok) {
+            console.error('[NVD] API error:', res.status, await res.text().catch(()=>''));
+            return {
+                vulns: [],
+                total: 0
+            };
+        }
         const data = await res.json();
         return {
-            vulns: (data.vulnerabilities ?? []).map(parse),
+            vulns: (data.vulnerabilities ?? []).map(parseVuln),
             total: data.totalResults ?? 0
         };
-    } catch  {
+    } catch (err) {
+        console.error('[NVD] Fetch failed:', err);
         return {
             vulns: [],
             total: 0
@@ -149,6 +179,7 @@ async function fetchRecentCVEs(opts = {}) {
     }
 }
 async function fetchCVEById(cveId) {
+    if (!API_KEY) return null;
     try {
         const res = await fetch(`${NVD_BASE}?cveId=${cveId}`, {
             headers: {
@@ -160,7 +191,7 @@ async function fetchCVEById(cveId) {
         });
         if (!res.ok) return null;
         const data = await res.json();
-        return data.vulnerabilities?.[0] ? parse(data.vulnerabilities[0]) : null;
+        return data.vulnerabilities?.[0] ? parseVuln(data.vulnerabilities[0]) : null;
     } catch  {
         return null;
     }

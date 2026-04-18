@@ -77,7 +77,7 @@ export default function ScanDetailPage() {
             <div className="font-mono text-[10px] text-slate-600 mt-0.5">{id}</div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
           {!fromDb&&(
             <div className="w-2 h-2 rounded-full" title={`WebSocket: ${wsState}`}
               style={{background:wsState==='connected'?'#00ffaa':wsState==='connecting'?'#ffd700':'#334155'}}/>
@@ -86,6 +86,25 @@ export default function ScanDetailPage() {
             style={{color:STATUS_COLOR[scan.status]??'#64748b',background:'rgba(255,255,255,0.06)'}}>
             {scan.status?.toUpperCase()}
           </span>
+          {scan.status==='completed'&&(
+            <>
+              <a href={`/api/eso/reports/pdf/${id}`} target="_blank" rel="noopener noreferrer"
+                className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
+                style={{background:'rgba(0,170,255,0.1)',border:'1px solid rgba(0,170,255,0.3)',color:'#00aaff'}}>
+                PDF ↓
+              </a>
+              <a href={`/api/eso/reports/compliance/${id}?framework=iso27001`} target="_blank" rel="noopener noreferrer"
+                className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
+                style={{background:'rgba(167,139,250,0.1)',border:'1px solid rgba(167,139,250,0.3)',color:'#a78bfa'}}>
+                ISO27001 ↓
+              </a>
+              <a href={`/api/eso/reports/compliance/${id}?framework=soc2`} target="_blank" rel="noopener noreferrer"
+                className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
+                style={{background:'rgba(167,139,250,0.08)',border:'1px solid rgba(167,139,250,0.2)',color:'#a78bfa'}}>
+                SOC2 ↓
+              </a>
+            </>
+          )}
         </div>
       </div>
 

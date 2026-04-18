@@ -22,6 +22,10 @@
     "react-dom": "^19.0.0",
     "three": "^0.169.0"
   },
+  "note": "Add this 'prisma' block to your existing package.json",
+  "prisma": {
+  "seed": "node prisma/seed.js"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22",
@@ -29,6 +33,7 @@
     "@types/react-dom": "^19",
     "@types/three": "^0.169.0",
     "tailwindcss": "^4.0.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
