@@ -1,3 +1,0 @@
-{
-  "/api/eso/[[...path]]/route": "app/api/eso/[[...path]]/route.js"
-}
