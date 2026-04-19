@@ -292,7 +292,7 @@ export default function LandingPage() {
         <div className="font-mono text-[10px] text-slate-700 space-y-2">
           <div>
             XCloak · AI-Powered Security Platform ·{' '}
-            <a href="mailto:hello@xcloak.app" className="text-accent hover:underline">hello@xcloak.app</a>
+            <a href="mailto:admin@xcloak.tech" className="text-accent hover:underline">admin@xcloak.tech</a>
           </div>
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
             <Link href="/pricing" className="hover:text-slate-400 transition-colors">Pricing</Link>

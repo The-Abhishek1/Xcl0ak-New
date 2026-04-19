@@ -215,7 +215,7 @@ function PricingPageInner() {
         <div className="text-center">
           <p className="font-mono text-[12px] text-slate-600 mb-4">
             Questions? Email{' '}
-            <a href="mailto:billing@xcloak.app" className="text-accent hover:underline">billing@xcloak.app</a>
+            <a href="mailto:admin@xcloak.tech" className="text-accent hover:underline">admin@xcloak.tech</a>
             {' '}· Payments via Razorpay · Cancel anytime
           </p>
           <p className="font-mono text-[10px] text-slate-700 mb-4">
