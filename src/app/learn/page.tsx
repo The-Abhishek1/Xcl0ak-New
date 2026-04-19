@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 
 // ── Static curriculum — modules are real topics with real links ───────────────
@@ -104,6 +104,10 @@ export default function LearnPage() {
   const [activeTrack, setActiveTrack] = useState('beginner')
   const [progress,    setProgress]    = useState<Record<string, boolean>>({})
   const [loaded,      setLoaded]      = useState(false)
+  const [showSubmit,  setShowSubmit]  = useState(false)
+  const [submitForm,  setSubmitForm]  = useState({ title:'', description:'', difficulty:'intermediate', category:'web', modules:'' })
+  const [submitting,  setSubmitting]  = useState(false)
+  const [submitMsg,   setSubmitMsg]   = useState('')
 
   // Load progress from localStorage on mount
   useEffect(() => {
@@ -120,8 +124,18 @@ export default function LearnPage() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)) } catch {}
   }, [progress, loaded])
 
+  const contentRef = useRef<HTMLDivElement>(null)
+
   function toggle(key: string) {
     setProgress(p => ({ ...p, [key]: !p[key] }))
+  }
+
+  function selectTrack(id: string) {
+    setActiveTrack(id)
+    // Smooth scroll to content on mobile
+    setTimeout(() => {
+      contentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 50)
   }
 
   const track     = TRACKS.find(t => t.id === activeTrack)!
@@ -132,6 +146,28 @@ export default function LearnPage() {
   const overallDone  = TRACKS.reduce((s, t) =>
     s + t.modules.filter((_, i) => progress[`${t.id}-${i}`] ? 1 : 0).length, 0)
 
+  const alias = typeof window !== 'undefined' ? (localStorage.getItem('eso_user') ? JSON.parse(localStorage.getItem('eso_user')!).username : 'anonymous') : 'anonymous'
+
+  async function submitPath() {
+    if (!submitForm.title || !submitForm.modules) return
+    setSubmitting(true)
+    try {
+      const modules = submitForm.modules.split('\n').filter(Boolean).map((m, i) => ({
+        title: m.trim(), type: 'read', url: ''
+      }))
+      const res = await fetch('/api/v1/learn/paths', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...submitForm, modules, authorAlias: alias }),
+      })
+      if (res.ok) {
+        setSubmitMsg('✓ Submitted for review! We\'ll notify you when approved.')
+        setSubmitForm({ title:'', description:'', difficulty:'intermediate', category:'web', modules:'' })
+      }
+    } catch { setSubmitMsg('✗ Submission failed. Try again.') }
+    setSubmitting(false)
+  }
+
   return (
     <div className="p-3 sm:p-5">
       <div className="flex items-start justify-between mb-5 flex-wrap gap-3">
@@ -141,13 +177,83 @@ export default function LearnPage() {
             Structured cybersecurity curriculum — beginner to red team · progress saved locally
           </p>
         </div>
-        <div className="glass px-4 py-2.5 rounded-xl text-center">
+        <div className="flex items-center gap-3">
+        <button onClick={() => setShowSubmit(true)}
+          className="font-mono text-[11px] font-bold px-4 py-2.5 rounded-xl cursor-pointer transition-all hover:opacity-80"
+          style={{background:'rgba(167,139,250,0.1)',border:'1px solid rgba(167,139,250,0.3)',color:'#a78bfa'}}>
+          + Submit a Path
+        </button>
+      <div className="glass px-4 py-2.5 rounded-xl text-center">
           <div className="font-mono text-xl font-bold text-accent">
             {overallDone}/{overallTotal}
           </div>
           <div className="font-mono text-[8px] text-slate-600 uppercase tracking-widest">Total Done</div>
         </div>
       </div>
+      </div>
+
+      {/* Submit Modal */}
+      {showSubmit && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{background:'rgba(0,0,0,0.8)'}}>
+          <div className="glass rounded-2xl p-6 w-full max-w-lg">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-black text-lg text-slate-200">Submit Learning Path</h2>
+              <button onClick={() => {setShowSubmit(false);setSubmitMsg('')}} className="text-slate-600 hover:text-slate-300 cursor-pointer text-xl">✕</button>
+            </div>
+            {submitMsg ? (
+              <div className="text-center py-6">
+                <p className="font-mono text-[13px]" style={{color: submitMsg.startsWith('✓') ? '#00ffaa' : '#ff3a5c'}}>{submitMsg}</p>
+                <button onClick={() => {setShowSubmit(false);setSubmitMsg('')}} className="mt-4 font-mono text-[11px] text-accent hover:underline cursor-pointer">Close</button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <label className="font-mono text-[9px] uppercase tracking-widest text-slate-600 block mb-1">Title *</label>
+                  <input value={submitForm.title} onChange={e => setSubmitForm(f=>({...f,title:e.target.value}))}
+                    placeholder="e.g. Android Security Basics"
+                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 font-mono text-[12px] text-slate-200 outline-none focus:border-accent/30" />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="font-mono text-[9px] uppercase tracking-widest text-slate-600 block mb-1">Category</label>
+                    <select value={submitForm.category} onChange={e => setSubmitForm(f=>({...f,category:e.target.value}))}
+                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 font-mono text-[11px] text-slate-200 outline-none">
+                      {['web','network','binary','crypto','mobile','cloud','red-team','forensics'].map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="font-mono text-[9px] uppercase tracking-widest text-slate-600 block mb-1">Difficulty</label>
+                    <select value={submitForm.difficulty} onChange={e => setSubmitForm(f=>({...f,difficulty:e.target.value}))}
+                      className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 font-mono text-[11px] text-slate-200 outline-none">
+                      {['beginner','intermediate','advanced','expert'].map(d => <option key={d} value={d}>{d}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="font-mono text-[9px] uppercase tracking-widest text-slate-600 block mb-1">Description</label>
+                  <textarea value={submitForm.description} onChange={e => setSubmitForm(f=>({...f,description:e.target.value}))}
+                    placeholder="What will learners achieve?" rows={2}
+                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 font-mono text-[12px] text-slate-200 outline-none resize-none" />
+                </div>
+                <div>
+                  <label className="font-mono text-[9px] uppercase tracking-widest text-slate-600 block mb-1">Modules (one per line) *</label>
+                  <textarea value={submitForm.modules} onChange={e => setSubmitForm(f=>({...f,modules:e.target.value}))}
+                    placeholder={"Introduction to Android Security\nADB and Device Debugging\nAPK Analysis with apktool\nCTF: Mobile Challenge"}
+                    rows={5}
+                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2.5 font-mono text-[11px] text-slate-200 outline-none resize-none" />
+                </div>
+                <button onClick={submitPath} disabled={submitting || !submitForm.title || !submitForm.modules}
+                  className="w-full font-mono text-[12px] font-bold py-3 rounded-xl transition-all disabled:opacity-50 cursor-pointer"
+                  style={{background:'rgba(167,139,250,0.1)',border:'1px solid rgba(167,139,250,0.3)',color:'#a78bfa'}}>
+                  {submitting ? 'Submitting...' : 'Submit for Review →'}
+                </button>
+                <p className="font-mono text-[9px] text-slate-700 text-center">Admin will review and approve within 24h</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-4">
 
@@ -157,7 +263,7 @@ export default function LearnPage() {
             const done = t.modules.filter((_, i) => progress[`${t.id}-${i}`]).length
             const pct  = Math.round((done / t.modules.length) * 100)
             return (
-              <button key={t.id} onClick={() => setActiveTrack(t.id)}
+              <button key={t.id} onClick={() => selectTrack(t.id)}
                 className="w-full text-left p-3.5 rounded-xl border transition-all block cursor-pointer"
                 style={{
                   background:   activeTrack === t.id ? `${t.color}12` : 'rgba(255,255,255,0.025)',
@@ -181,7 +287,7 @@ export default function LearnPage() {
         </div>
 
         {/* Track content */}
-        <div className="space-y-4">
+        <div className="space-y-4" ref={contentRef}>
           <div className="glass p-5">
             <div className="flex items-center gap-3 mb-3">
               <span className="text-3xl">{track.icon}</span>
