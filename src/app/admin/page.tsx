@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { getToken, clearSession } from '@/lib/eso-auth'
 
-type Tab = 'overview' | 'users' | 'exploits' | 'ctf' | 'scans' | 'tiers' | 'leaderboard' | 'payments'
+type Tab = 'overview' | 'users' | 'exploits' | 'ctf' | 'scans' | 'tiers' | 'leaderboard' | 'payments' | 'paths'
 
 const TIER_COLOR:   Record<string,string> = { free:'#64748b', pro:'#00aaff', enterprise:'#a78bfa', admin:'#00ffaa' }
 const STATUS_COLOR: Record<string,string> = { completed:'#00ffaa', failed:'#ff3a5c', running:'#00aaff', planning:'#ffd700', pending:'#475569', approved:'#00ffaa', rejected:'#ff3a5c' }
@@ -71,6 +71,7 @@ export default function AdminPage() {
   const [xStatus,    setXStatus]    = useState<'pending'|'approved'|'rejected'>('pending')
   const [leaders,    setLeaders]    = useState<any[]>([])
   const [payments,   setPayments]   = useState<any[]>([])
+  const [paths,      setPaths]      = useState<any[]>([])
 
   // Auth guard
   useEffect(() => {
@@ -123,6 +124,13 @@ export default function AdminPage() {
         const r = await esoFetch('/admin/payments?limit=100')
         setPayments(r.payments ?? [])
       }
+      if (tab === 'paths') {
+        const r = await xcloakFetch('/api/v1/notifications?alias=admin&limit=50')
+        const pending = (r.notifications ?? []).filter((n: any) =>
+          n.title?.startsWith('📚 New Learning Path:')
+        )
+        setPaths(pending)
+      }
     } catch(e:any) { setMsg(`✗ ${e.message}`) }
     setLoading(false)
   }, [ready, tab, xStatus])
@@ -170,6 +178,7 @@ export default function AdminPage() {
     {id:'tiers'       as Tab, label:'Tiers',       icon:'🎯'},
     {id:'leaderboard' as Tab, label:'Leaderboard', icon:'🏆'},
     {id:'payments'    as Tab, label:'Payments',    icon:'💳'},
+    {id:'paths'       as Tab, label:'Learn Paths', icon:'📚'},
   ]
 
   const td = "px-4 py-2.5 font-mono text-[11px]"
@@ -633,6 +642,61 @@ export default function AdminPage() {
             </table>
           )}
         </div>
+
+      {tab === 'paths' && (
+        <div>
+          <h2 className="font-black text-[13px] text-slate-300 mb-4">📚 Learning Path Submissions</h2>
+          {paths.length === 0 ? (
+            <div className="glass rounded-xl p-8 text-center font-mono text-[11px] text-slate-600">
+              No pending path submissions
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {paths.map((n: any) => (
+                <div key={n.id} className="glass rounded-xl p-4">
+                  <div className="flex items-start justify-between gap-4 flex-wrap">
+                    <div>
+                      <p className="font-bold text-[12px] text-slate-200">{n.title?.replace('📚 New Learning Path: ', '')}</p>
+                      <p className="font-mono text-[10px] text-slate-500 mt-1 whitespace-pre-line">{n.body}</p>
+                      <p className="font-mono text-[9px] text-slate-700 mt-2">
+                        {new Date(n.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <button
+                        onClick={async () => {
+                          await xcloakFetch(`/api/v1/notifications/read`, {
+                            method: 'POST',
+                            body: JSON.stringify({ id: n.id, action: 'approve' })
+                          })
+                          setMsg('✓ Path approved — notify author manually')
+                          setPaths(p => p.filter(x => x.id !== n.id))
+                        }}
+                        className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-all hover:opacity-80"
+                        style={{background:'rgba(0,255,170,0.1)',border:'1px solid rgba(0,255,170,0.3)',color:'#00ffaa'}}>
+                        ✓ Approve
+                      </button>
+                      <button
+                        onClick={async () => {
+                          await xcloakFetch(`/api/v1/notifications/read`, {
+                            method: 'POST',
+                            body: JSON.stringify({ id: n.id, action: 'reject' })
+                          })
+                          setMsg('✗ Path rejected')
+                          setPaths(p => p.filter(x => x.id !== n.id))
+                        }}
+                        className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-all hover:opacity-80"
+                        style={{background:'rgba(255,58,92,0.1)',border:'1px solid rgba(255,58,92,0.3)',color:'#ff3a5c'}}>
+                        ✗ Reject
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       )}
     </div>
   )

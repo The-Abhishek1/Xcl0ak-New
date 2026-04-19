@@ -135,6 +135,33 @@ export async function fetchCVEById(cveId: string): Promise<NVDVuln | null> {
 }
 
 export async function searchCVEs(keyword: string, limit = 20): Promise<NVDVuln[]> {
-  const { vulns } = await fetchRecentCVEs({ keyword, limit, daysBack: 365 })
-  return vulns
+  const isCveId = /^CVE-\d{4}-\d+$/i.test(keyword.trim())
+
+  if (isCveId) {
+    // Direct CVE ID lookup — no date filter needed
+    const single = await fetchCVEById(keyword.trim().toUpperCase())
+    return single ? [single] : []
+  }
+
+  // Keyword search — no date range so we get all matching CVEs
+  const API_KEY = process.env.NVD_API_KEY ?? ''
+  if (!API_KEY) return []
+
+  const p = new URLSearchParams({
+    resultsPerPage: String(Math.min(limit, 2000)),
+    startIndex: '0',
+    keywordSearch: keyword,
+  })
+
+  try {
+    const res = await fetch(`${NVD_BASE}?${p}`, {
+      headers: { apiKey: API_KEY },
+      next: { revalidate: 3600 },
+    } as RequestInit)
+    if (!res.ok) return []
+    const data = await res.json()
+    return (data.vulnerabilities ?? []).map(parseVuln)
+  } catch {
+    return []
+  }
 }
