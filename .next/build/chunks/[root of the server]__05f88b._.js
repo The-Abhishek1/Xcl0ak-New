@@ -34,7 +34,8 @@ __turbopack_esm__({
 });
 const config = {
     plugins: {
-        "@tailwindcss/postcss": {}
+        tailwindcss: {},
+        autoprefixer: {}
     }
 };
 const __TURBOPACK__default__export__ = config;
