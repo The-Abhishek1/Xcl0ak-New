@@ -11,7 +11,7 @@ const USER_KEY  = 'eso_user'
 export function saveSession(token: string, user: any) {
   if (typeof window === 'undefined') return
   // Cookie — expires in 1 day
-  document.cookie = `${TOKEN_KEY}=${token}; path=/; max-age=86400; SameSite=strict`
+  document.cookie = `${TOKEN_KEY}=${token}; path=/; max-age=86400; SameSite=lax`
   localStorage.setItem(USER_KEY, JSON.stringify(user))
   // Legacy compat for old xcloak admin API calls
   if (user?.role === 'admin') {
