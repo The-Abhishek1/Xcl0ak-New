@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+  <rect width="80" height="80" rx="16" fill="#0f1219"/>
+  <path d="M40 12 L62 22 L62 42 C62 55 52 64 40 68 C28 64 18 55 18 42 L18 22 Z" 
+        fill="none" stroke="#00ffaa" stroke-width="3" stroke-linejoin="round"/>
+  <text x="40" y="50" font-family="monospace" font-weight="900" font-size="22" 
+        fill="#00ffaa" text-anchor="middle">X</text>
+</svg>
