@@ -20,7 +20,8 @@ import { Leaderboard }                   from '@/components/layout/Leaderboard'
 export const metadata = { title: 'Dashboard — Xcloak' }
 
 // Revalidate every 5 minutes — real data, not static
-export const revalidate = 300
+export const dynamic = "force-dynamic"
+export const revalidate = 0
 
 async function getDashboardData() {
   const [nvdResult, threats, pulses, exploits, exploitCount, cveCount] =
