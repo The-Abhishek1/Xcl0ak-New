@@ -47,6 +47,8 @@ export async function POST(req: NextRequest, { params }: Ctx) {
         link:  '/ctf',
       },
     }).catch(() => null)
+
+    // Email via ESO internal callback (ESO holds user emails)
   }
 
   return NextResponse.json({ ok: true, challenge })

@@ -64,6 +64,9 @@ function LoginForm() {
               <label className="font-mono text-[9px] uppercase tracking-widest text-slate-600">Password</label>
               <input type="password" required value={password} onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••" className={inp} />
+              <div className="text-right mt-1.5">
+                <a href="/forgot-password" className="font-mono text-[10px] text-slate-600 hover:text-accent transition-colors">Forgot password?</a>
+              </div>
             </div>
 
             {error && (

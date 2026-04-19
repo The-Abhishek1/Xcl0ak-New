@@ -49,6 +49,8 @@ export async function POST(
       link:  '/ctf',
       broadcastRoom: 'ctf-help',
     }).catch(() => null)
+
+    // Email sent via ESO internal callback (ESO has user emails, not Prisma)
   }
 
   return NextResponse.json({ correct, points: correct ? challenge.points : 0 })

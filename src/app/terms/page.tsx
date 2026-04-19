@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = { title: 'Terms of Service — Xcloak' }
 
 const LAST_UPDATED = 'April 18, 2026'
-const CONTACT_EMAIL = 'legal@xcloak.app'
+const CONTACT_EMAIL = 'admin@xcloak.tech'
 const COMPANY = 'Xcloak'
 
 export default function TermsPage() {
@@ -185,7 +185,7 @@ export default function TermsPage() {
             <p>
               For questions about these Terms, email us at{' '}
               <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent hover:underline">{CONTACT_EMAIL}</a>.
-              For billing issues: <a href="mailto:billing@xcloak.app" className="text-accent hover:underline">billing@xcloak.app</a>.
+              For billing issues: <a href="mailto:admin@xcloak.tech" className="text-accent hover:underline">admin@xcloak.tech</a>.
             </p>
           </Section>
 

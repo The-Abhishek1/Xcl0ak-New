@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 export const metadata: Metadata = { title: 'Privacy Policy — Xcloak' }
 
 const LAST_UPDATED = 'April 18, 2026'
-const CONTACT_EMAIL = 'privacy@xcloak.app'
+const CONTACT_EMAIL = 'admin@xcloak.tech'
 const COMPANY = 'Xcloak'
 
 export default function PrivacyPage() {
@@ -148,7 +148,7 @@ export default function PrivacyPage() {
             </ul>
             <p className="mt-4 text-slate-500">
               No system is perfectly secure. If you discover a security issue, please report it
-              responsibly to <a href="mailto:security@xcloak.app" className="text-accent hover:underline">security@xcloak.app</a>.
+              responsibly to <a href="mailto:admin@xcloak.tech" className="text-accent hover:underline">admin@xcloak.tech</a>.
             </p>
           </Section>
 
@@ -230,8 +230,8 @@ export default function PrivacyPage() {
             </p>
             <div className="mt-3 space-y-1 ml-4 text-slate-500">
               <p>Email: <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent hover:underline">{CONTACT_EMAIL}</a></p>
-              <p>Security issues: <a href="mailto:security@xcloak.app" className="text-accent hover:underline">security@xcloak.app</a></p>
-              <p>Billing: <a href="mailto:billing@xcloak.app" className="text-accent hover:underline">billing@xcloak.app</a></p>
+              <p>Security issues: <a href="mailto:admin@xcloak.tech" className="text-accent hover:underline">admin@xcloak.tech</a></p>
+              <p>Billing: <a href="mailto:admin@xcloak.tech" className="text-accent hover:underline">admin@xcloak.tech</a></p>
             </div>
           </Section>
 

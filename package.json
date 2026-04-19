@@ -17,6 +17,7 @@
     "clsx": "^2.1.1",
     "js-cookie": "^3.0.5",
     "next": "^15.1.12",
+    "nodemailer": "^6.10.1",
     "prisma": "^6.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -24,11 +25,12 @@
   },
   "note": "Add this 'prisma' block to your existing package.json",
   "prisma": {
-  "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.js"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^22",
+    "@types/nodemailer": "^6.4.17",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.169.0",
