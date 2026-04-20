@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /dashboard
+Disallow: /scan
+Disallow: /settings
+Disallow: /login
+Disallow: /register
+
+Sitemap: https://xcloak.tech/sitemap.xml
