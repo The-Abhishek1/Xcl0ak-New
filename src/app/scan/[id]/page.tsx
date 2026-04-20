@@ -18,8 +18,21 @@ export default function ScanDetailPage() {
   const [fromDb,  setFromDb]  = useState(false)
 
   const fetchScan = useCallback(async () => {
-    try { const s = await esoScans.status(id); if (s?.status) return s } catch {}
-    try { const s = await esoApi.get(`/auth/scans/${id}`); if (s) { setFromDb(true); return s } } catch {}
+    // Try hybrid status first (live scan)
+    try {
+      const s = await esoScans.status(id)
+      if (s?.status) return s
+    } catch (e: any) {
+      // 404 = scan just started, not in DB yet — don't treat as error
+      if (!e.message?.includes('404') && !e.message?.includes('Not Found')) {
+        console.warn('[fetchScan] status error:', e.message)
+      }
+    }
+    // Fall back to scan history (completed scans)
+    try {
+      const s = await esoApi.get(`/auth/scans/${id}`)
+      if (s?.status) { setFromDb(true); return s }
+    } catch {}
     return null
   }, [id])
 
@@ -50,26 +63,6 @@ export default function ScanDetailPage() {
   const progress  = scan.progress || (total>0?(done/total*100):0)
   const dur       = scan.duration ? `${(scan.duration/60).toFixed(1)}m`
                   : scan.duration_seconds ? `${(scan.duration_seconds/60).toFixed(1)}m` : '—'
-
-  async function downloadReport(type: 'pdf' | 'compliance', framework?: string) {
-    const tokenMatch = document.cookie.match(/(?:^|; )eso_token=([^;]*)/)
-    const token = tokenMatch ? decodeURIComponent(tokenMatch[1]) : ''
-    const url = type === 'pdf'
-      ? `/api/eso/reports/pdf/${id}`
-      : `/api/eso/reports/compliance/${id}?framework=${framework}`
-    try {
-      const res = await fetch(url, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {}
-      })
-      if (!res.ok) { alert('Report not ready or auth failed'); return }
-      const blob = await res.blob()
-      const a = document.createElement('a')
-      a.href = URL.createObjectURL(blob)
-      a.download = `xcloak-${type}-${id.slice(0,8)}.${type === 'pdf' ? 'pdf' : 'pdf'}`
-      a.click()
-      URL.revokeObjectURL(a.href)
-    } catch (e) { alert('Download failed') }
-  }
 
   function wsStep(): number {
     for (let i=events.length-1;i>=0;i--) {
@@ -108,15 +101,21 @@ export default function ScanDetailPage() {
           </span>
           {scan.status==='completed'&&(
             <>
-              <button onClick={() => downloadReport('pdf')} className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-80 cursor-pointer" style={{background:'rgba(0,170,255,0.1)',border:'1px solid rgba(0,170,255,0.3)',color:'#00aaff'}}>
+              <a href={`/api/eso/reports/pdf/${id}`} target="_blank" rel="noopener noreferrer"
+                className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
+                style={{background:'rgba(0,170,255,0.1)',border:'1px solid rgba(0,170,255,0.3)',color:'#00aaff'}}>
                 PDF ↓
-              </button>
-              <button onClick={() => downloadReport('compliance', 'iso27001')} className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-80 cursor-pointer" style={{background:'rgba(167,139,250,0.1)',border:'1px solid rgba(167,139,250,0.3)',color:'#a78bfa'}}>
+              </a>
+              <a href={`/api/eso/reports/compliance/${id}?framework=iso27001`} target="_blank" rel="noopener noreferrer"
+                className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
+                style={{background:'rgba(167,139,250,0.1)',border:'1px solid rgba(167,139,250,0.3)',color:'#a78bfa'}}>
                 ISO27001 ↓
-              </button>
-              <button onClick={() => downloadReport('compliance', 'soc2')} className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-80 cursor-pointer" style={{background:'rgba(167,139,250,0.1)',border:'1px solid rgba(167,139,250,0.3)',color:'#a78bfa'}}>
+              </a>
+              <a href={`/api/eso/reports/compliance/${id}?framework=soc2`} target="_blank" rel="noopener noreferrer"
+                className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-80"
+                style={{background:'rgba(167,139,250,0.08)',border:'1px solid rgba(167,139,250,0.2)',color:'#a78bfa'}}>
                 SOC2 ↓
-              </button>
+              </a>
             </>
           )}
         </div>
