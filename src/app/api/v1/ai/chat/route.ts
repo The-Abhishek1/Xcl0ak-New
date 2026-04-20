@@ -27,27 +27,56 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Message too long' }, { status: 400 })
   }
 
-  // Try OpenAI if key is present
+  // Try Groq first (free, fast), then OpenAI as fallback
+  const groqKey   = process.env.GROQ_API_KEY
   const openAIKey = process.env.OPENAI_API_KEY
+
+  const aiMessages = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    ...messages.slice(-6),
+  ]
+
+  // 1. Try Groq
+  if (groqKey) {
+    try {
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': `Bearer ${groqKey}`,
+        },
+        body: JSON.stringify({
+          model:       'llama-3.1-8b-instant',
+          messages:    aiMessages,
+          max_tokens:  600,
+          temperature: 0.3,
+        }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        return NextResponse.json({ message: data.choices[0].message.content })
+      }
+    } catch (err) {
+      console.error('[AI] Groq error:', err)
+    }
+  }
+
+  // 2. Fallback to OpenAI
   if (openAIKey) {
     try {
       const res = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type':  'application/json',
           'Authorization': `Bearer ${openAIKey}`,
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
-            ...messages.slice(-6), // last 6 turns
-          ],
-          max_tokens: 600,
+          model:       'gpt-4o-mini',
+          messages:    aiMessages,
+          max_tokens:  600,
           temperature: 0.3,
         }),
       })
-
       if (res.ok) {
         const data = await res.json()
         return NextResponse.json({ message: data.choices[0].message.content })

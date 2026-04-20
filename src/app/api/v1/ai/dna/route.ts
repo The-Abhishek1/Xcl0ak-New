@@ -108,14 +108,18 @@ export async function POST(req: NextRequest) {
   // Try AI summary if OpenAI key available
   let summary = `${payloadType} exploit targeting ${targetSystem}. Uses ${techniques.slice(0,2).join(', ') || 'standard techniques'}.`
 
+  const groqKey   = process.env.GROQ_API_KEY
   const openAIKey = process.env.OPENAI_API_KEY
-  if (openAIKey) {
+  const aiKey   = groqKey || openAIKey
+  const aiUrl   = groqKey ? 'https://api.groq.com/openai/v1/chat/completions' : 'https://api.openai.com/v1/chat/completions'
+  const aiModel = groqKey ? 'llama-3.1-8b-instant' : 'gpt-4o-mini'
+  if (aiKey) {
     try {
-      const aiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+      const aiRes = await fetch(aiUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${openAIKey}` },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${aiKey}` },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: aiModel,
           messages: [{
             role: 'user',
             content: `In one sentence, describe what this exploit does technically. Be specific about the attack vector:\n\n${chunk.slice(0, 800)}`

@@ -47,6 +47,7 @@ export default function SettingsPage() {
   const [model,       setModel]       = useState('qwen2.5:3b')
   const [openaiKey,   setOpenaiKey]   = useState('')
   const [anthropicKey,setAnthropicKey]= useState('')
+  const [groqKey,     setGroqKey]     = useState('')
   const [llmTesting,   setLlmTesting]   = useState(false)
   const [llmTestResult,setLlmTestResult]= useState<any>(null)
 
@@ -72,6 +73,7 @@ export default function SettingsPage() {
     apiFetch('/system/llm-config').then(c => {
       setLlmConfig(c)
       setProvider(c.provider ?? 'local')
+      if (c.has_groq_key) setGroqKey('••••••••')
       setModel(c.model ?? 'qwen2.5:3b')
     }).catch(()=>{})
     apiFetch('/auth/api-keys').then(r => setApiKeys(r.keys ?? [])).catch(()=>{})
@@ -82,7 +84,7 @@ export default function SettingsPage() {
     try {
       await apiFetch('/system/llm-config', {
         method:'POST',
-        body: JSON.stringify({ provider, model, openai_api_key: openaiKey||undefined, anthropic_api_key: anthropicKey||undefined }),
+        body: JSON.stringify({ provider, model, openai_api_key: openaiKey||undefined, anthropic_api_key: anthropicKey||undefined, groq_api_key: groqKey&&groqKey!=='••••••••'?groqKey:undefined }),
       })
       setMsg('✓ LLM settings saved')
     } catch(e:any) { setMsg(`✗ ${e.message}`) }
@@ -266,11 +268,12 @@ export default function SettingsPage() {
       {tab==='llm' && (
         <div className="glass p-5 space-y-4">
           <div className="font-mono text-[9px] uppercase tracking-widest text-slate-600">LLM Provider</div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {[
               {id:'local',     label:'Ollama',    desc:'Free · local · private'},
               {id:'openai',    label:'OpenAI',    desc:'GPT-4o · API key required'},
               {id:'anthropic', label:'Anthropic', desc:'Claude · API key required'},
+              {id:'groq',      label:'Groq',      desc:'Llama 3 · Free tier · Fast'},
             ].map(p => (
               <button key={p.id} onClick={()=>setProvider(p.id)}
                 className="p-3 rounded-xl border text-left cursor-pointer transition-all"
@@ -307,6 +310,22 @@ export default function SettingsPage() {
               <input type="password" value={anthropicKey} onChange={e=>setAnthropicKey(e.target.value)} placeholder="sk-ant-..." className={inp}/>
             </div>
           )}
+          {provider==='groq' && (
+            <div className="space-y-3">
+              <div className="p-3 rounded-xl font-mono text-[10px]"
+                style={{background:'rgba(0,255,170,0.04)',border:'1px solid rgba(0,255,170,0.15)',color:'#00ffaa'}}>
+                ✓ Free tier — 131,072 tokens/day · Llama 3 on Groq hardware · Extremely fast
+              </div>
+              <select value={model} onChange={e=>setModel(e.target.value)} className={sel}>
+                {['llama-3.1-8b-instant','llama-3.3-70b-versatile','llama-3.1-70b-versatile','mixtral-8x7b-32768','gemma2-9b-it'].map(m=><option key={m}>{m}</option>)}
+              </select>
+              <input type="password" value={groqKey} onChange={e=>setGroqKey(e.target.value)}
+                placeholder="gsk_..." className={inp}/>
+              <p className="font-mono text-[9px] text-slate-600">
+                Get free API key at <a href="https://console.groq.com" target="_blank" rel="noreferrer" className="text-accent hover:underline">console.groq.com</a>
+              </p>
+            </div>
+          )}
 
           <div className="flex gap-2">
             <button onClick={saveLLM} disabled={loading}
@@ -339,6 +358,7 @@ export default function SettingsPage() {
                 {llmConfig.provider} · {llmConfig.model}
                 {llmConfig.has_openai_key && <span className="ml-2 text-accent2">OpenAI key ✓</span>}
                 {llmConfig.has_anthropic_key && <span className="ml-2" style={{color:'#a78bfa'}}>Anthropic key ✓</span>}
+                {llmConfig.has_groq_key && <span className="ml-2" style={{color:'#00ffaa'}}>Groq key ✓</span>}
               </div>
             </div>
           )}
