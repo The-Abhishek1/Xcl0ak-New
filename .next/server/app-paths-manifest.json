@@ -1,7 +1,9 @@
 {
-  "/ctf/page": "app/ctf/page.js",
-  "/api/v1/threat/route": "app/api/v1/threat/route.js",
+  "/page": "app/page.js",
   "/api/v1/notifications/route": "app/api/v1/notifications/route.js",
-  "/api/v1/ctf/route": "app/api/v1/ctf/route.js",
-  "/api/v1/users/route": "app/api/v1/users/route.js"
+  "/api/v1/threat/route": "app/api/v1/threat/route.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/terms/page": "app/terms/page.js",
+  "/refund/page": "app/refund/page.js",
+  "/contact/page": "app/contact/page.js"
 }

@@ -1,21 +1,19 @@
 import Link from 'next/link'
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = { title: 'Terms of Service — Xcloak' }
+export const metadata: Metadata = { title: 'Terms of Service — XCloak' }
 
-const LAST_UPDATED = 'April 18, 2026'
+const LAST_UPDATED = 'April 20, 2026'
 const CONTACT_EMAIL = 'admin@xcloak.tech'
-const COMPANY = 'Xcloak'
 
 export default function TermsPage() {
   return (
     <div className="min-h-screen px-5 py-16" style={{ background: '#03050a' }}>
       <div className="max-w-3xl mx-auto">
 
-        {/* Header */}
         <div className="mb-10">
           <Link href="/" className="font-mono text-[11px] text-slate-600 hover:text-slate-400 transition-colors">
-            ← Back to Xcloak
+            ← Back to XCloak
           </Link>
           <h1 className="text-3xl font-black mt-6 mb-2">Terms of Service</h1>
           <p className="font-mono text-[11px] text-slate-600">
@@ -24,182 +22,192 @@ export default function TermsPage() {
           </p>
         </div>
 
-        {/* Important notice */}
-        <div className="glass p-5 mb-8 rounded-xl" style={{ borderColor: 'rgba(255,58,92,0.3)', background: 'rgba(255,58,92,0.04)' }}>
-          <p className="font-mono text-[12px] font-bold text-red-400 mb-1">Important — Read Before Using</p>
-          <p className="font-mono text-[11px] text-slate-400 leading-6">
-            {COMPANY} is a penetration testing tool. You must only scan systems you own or have explicit written
-            permission to test. Unauthorized scanning is illegal under the IT Act 2000 (India) and equivalent
-            laws worldwide. Misuse may result in immediate account termination and legal action.
-          </p>
+        {/* Summary */}
+        <div className="glass p-5 mb-8 rounded-xl" style={{ borderColor: 'rgba(0,255,170,0.2)', background: 'rgba(0,255,170,0.03)' }}>
+          <p className="font-mono text-[11px] font-bold text-slate-300 mb-2">Summary (plain English)</p>
+          <div className="space-y-1.5">
+            {[
+              'Only scan targets you own or have explicit written permission to test',
+              'Do not use XCloak for illegal activities or to harm others',
+              'Subscriptions renew monthly — cancel anytime from your dashboard',
+              'We can suspend accounts that violate these terms',
+              'By using XCloak you agree to these terms',
+            ].map(s => (
+              <div key={s} className="flex items-start gap-2 font-mono text-[11px] text-slate-500">
+                <span className="text-accent text-[9px] mt-0.5 flex-shrink-0">✓</span>
+                <span>{s}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="space-y-8 font-mono text-[12px] text-slate-400 leading-7">
 
           <Section title="1. Acceptance of Terms">
             <p>
-              By accessing or using {COMPANY} ("the Service", "we", "us"), you agree to be bound by
-              these Terms of Service. If you do not agree, do not use the Service. These terms apply
-              to all users including free, pro, and enterprise plan subscribers.
+              By accessing or using XCloak ("the Service"), you agree to be bound by these Terms of Service.
+              If you do not agree, do not use the Service. These terms apply to all users including
+              free, Pro, and Enterprise tier accounts.
             </p>
           </Section>
 
-          <Section title="2. Authorized Use Only">
-            <p>You may only use {COMPANY} to scan:</p>
+          <Section title="2. Eligibility">
+            <p>You must be at least 18 years old to use the Service. By registering, you confirm that:</p>
             <ul className="mt-3 space-y-2 ml-4">
-              <Li>Systems and networks you own outright</Li>
-              <Li>Systems for which you have explicit written authorization from the owner</Li>
-              <Li>Your own hosted applications and infrastructure</Li>
-              <Li>Designated practice/lab environments (e.g. HackTheBox, TryHackMe)</Li>
+              <Li>You are 18 or older</Li>
+              <Li>You have the legal capacity to enter into a binding agreement</Li>
+              <Li>You are not prohibited from using the Service under applicable law</Li>
+              <Li>All information you provide is accurate and complete</Li>
+            </ul>
+          </Section>
+
+          <Section title="3. Permitted Use — Authorisation Requirement">
+            <p className="text-red-400 font-bold mb-3">
+              ⚠️ You must only scan targets you own or have explicit written authorisation to test.
+            </p>
+            <p>Permitted uses include:</p>
+            <ul className="mt-3 space-y-2 ml-4">
+              <Li>Scanning your own servers, domains, and applications</Li>
+              <Li>Scanning client systems under a signed penetration testing agreement</Li>
+              <Li>Scanning systems explicitly listed in a bug bounty program scope</Li>
+              <Li>Using CTF challenges and learning resources for education</Li>
+              <Li>Accessing the exploit database and CVE tracker for research</Li>
             </ul>
             <p className="mt-4">
-              You <span className="text-red-400 font-bold">must not</span> use the Service to scan:
+              Unauthorised scanning is illegal under the Information Technology Act 2000 (India),
+              the Computer Fraud and Abuse Act (USA), and equivalent laws worldwide.
+              XCloak is not responsible for misuse of the platform.
             </p>
+          </Section>
+
+          <Section title="4. Prohibited Activities">
+            <p>You must not use the Service to:</p>
             <ul className="mt-3 space-y-2 ml-4">
-              <Li red>Systems, networks, or websites you do not own or have no permission to test</Li>
-              <Li red>Government, financial, or critical infrastructure systems</Li>
-              <Li red>Any target for the purpose of unauthorized data access, disruption, or harm</Li>
-              <Li red>Shared hosting environments where testing may affect other tenants</Li>
+              <Li>Scan systems you do not own or lack authorisation to test</Li>
+              <Li>Launch denial-of-service attacks or disrupt services</Li>
+              <Li>Distribute malware, ransomware, or any malicious software</Li>
+              <Li>Access, exfiltrate, or tamper with third-party data without permission</Li>
+              <Li>Bypass authentication or security controls of systems without authorisation</Li>
+              <Li>Use the platform to harass, threaten, or harm individuals</Li>
+              <Li>Share your account credentials with others</Li>
+              <Li>Attempt to reverse-engineer, scrape, or abuse the XCloak API</Li>
+              <Li>Circumvent scan quotas or payment requirements via technical means</Li>
             </ul>
-            <p className="mt-4 text-slate-500">
-              We log all scan targets, timestamps, and user identifiers. This data may be disclosed
-              to law enforcement upon valid legal request.
+            <p className="mt-4">
+              We reserve the right to suspend or terminate accounts engaged in prohibited activities
+              without notice and to report illegal activity to relevant authorities.
             </p>
           </Section>
 
-          <Section title="3. Account Registration">
-            <p>
-              You must provide accurate information when creating an account. You are responsible for
-              maintaining the confidentiality of your credentials and for all activity under your account.
-              You must be at least 18 years old to use the Service. We reserve the right to suspend or
-              terminate accounts that provide false information.
-            </p>
-          </Section>
-
-          <Section title="4. Subscription Plans and Billing">
-            <p>
-              {COMPANY} offers Free, Pro (₹999/month), and Enterprise (₹4,999/month) plans.
-              Payments are processed by Razorpay. By subscribing, you authorize us to charge your
-              payment method on a recurring monthly basis.
-            </p>
+          <Section title="5. Subscriptions and Payments">
+            <p>XCloak offers a free tier and paid subscription plans (Pro and Enterprise).</p>
             <ul className="mt-3 space-y-2 ml-4">
-              <Li>Subscriptions renew automatically unless cancelled before the renewal date</Li>
-              <Li>Refunds are not provided for partial months or unused scan credits</Li>
-              <Li>You may cancel at any time via Settings → Billing or by emailing us</Li>
-              <Li>Plan downgrades take effect at the next billing cycle</Li>
-              <Li>We reserve the right to change pricing with 30 days' notice</Li>
-            </ul>
-          </Section>
-
-          <Section title="5. Scan Credits and Usage Limits">
-            <p>
-              Each plan includes a daily scan allowance that resets at midnight UTC. Unused credits
-              do not carry over. We may impose rate limits, queue scans, or throttle usage to ensure
-              fair service for all users. Enterprise plans may negotiate custom limits.
-            </p>
-          </Section>
-
-          <Section title="6. AI-Generated Content">
-            <p>
-              {COMPANY} uses AI (including Claude by Anthropic) to analyze scan results, generate
-              reports, and propose follow-up actions. AI output may contain errors, false positives,
-              or incorrect recommendations. You are solely responsible for verifying AI-generated
-              findings before acting on them. Do not rely on our reports as the sole basis for
-              security decisions in production environments.
-            </p>
-          </Section>
-
-          <Section title="7. Data and Privacy">
-            <p>
-              Scan targets, results, and reports are stored on our servers and associated with your
-              account. We do not share your scan data with third parties except as required by law.
-              See our <Link href="/privacy" className="text-accent hover:underline">Privacy Policy</Link> for
-              full details on data handling, retention, and your rights.
-            </p>
-          </Section>
-
-          <Section title="8. Intellectual Property">
-            <p>
-              All software, UI, and content of the {COMPANY} platform is owned by us or our licensors.
-              You retain ownership of your scan data and reports. You grant us a limited licence to
-              process your data to provide the Service. You may not reverse-engineer, resell, or
-              redistribute any part of the platform.
-            </p>
-          </Section>
-
-          <Section title="9. Prohibited Activities">
-            <p>In addition to unauthorized scanning, you must not:</p>
-            <ul className="mt-3 space-y-2 ml-4">
-              <Li red>Attempt to circumvent rate limits, quotas, or authentication mechanisms</Li>
-              <Li red>Use the platform to develop or deploy malware or offensive tools against third parties</Li>
-              <Li red>Share account credentials or API keys with unauthorized users</Li>
-              <Li red>Interfere with the platform's infrastructure or other users' scans</Li>
-              <Li red>Scrape, automate, or abuse the API beyond your plan's limits</Li>
+              <Li>Paid subscriptions are billed monthly in advance</Li>
+              <Li>Payments are processed by our payment partners — we do not store card details</Li>
+              <Li>Subscriptions automatically renew unless cancelled before the billing date</Li>
+              <Li>You can cancel your subscription at any time from your account dashboard</Li>
+              <Li>Downgrading takes effect at the end of the current billing period</Li>
+              <Li>We reserve the right to change pricing with 30 days notice to subscribers</Li>
             </ul>
           </Section>
 
-          <Section title="10. Disclaimer of Warranties">
+          <Section title="6. Refunds">
             <p>
-              The Service is provided "as is" and "as available" without any warranty of any kind,
-              express or implied. We do not warrant that the Service will be error-free, uninterrupted,
-              or that scan results will be complete or accurate. Security testing is inherently
-              imperfect — our tools may miss vulnerabilities or report false positives.
+              Please refer to our{' '}
+              <Link href="/refund" className="text-accent hover:underline">Refund and Cancellation Policy</Link>{' '}
+              for full details on refund eligibility and the process.
             </p>
           </Section>
 
-          <Section title="11. Limitation of Liability">
+          <Section title="7. Intellectual Property">
             <p>
-              To the maximum extent permitted by law, {COMPANY} and its operators shall not be liable
-              for any indirect, incidental, or consequential damages arising from your use of the Service,
-              including damages resulting from scan errors, data loss, or security breaches. Our total
-              liability shall not exceed the amount you paid us in the 3 months prior to the claim.
+              The XCloak platform, including its source code, design, trademarks, and content,
+              is owned by XCloak and protected by applicable intellectual property laws.
+            </p>
+            <ul className="mt-3 space-y-2 ml-4">
+              <Li>You may not copy, redistribute, or create derivative works from the platform</Li>
+              <Li>Community-contributed content (exploits, CTF writeups) remains the intellectual property of the contributor</Li>
+              <Li>By submitting content, you grant XCloak a non-exclusive licence to display it on the platform</Li>
+            </ul>
+          </Section>
+
+          <Section title="8. Disclaimer of Warranties">
+            <p>
+              The Service is provided "as is" and "as available" without warranties of any kind.
+              We do not warrant that the Service will be uninterrupted, error-free, or that
+              scan results will be complete or accurate. Security scanning has inherent limitations —
+              a clean scan result does not mean a target is fully secure.
             </p>
           </Section>
 
-          <Section title="12. Termination">
+          <Section title="9. Limitation of Liability">
             <p>
-              We may suspend or terminate your account immediately, without notice, if you violate
-              these terms — particularly the authorized-use requirements. You may terminate your
-              account at any time by contacting us. Upon termination, your data will be deleted
-              within 30 days except where retention is required by law.
+              To the maximum extent permitted by law, XCloak shall not be liable for any indirect,
+              incidental, consequential, or punitive damages arising from your use of the Service,
+              including but not limited to damages resulting from scan results, data loss, or
+              unauthorised access to your account.
+            </p>
+            <p className="mt-3">
+              Our total liability to you for any claim shall not exceed the amount you paid us in
+              the 3 months preceding the claim.
             </p>
           </Section>
 
-          <Section title="13. Governing Law">
+          <Section title="10. Indemnification">
             <p>
-              These Terms are governed by the laws of India. Any disputes shall be subject to the
-              exclusive jurisdiction of the courts in Bangalore, Karnataka. If you are located outside
-              India, you agree that Indian law governs this agreement.
+              You agree to indemnify and hold harmless XCloak, its operators, and affiliates from
+              any claims, damages, or expenses (including legal fees) arising from your use of the
+              Service, violation of these Terms, or infringement of any third-party rights.
             </p>
           </Section>
 
-          <Section title="14. Changes to Terms">
+          <Section title="11. Account Termination">
             <p>
-              We may update these Terms at any time. We will notify registered users by email at
-              least 14 days before material changes take effect. Continued use of the Service after
-              changes constitutes acceptance.
+              We may suspend or terminate your account without notice if you violate these Terms.
+              You may delete your account at any time from Settings. Upon termination:
+            </p>
+            <ul className="mt-3 space-y-2 ml-4">
+              <Li>Your access to the Service ends immediately</Li>
+              <Li>Scan history and findings will be deleted within 30 days</Li>
+              <Li>Payment records are retained for 7 years per Indian tax law</Li>
+              <Li>Pending subscription refunds are handled per our Refund Policy</Li>
+            </ul>
+          </Section>
+
+          <Section title="12. Governing Law">
+            <p>
+              These Terms are governed by the laws of India. Any disputes shall be subject to
+              the exclusive jurisdiction of courts in Karnataka, India.
             </p>
           </Section>
 
-          <Section title="15. Contact">
+          <Section title="13. Changes to Terms">
             <p>
-              For questions about these Terms, email us at{' '}
-              <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent hover:underline">{CONTACT_EMAIL}</a>.
-              For billing issues: <a href="mailto:admin@xcloak.tech" className="text-accent hover:underline">admin@xcloak.tech</a>.
+              We may update these Terms from time to time. We will notify registered users by email
+              at least 14 days before material changes take effect. Continued use of the Service
+              after changes constitutes acceptance of the updated Terms.
             </p>
+          </Section>
+
+          <Section title="14. Contact">
+            <p>For questions about these Terms:</p>
+            <div className="mt-3 space-y-1 ml-4 text-slate-500">
+              <p>Email: <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent hover:underline">{CONTACT_EMAIL}</a></p>
+              <p>Phone: <a href="tel:+916366652685" className="text-accent hover:underline">+91 63666 52685</a></p>
+              <p>Address: Karnataka, India</p>
+            </div>
           </Section>
 
         </div>
 
-        {/* Footer */}
         <div className="mt-12 pt-6 border-t border-white/[0.05] flex flex-wrap gap-4 justify-between items-center">
           <p className="font-mono text-[10px] text-slate-700">
-            © {new Date().getFullYear()} {COMPANY}. All rights reserved.
+            © {new Date().getFullYear()} XCloak. All rights reserved.
           </p>
           <div className="flex gap-4 font-mono text-[10px]">
             <Link href="/privacy" className="text-slate-600 hover:text-slate-400 transition-colors">Privacy Policy</Link>
-            <Link href="/pricing" className="text-slate-600 hover:text-slate-400 transition-colors">Pricing</Link>
-            <Link href="/register" className="text-accent hover:underline">Get Started</Link>
+            <Link href="/refund" className="text-slate-600 hover:text-slate-400 transition-colors">Refund Policy</Link>
+            <Link href="/contact" className="text-slate-600 hover:text-slate-400 transition-colors">Contact</Link>
           </div>
         </div>
 
@@ -219,12 +227,10 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-function Li({ children, red }: { children: React.ReactNode; red?: boolean }) {
+function Li({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex items-start gap-2">
-      <span className="mt-1 text-[9px] flex-shrink-0" style={{ color: red ? '#ff3a5c' : '#00ffaa' }}>
-        {red ? '✗' : '✓'}
-      </span>
+      <span className="mt-1 text-accent text-[9px] flex-shrink-0">✓</span>
       <span>{children}</span>
     </li>
   )
