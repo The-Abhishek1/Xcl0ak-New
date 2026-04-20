@@ -5,5 +5,6 @@
   "/dashboard/page": "app/dashboard/page.js",
   "/terms/page": "app/terms/page.js",
   "/refund/page": "app/refund/page.js",
-  "/contact/page": "app/contact/page.js"
+  "/contact/page": "app/contact/page.js",
+  "/news/page": "app/news/page.js"
 }

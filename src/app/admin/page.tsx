@@ -322,7 +322,10 @@ export default function AdminPage() {
   const [xStatus,    setXStatus]    = useState<'pending'|'approved'|'rejected'>('pending')
   const [leaders,    setLeaders]    = useState<any[]>([])
   const [learnPaths, setLearnPaths] = useState<any[]>([])
-  const [payments,   setPayments]   = useState<any[]>([])
+  const [payments,     setPayments]     = useState<any[]>([])
+  const [paymentMode,  setPaymentMode]  = useState<'razorpay'|'upi'>('razorpay')
+  const [upiForm,      setUpiForm]      = useState({userId:'',tier:'pro',amount:99900,utr:''})
+  const [upiMsg,       setUpiMsg]       = useState('')
 
   // Auth guard
   useEffect(() => {
@@ -372,8 +375,12 @@ export default function AdminPage() {
         setLeaders(r.users ?? [])
       }
       if (tab === 'payments') {
-        const r = await esoFetch('/admin/payments?limit=100')
+        const [r, modeR] = await Promise.all([
+          esoFetch('/admin/payments?limit=100'),
+          esoFetch('/admin/settings/payment-mode'),
+        ])
         setPayments(r.payments ?? [])
+        setPaymentMode(modeR.mode === 'upi' ? 'upi' : 'razorpay')
       }
       if (tab === 'learn') {
         const r = await xcloakFetch(`/api/v1/admin/learn?status=${xStatus}`)
@@ -438,6 +445,36 @@ export default function AdminPage() {
     {id:'leaderboard' as Tab, label:'Leaderboard', icon:'📈'},
     {id:'payments'    as Tab, label:'Payments',    icon:'💳'},
   ]
+
+  async function togglePaymentMode() {
+    const newMode = paymentMode === 'razorpay' ? 'upi' : 'razorpay'
+    await esoFetch('/admin/settings/payment-mode', {
+      method: 'POST',
+      body: JSON.stringify({ mode: newMode })
+    })
+    setPaymentMode(newMode)
+    setMsg(`✓ Payment mode set to ${newMode.toUpperCase()}`)
+  }
+
+  async function recordUpiPayment() {
+    if (!upiForm.userId || !upiForm.utr) { setUpiMsg('✗ User ID and UTR required'); return }
+    setUpiMsg('')
+    try {
+      const r = await esoFetch('/admin/payments/upi', {
+        method: 'POST',
+        body: JSON.stringify(upiForm)
+      })
+      if (r.ok) {
+        setUpiMsg(`✓ Payment recorded — ${upiForm.userId} upgraded to ${upiForm.tier}`)
+        setUpiForm({userId:'',tier:'pro',amount:99900,utr:''})
+        // Refresh payments list
+        const r2 = await esoFetch('/admin/payments?limit=100')
+        setPayments(r2.payments ?? [])
+      } else {
+        setUpiMsg(`✗ ${r.detail || 'Failed'}`)
+      }
+    } catch(e:any) { setUpiMsg(`✗ ${e.message}`) }
+  }
 
   const td = "px-4 py-2.5 font-mono text-[11px]"
 
@@ -891,44 +928,119 @@ export default function AdminPage() {
 
       {/* ── PAYMENTS ── */}
       {tab==='payments' && !loading && (
-        <div className="glass overflow-x-auto">
-          <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
-            <span className="font-mono text-[10px] text-accent uppercase tracking-widest">Payment History</span>
-            <span className="font-mono text-[9px] text-slate-600">{payments.length} transactions</span>
+        <div className="space-y-4">
+
+          {/* Payment Mode Toggle */}
+          <div className="glass p-4 rounded-xl flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <p className="font-bold text-[13px] text-slate-200">Payment Mode</p>
+              <p className="font-mono text-[11px] text-slate-600 mt-0.5">
+                {paymentMode === 'razorpay' ? 'Razorpay checkout shown to users' : 'UPI QR shown to users on pricing page'}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-[10px]" style={{color: paymentMode==='razorpay' ? '#00aaff' : '#64748b'}}>Razorpay</span>
+              <button onClick={togglePaymentMode}
+                className="relative w-12 h-6 rounded-full transition-all cursor-pointer"
+                style={{background: paymentMode==='upi' ? 'rgba(0,255,170,0.3)' : 'rgba(255,255,255,0.1)',border:'1px solid rgba(255,255,255,0.1)'}}>
+                <span className="absolute top-0.5 w-5 h-5 rounded-full transition-all"
+                  style={{left: paymentMode==='upi' ? '26px' : '2px', background: paymentMode==='upi' ? '#00ffaa' : '#64748b'}} />
+              </button>
+              <span className="font-mono text-[10px]" style={{color: paymentMode==='upi' ? '#00ffaa' : '#64748b'}}>UPI</span>
+            </div>
           </div>
-          {payments.length===0 ? (
-            <div className="p-8 text-center font-mono text-[11px] text-slate-600">No payments recorded yet</div>
-          ) : (
-            <table className="w-full border-collapse min-w-[700px]">
-              <thead>
-                <tr style={{background:'rgba(255,255,255,0.015)',borderBottom:'1px solid rgba(255,255,255,0.06)'}}>
-                  {['Payment ID','User','Tier','Amount','Status','Date'].map(h=>(
-                    <th key={h} className="font-mono text-[9px] uppercase tracking-widest text-slate-600 text-left px-4 py-2.5">{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {payments.map((p:any)=>(
-                  <tr key={p.payment_id} className="border-b border-white/[0.03] hover:bg-white/[0.02]">
-                    <td className={`${td} font-mono text-[9px] text-slate-600`}>{p.payment_id?.slice(0,20)}...</td>
-                    <td className={`${td} text-slate-300`}>{p.username??p.user_id?.slice(0,12)}</td>
-                    <td className={td}>
-                      <span className="font-mono text-[10px] font-bold capitalize" style={{color:TIER_COLOR[p.tier??'free']}}>{p.tier}</span>
-                    </td>
-                    <td className={`${td} font-mono text-accent font-bold`}>₹{((p.amount??0)/100).toLocaleString()}</td>
-                    <td className={td}>
-                      <span className="font-mono text-[9px] px-2 py-[2px] rounded" style={{color:STATUS_COLOR[p.status??'pending']??'#64748b',background:'rgba(255,255,255,0.05)'}}>
-                        {p.status}
-                      </span>
-                    </td>
-                    <td className={`${td} font-mono text-[10px] text-slate-600`}>
-                      {p.paid_at ? new Date(p.paid_at).toLocaleDateString('en-IN') : '—'}
-                    </td>
+
+          {/* Record UPI Payment */}
+          <div className="glass p-4 rounded-xl">
+            <p className="font-bold text-[13px] text-slate-200 mb-3">📱 Record UPI Payment</p>
+            <p className="font-mono text-[10px] text-slate-600 mb-3">
+              When a user pays via UPI, enter details here to upgrade their account instantly.
+            </p>
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <label className="font-mono text-[9px] uppercase tracking-widest text-slate-600 block mb-1">User ID or Email *</label>
+                <input value={upiForm.userId} onChange={e=>setUpiForm(f=>({...f,userId:e.target.value}))}
+                  placeholder="user_abc123 or email"
+                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 font-mono text-[11px] text-slate-200 outline-none focus:border-accent/30" />
+              </div>
+              <div>
+                <label className="font-mono text-[9px] uppercase tracking-widest text-slate-600 block mb-1">UTR Number *</label>
+                <input value={upiForm.utr} onChange={e=>setUpiForm(f=>({...f,utr:e.target.value}))}
+                  placeholder="UPI transaction reference"
+                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 font-mono text-[11px] text-slate-200 outline-none focus:border-accent/30" />
+              </div>
+              <div>
+                <label className="font-mono text-[9px] uppercase tracking-widest text-slate-600 block mb-1">Plan</label>
+                <select value={upiForm.tier} onChange={e=>setUpiForm(f=>({...f, tier:e.target.value, amount:e.target.value==='pro'?99900:499900}))}
+                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 font-mono text-[11px] text-slate-200 outline-none cursor-pointer">
+                  <option value="pro">Pro — ₹999/month</option>
+                  <option value="enterprise">Enterprise — ₹4,999/month</option>
+                </select>
+              </div>
+              <div>
+                <label className="font-mono text-[9px] uppercase tracking-widest text-slate-600 block mb-1">Amount (paise)</label>
+                <input value={upiForm.amount} onChange={e=>setUpiForm(f=>({...f,amount:Number(e.target.value)}))}
+                  type="number"
+                  className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 font-mono text-[11px] text-slate-200 outline-none" />
+                <span className="font-mono text-[9px] text-slate-700">= ₹{(upiForm.amount/100).toLocaleString()}</span>
+              </div>
+            </div>
+            {upiMsg && (
+              <p className="font-mono text-[11px] mb-3" style={{color: upiMsg.startsWith('✓') ? '#00ffaa' : '#ff3a5c'}}>{upiMsg}</p>
+            )}
+            <button onClick={recordUpiPayment}
+              className="font-mono text-[11px] font-bold px-5 py-2 rounded-lg cursor-pointer transition-all hover:opacity-80"
+              style={{background:'rgba(0,255,170,0.1)',border:'1px solid rgba(0,255,170,0.3)',color:'#00ffaa'}}>
+              ✓ Record Payment & Upgrade User
+            </button>
+          </div>
+
+          {/* Payment History */}
+          <div className="glass overflow-x-auto rounded-xl">
+            <div className="px-4 py-2.5 border-b border-white/[0.06] flex items-center justify-between">
+              <span className="font-mono text-[10px] text-accent uppercase tracking-widest">Payment History</span>
+              <span className="font-mono text-[9px] text-slate-600">{payments.length} transactions</span>
+            </div>
+            {payments.length===0 ? (
+              <div className="p-8 text-center font-mono text-[11px] text-slate-600">No payments recorded yet</div>
+            ) : (
+              <table className="w-full border-collapse min-w-[700px]">
+                <thead>
+                  <tr style={{background:'rgba(255,255,255,0.015)',borderBottom:'1px solid rgba(255,255,255,0.06)'}}>
+                    {['Payment ID','User','Tier','Amount','Type','Status','Date'].map(h=>(
+                      <th key={h} className="font-mono text-[9px] uppercase tracking-widest text-slate-600 text-left px-4 py-2.5">{h}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+                </thead>
+                <tbody>
+                  {payments.map((p:any)=>(
+                    <tr key={p.payment_id} className="border-b border-white/[0.03] hover:bg-white/[0.02]">
+                      <td className={`${td} font-mono text-[9px] text-slate-600`}>{p.payment_id?.slice(0,18)}...</td>
+                      <td className={`${td} text-slate-300`}>{p.username??p.user_id?.slice(0,12)}</td>
+                      <td className={td}>
+                        <span className="font-mono text-[10px] font-bold capitalize" style={{color:TIER_COLOR[p.tier??'free']}}>{p.tier}</span>
+                      </td>
+                      <td className={`${td} font-mono text-accent font-bold`}>₹{((p.amount??0)/100).toLocaleString()}</td>
+                      <td className={td}>
+                        <span className="font-mono text-[9px] px-2 py-[2px] rounded"
+                          style={{color: p.payment_id?.startsWith('upi_') ? '#00ffaa' : '#00aaff', background:'rgba(255,255,255,0.05)'}}>
+                          {p.payment_id?.startsWith('upi_') ? '📱 UPI' : '💳 Razorpay'}
+                        </span>
+                      </td>
+                      <td className={td}>
+                        <span className="font-mono text-[9px] px-2 py-[2px] rounded" style={{color:STATUS_COLOR[p.status??'pending']??'#64748b',background:'rgba(255,255,255,0.05)'}}>
+                          {p.status}
+                        </span>
+                      </td>
+                      <td className={`${td} font-mono text-[10px] text-slate-600`}>
+                        {p.paid_at ? new Date(p.paid_at).toLocaleDateString('en-IN') : '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
       )}
     </div>
