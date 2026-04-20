@@ -110,13 +110,13 @@ export default function ScanDetailPage() {
             <>
               <button onClick={() => downloadReport('pdf')} className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-80 cursor-pointer" style={{background:'rgba(0,170,255,0.1)',border:'1px solid rgba(0,170,255,0.3)',color:'#00aaff'}}>
                 PDF ↓
-              </a>
+              </button>
               <button onClick={() => downloadReport('compliance', 'iso27001')} className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-80 cursor-pointer" style={{background:'rgba(167,139,250,0.1)',border:'1px solid rgba(167,139,250,0.3)',color:'#a78bfa'}}>
                 ISO27001 ↓
-              </a>
+              </button>
               <button onClick={() => downloadReport('compliance', 'soc2')} className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all hover:opacity-80 cursor-pointer" style={{background:'rgba(167,139,250,0.1)',border:'1px solid rgba(167,139,250,0.3)',color:'#a78bfa'}}>
                 SOC2 ↓
-              </a>
+              </button>
             </>
           )}
         </div>

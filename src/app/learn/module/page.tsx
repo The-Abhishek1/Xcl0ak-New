@@ -102,7 +102,7 @@ function EditContentModal({ mod, onSave, onClose }: { mod: any; onSave: (content
               { label:'---', insert:'---' },
             ].map(btn => (
               <button key={btn.label}
-                onClick={() => setContent(c => c + (c.endsWith('\n') || !c ? '' : '\n') + btn.insert + '\n')}
+                onClick={() => setContent((c: string) => c + (c.endsWith('\n') || !c ? '' : '\n') + btn.insert + '\n')}
                 className="font-mono text-[9px] px-2 py-1 rounded cursor-pointer transition-all hover:opacity-80 shrink-0"
                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: '#64748b' }}>
                 {btn.label}
