@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { getToken, clearSession } from '@/lib/eso-auth'
 
-type Tab = 'overview' | 'users' | 'exploits' | 'ctf' | 'scans' | 'tiers' | 'leaderboard' | 'payments' | 'paths'
+type Tab = 'overview' | 'users' | 'exploits' | 'ctf' | 'learn' | 'scans' | 'tiers' | 'leaderboard' | 'payments'
 
 const TIER_COLOR:   Record<string,string> = { free:'#64748b', pro:'#00aaff', enterprise:'#a78bfa', admin:'#00ffaa' }
 const STATUS_COLOR: Record<string,string> = { completed:'#00ffaa', failed:'#ff3a5c', running:'#00aaff', planning:'#ffd700', pending:'#475569', approved:'#00ffaa', rejected:'#ff3a5c' }
@@ -15,14 +15,7 @@ async function esoFetch(path: string, opts?: RequestInit) {
     ...opts,
     headers: { 'Content-Type':'application/json', ...(token?{Authorization:`Bearer ${token}`}:{}), ...opts?.headers },
   })
-  if (!res.ok) {
-    const ct = res.headers.get('content-type') ?? ''
-    if (ct.includes('application/json')) {
-      const d = await res.json().catch(() => ({}))
-      throw new Error(d.detail ?? d.error ?? `HTTP ${res.status}`)
-    }
-    throw new Error(`HTTP ${res.status} ${res.statusText}`)
-  }
+  if (!res.ok) throw new Error(await res.text().catch(()=>res.statusText))
   return res.json()
 }
 
@@ -32,20 +25,278 @@ async function xcloakFetch(path: string, opts?: RequestInit) {
     ...opts,
     headers: {
       'Content-Type': 'application/json',
+      // Send ESO bearer token as x-admin-token for xcloak admin API auth
       ...(token ? { 'x-admin-token': token } : {}),
       ...opts?.headers,
     },
   })
-  if (!res.ok) {
-    // Parse error cleanly — don't dump raw HTML
-    const ct = res.headers.get('content-type') ?? ''
-    if (ct.includes('application/json')) {
-      const d = await res.json().catch(() => ({}))
-      throw new Error(d.error ?? d.detail ?? `HTTP ${res.status}`)
-    }
-    throw new Error(`HTTP ${res.status} ${res.statusText}`)
-  }
+  if (!res.ok) throw new Error(await res.text().catch(()=>res.statusText))
   return res.json()
+}
+
+
+// ── Review Card Components ────────────────────────────────────────────────────
+function ExploitReviewCard({ ex, xStatus, onApprove, onReject }: {
+  ex: any; xStatus: string; onApprove: ()=>void; onReject: ()=>void
+}) {
+  const [open, setOpen] = useState(false)
+  const EX_TYPE_COLOR: Record<string,string> = {
+    RCE:'#ff3a5c', SQLi:'#fb923c', XSS:'#facc15', SSRF:'#38bdf8',
+    LFI:'#a78bfa', other:'#94a3b8', Phishing:'#fb923c', DoS:'#f472b6',
+  }
+  const color = EX_TYPE_COLOR[ex.type] ?? '#94a3b8'
+  const statusLabel = ex.status?.toUpperCase()
+  const statusColor = ex.status==='approved'?'#00ffaa':ex.status==='rejected'?'#ff3a5c':'#facc15'
+
+  return (
+    <div className="rounded-xl overflow-hidden" style={{background:'rgba(255,255,255,0.025)',border:'1px solid rgba(255,255,255,0.07)'}}>
+      {/* Header */}
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div className="flex-1 min-w-0">
+            {/* Title + badges */}
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+              <span className="text-[13px] font-bold text-slate-100 leading-snug">{ex.title}</span>
+              <span className="font-mono text-[9px] px-2 py-[1px] rounded-full shrink-0"
+                style={{background:`${color}18`,color,border:`1px solid ${color}30`}}>{ex.type}</span>
+              <span className="font-mono text-[9px] px-2 py-[1px] rounded-full shrink-0"
+                style={{background:'rgba(167,139,250,0.1)',color:'#a78bfa',border:'1px solid rgba(167,139,250,0.2)'}}>
+                {ex.difficulty}
+              </span>
+              {ex.cveId && (
+                <span className="font-mono text-[9px] px-2 py-[1px] rounded-full font-bold shrink-0"
+                  style={{background:'rgba(0,170,255,0.1)',color:'#00aaff',border:'1px solid rgba(0,170,255,0.2)'}}>
+                  {ex.cveId}
+                </span>
+              )}
+              <span className="font-mono text-[8px] px-1.5 py-[1px] rounded shrink-0"
+                style={{background:'rgba(255,255,255,0.05)',color:'#64748b'}}>{ex.language}</span>
+              {xStatus !== 'pending' && (
+                <span className="font-mono text-[8px] px-2 py-[1px] rounded-full font-bold shrink-0"
+                  style={{background:`${statusColor}12`,color:statusColor,border:`1px solid ${statusColor}25`}}>
+                  {statusLabel}
+                </span>
+              )}
+            </div>
+
+            {/* Meta */}
+            <div className="font-mono text-[10px] text-slate-600 mb-2">
+              by <span className="text-slate-400">{ex.authorAlias}</span>
+              {' · '}{new Date(ex.createdAt).toLocaleDateString()}
+              {' · '}<span className="text-slate-500">⬆ {ex._count?.votes ?? ex.upvotes ?? 0}</span>
+              {' · '}<span className="text-slate-500">💬 {ex._count?.comments ?? 0}</span>
+              {ex.dnaRisk ? <span className="ml-2 text-red-400">Risk: {ex.dnaRisk}/10</span> : null}
+            </div>
+
+            {/* Description — full, not truncated */}
+            <p className="font-mono text-[11px] text-slate-400 leading-relaxed mb-2">{ex.description}</p>
+
+            {/* Tags */}
+            <div className="flex flex-wrap gap-1.5 mt-1">
+              {(ex.tags ?? []).map((t:string) => (
+                <span key={t} className="font-mono text-[8px] px-1.5 py-[1px] rounded"
+                  style={{background:'rgba(255,255,255,0.04)',color:'#475569'}}>#{t}</span>
+              ))}
+              {ex.fileUrl && (
+                <a href={ex.fileUrl} target="_blank" rel="noreferrer"
+                  className="font-mono text-[9px] text-accent2 hover:underline">📎 Attached file</a>
+              )}
+            </div>
+
+            {/* Review note if exists */}
+            {ex.reviewNote && (
+              <div className="mt-2 font-mono text-[10px] text-slate-500 italic">
+                Review note: {ex.reviewNote}
+              </div>
+            )}
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex flex-col gap-2 shrink-0">
+            {xStatus === 'pending' && (
+              <>
+                <button onClick={onApprove}
+                  className="px-4 py-2 rounded-lg font-mono text-[10px] font-bold cursor-pointer transition-all hover:opacity-80"
+                  style={{background:'rgba(0,255,170,0.1)',border:'1px solid rgba(0,255,170,0.3)',color:'#00ffaa'}}>
+                  ✓ Approve
+                </button>
+                <button onClick={onReject}
+                  className="px-4 py-2 rounded-lg font-mono text-[10px] font-bold cursor-pointer transition-all hover:opacity-80"
+                  style={{background:'rgba(255,58,92,0.1)',border:'1px solid rgba(255,58,92,0.3)',color:'#ff3a5c'}}>
+                  ✗ Reject
+                </button>
+              </>
+            )}
+            <button onClick={() => setOpen(v => !v)}
+              className="px-4 py-2 rounded-lg font-mono text-[10px] font-bold cursor-pointer transition-all hover:opacity-80"
+              style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',color:'#64748b'}}>
+              {open ? 'Hide ▲' : 'View Code ▼'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Expandable code section */}
+      {open && (
+        <div style={{borderTop:'1px solid rgba(255,255,255,0.06)'}}>
+          {ex.code ? (
+            <>
+              <div className="flex items-center justify-between px-4 py-2"
+                style={{background:'rgba(0,0,0,0.3)',borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
+                <span className="font-mono text-[9px] text-slate-600 uppercase tracking-wider">
+                  Source Code · {ex.language}
+                </span>
+                <span className="font-mono text-[9px] text-slate-700">
+                  {ex.code.split('\n').length} lines
+                </span>
+              </div>
+              <pre className="px-5 py-4 overflow-x-auto font-mono text-[11px] leading-relaxed"
+                style={{
+                  background:'rgba(0,0,0,0.5)',
+                  color:'#4ade80',
+                  maxHeight:'500px',
+                  overflowY:'auto',
+                  whiteSpace:'pre-wrap',
+                  wordBreak:'break-word',
+                }}>
+                {ex.code.length > 4000 ? ex.code.slice(0,4000) + '\n\n... (truncated — ' + ex.code.length + ' chars total)' : ex.code}
+              </pre>
+            </>
+          ) : (
+            <div className="px-4 py-6 text-center font-mono text-[11px] text-slate-600">No code submitted</div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function CTFReviewCard({ ctf, xStatus, onApprove, onReject }: {
+  ctf: any; xStatus: string; onApprove: ()=>void; onReject: ()=>void
+}) {
+  const [open, setOpen] = useState(false)
+  const DIFF_COLOR: Record<string,string> = {
+    easy:'#00ffaa', medium:'#facc15', hard:'#fb923c', insane:'#ff3a5c'
+  }
+  const color = DIFF_COLOR[ctf.difficulty] ?? '#94a3b8'
+  const statusColor = ctf.status==='approved'?'#00ffaa':ctf.status==='rejected'?'#ff3a5c':'#facc15'
+
+  return (
+    <div className="rounded-xl overflow-hidden" style={{background:'rgba(255,255,255,0.025)',border:'1px solid rgba(255,255,255,0.07)'}}>
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div className="flex-1 min-w-0">
+            {/* Title + badges */}
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+              <span className="text-[13px] font-bold text-slate-100">{ctf.title}</span>
+              <span className="font-mono text-[9px] px-2 py-[1px] rounded-full shrink-0"
+                style={{background:'rgba(0,170,255,0.1)',color:'#00aaff',border:'1px solid rgba(0,170,255,0.2)'}}>
+                {ctf.category}
+              </span>
+              <span className="font-mono text-[9px] px-2 py-[1px] rounded-full shrink-0"
+                style={{background:`${color}12`,color,border:`1px solid ${color}25`}}>
+                {ctf.difficulty}
+              </span>
+              <span className="font-mono text-[9px] font-bold shrink-0" style={{color:'#00aaff'}}>
+                {ctf.points} pts
+              </span>
+              <span className="font-mono text-[9px] text-slate-600 shrink-0">
+                {ctf._count?.solves ?? 0} solves
+              </span>
+              {xStatus !== 'pending' && (
+                <span className="font-mono text-[8px] px-2 py-[1px] rounded-full font-bold shrink-0"
+                  style={{background:`${statusColor}12`,color:statusColor,border:`1px solid ${statusColor}25`}}>
+                  {ctf.status?.toUpperCase()}
+                </span>
+              )}
+            </div>
+
+            {/* Meta */}
+            <div className="font-mono text-[10px] text-slate-600 mb-2">
+              by <span className="text-slate-400">{ctf.authorAlias}</span>
+              {' · '}{new Date(ctf.createdAt).toLocaleDateString()}
+              {ctf.expiresAt && <span className="ml-2 text-yellow-500">Expires: {new Date(ctf.expiresAt).toLocaleDateString()}</span>}
+            </div>
+
+            {/* Full description */}
+            <p className="font-mono text-[11px] text-slate-400 leading-relaxed whitespace-pre-line">
+              {ctf.description}
+            </p>
+
+            {ctf.reviewNote && (
+              <div className="mt-2 font-mono text-[10px] text-slate-500 italic">Review note: {ctf.reviewNote}</div>
+            )}
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex flex-col gap-2 shrink-0">
+            {xStatus === 'pending' && (
+              <>
+                <button onClick={onApprove}
+                  className="px-4 py-2 rounded-lg font-mono text-[10px] font-bold cursor-pointer transition-all hover:opacity-80"
+                  style={{background:'rgba(0,255,170,0.1)',border:'1px solid rgba(0,255,170,0.3)',color:'#00ffaa'}}>
+                  ✓ Approve
+                </button>
+                <button onClick={onReject}
+                  className="px-4 py-2 rounded-lg font-mono text-[10px] font-bold cursor-pointer transition-all hover:opacity-80"
+                  style={{background:'rgba(255,58,92,0.1)',border:'1px solid rgba(255,58,92,0.3)',color:'#ff3a5c'}}>
+                  ✗ Reject
+                </button>
+              </>
+            )}
+            <button onClick={() => setOpen(v => !v)}
+              className="px-4 py-2 rounded-lg font-mono text-[10px] font-bold cursor-pointer transition-all hover:opacity-80"
+              style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)',color:'#64748b'}}>
+              {open ? 'Hide ▲' : 'Hints & Flag ▼'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Expandable details */}
+      {open && (
+        <div style={{borderTop:'1px solid rgba(255,255,255,0.06)'}}>
+          {/* Hints */}
+          {(ctf.hints ?? []).length > 0 && (
+            <div className="px-4 py-3" style={{borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
+              <div className="font-mono text-[9px] text-slate-600 uppercase tracking-wider mb-2">
+                Hints ({ctf.hints.length})
+              </div>
+              <div className="space-y-1.5">
+                {ctf.hints.map((h:string, i:number) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <span className="font-mono text-[9px] text-yellow-400 shrink-0 mt-0.5">💡 {i+1}.</span>
+                    <span className="font-mono text-[11px] text-slate-300">{h}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Flag hash */}
+          <div className="px-4 py-3" style={{borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
+            <div className="font-mono text-[9px] text-slate-600 uppercase tracking-wider mb-1.5">
+              Flag Hash (SHA-256) — do not share with users
+            </div>
+            <div className="font-mono text-[10px] text-slate-500 break-all p-2 rounded"
+              style={{background:'rgba(0,0,0,0.3)',border:'1px solid rgba(255,255,255,0.05)'}}>
+              {ctf.flagHash}
+            </div>
+          </div>
+
+          {/* File download */}
+          {ctf.fileUrl && (
+            <div className="px-4 py-3">
+              <a href={ctf.fileUrl} target="_blank" rel="noreferrer"
+                className="font-mono text-[10px] text-accent2 hover:underline">
+                📎 Download challenge file
+              </a>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
 }
 
 // ── main component ────────────────────────────────────────────────────────────
@@ -70,8 +321,8 @@ export default function AdminPage() {
   const [ctfs,       setCTFs]       = useState<any[]>([])
   const [xStatus,    setXStatus]    = useState<'pending'|'approved'|'rejected'>('pending')
   const [leaders,    setLeaders]    = useState<any[]>([])
+  const [learnPaths, setLearnPaths] = useState<any[]>([])
   const [payments,   setPayments]   = useState<any[]>([])
-  const [paths,      setPaths]      = useState<any[]>([])
 
   // Auth guard
   useEffect(() => {
@@ -124,12 +375,9 @@ export default function AdminPage() {
         const r = await esoFetch('/admin/payments?limit=100')
         setPayments(r.payments ?? [])
       }
-      if (tab === 'paths') {
-        const r = await xcloakFetch('/api/v1/notifications?alias=admin&limit=50')
-        const pending = (r.notifications ?? []).filter((n: any) =>
-          n.title?.startsWith('📚 New Learning Path:')
-        )
-        setPaths(pending)
+      if (tab === 'learn') {
+        const r = await xcloakFetch(`/api/v1/admin/learn?status=${xStatus}`)
+        setLearnPaths(Array.isArray(r) ? r : [])
       }
     } catch(e:any) { setMsg(`✗ ${e.message}`) }
     setLoading(false)
@@ -158,6 +406,16 @@ export default function AdminPage() {
     try { await xcloakFetch(`/api/v1/admin/ctf/${id}`,{method:'POST',body:JSON.stringify({status:action,reviewNote:note})}); setMsg(`✓ CTF ${action}`); load() }
     catch(e:any) { setMsg(`✗ ${e.message}`) }
   }
+  async function reviewLearnPath(id: string, action: 'approve'|'reject', note='') {
+    try { await xcloakFetch('/api/v1/admin/learn',{method:'PATCH',body:JSON.stringify({id,action,reviewNote:note,reviewedBy:adminName})}); setMsg(`✓ Learning path ${action}d`); load() }
+    catch(e:any) { setMsg(`✗ ${e.message}`) }
+  }
+  async function promptReject(type: 'exploit'|'ctf'|'learn', id: string, title: string) {
+    const note = window.prompt(`Reason for rejecting "${title}"?\n(optional — will be sent to author)`) ?? ''
+    if (type === 'exploit') await reviewExploit(id, 'rejected', note)
+    else if (type === 'ctf') await reviewCTF(id, 'rejected', note)
+    else await reviewLearnPath(id, 'reject', note)
+  }
 
   if (!ready) return (
     <div className="flex items-center justify-center h-64">
@@ -174,11 +432,11 @@ export default function AdminPage() {
     {id:'users'    as Tab, label:'Users',      icon:'👥'},
     {id:'exploits' as Tab, label:'Exploits',   icon:'💉'},
     {id:'ctf'      as Tab, label:'CTF',        icon:'🏆'},
+    {id:'learn'    as Tab, label:'Learn',      icon:'📚'},
     {id:'scans'    as Tab, label:'Scans',      icon:'🔍'},
     {id:'tiers'       as Tab, label:'Tiers',       icon:'🎯'},
-    {id:'leaderboard' as Tab, label:'Leaderboard', icon:'🏆'},
+    {id:'leaderboard' as Tab, label:'Leaderboard', icon:'📈'},
     {id:'payments'    as Tab, label:'Payments',    icon:'💳'},
-    {id:'paths'       as Tab, label:'Learn Paths', icon:'📚'},
   ]
 
   const td = "px-4 py-2.5 font-mono text-[11px]"
@@ -370,6 +628,7 @@ export default function AdminPage() {
       {/* ── EXPLOITS ── */}
       {tab==='exploits' && !loading && (
         <div className="space-y-3">
+          {/* Status filter */}
           <div className="flex gap-2">
             {(['pending','approved','rejected'] as const).map(s=>(
               <button key={s} onClick={()=>setXStatus(s)}
@@ -380,48 +639,17 @@ export default function AdminPage() {
                 {s.charAt(0).toUpperCase()+s.slice(1)}
               </button>
             ))}
+            <span className="font-mono text-[10px] text-slate-600 self-center ml-2">{exploits.length} result{exploits.length!==1?'s':''}</span>
           </div>
+
           {exploits.length===0
             ? <div className="glass p-12 text-center font-mono text-[11px] text-slate-600">No {xStatus} exploits</div>
-            : exploits.map(ex=>(
-              <div key={ex.id} className="glass p-4">
-                <div className="flex items-start justify-between gap-3 flex-wrap">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="text-[13px] font-semibold text-slate-200">{ex.title}</span>
-                      <span className="font-mono text-[9px] px-2 py-[1px] rounded" style={{background:'rgba(255,255,255,0.06)',color:'#64748b'}}>{ex.type}</span>
-                      {ex.cveId && <span className="font-mono text-[9px] text-accent2">{ex.cveId}</span>}
-                    </div>
-                    <div className="font-mono text-[10px] text-slate-600">by {ex.authorAlias} · {new Date(ex.createdAt).toLocaleDateString()}</div>
-                    <div className="font-mono text-[11px] text-slate-500 mt-1 line-clamp-2">{ex.description}</div>
-                    <div className="flex flex-wrap items-center gap-2 mt-2">
-                      {(ex.tags??[]).slice(0,4).map((t:string)=>(
-                        <span key={t} className="font-mono text-[8px] px-1.5 py-[1px] rounded" style={{background:'rgba(255,255,255,0.04)',color:'#475569'}}>#{t}</span>
-                      ))}
-                      {ex.fileUrl && (
-                        <a href={ex.fileUrl} target="_blank" rel="noopener noreferrer"
-                          className="font-mono text-[9px] text-accent2 hover:underline">
-                          📎 Download attached file
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                  {xStatus==='pending' && (
-                    <div className="flex gap-2 shrink-0">
-                      <button onClick={()=>reviewExploit(ex.id,'approved')}
-                        className="px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold cursor-pointer"
-                        style={{background:'rgba(0,255,170,0.1)',border:'1px solid rgba(0,255,170,0.3)',color:'#00ffaa'}}>
-                        ✓ Approve
-                      </button>
-                      <button onClick={()=>reviewExploit(ex.id,'rejected')}
-                        className="px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold cursor-pointer"
-                        style={{background:'rgba(255,58,92,0.1)',border:'1px solid rgba(255,58,92,0.3)',color:'#ff3a5c'}}>
-                        ✗ Reject
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
+            : exploits.map((ex:any)=>(
+              <ExploitReviewCard
+                key={ex.id} ex={ex} xStatus={xStatus}
+                onApprove={()=>reviewExploit(ex.id,'approved')}
+                onReject={()=>promptReject('exploit',ex.id,ex.title)}
+              />
             ))
           }
         </div>
@@ -431,6 +659,35 @@ export default function AdminPage() {
       {tab==='ctf' && !loading && (
         <div className="space-y-3">
           <div className="flex gap-2">
+            {(['pending','approved','rejected'] as const).map(st=>(
+              <button key={st} onClick={()=>setXStatus(st)}
+                className="px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold cursor-pointer transition-all border"
+                style={xStatus===st
+                  ?{background:STATUS_COLOR[st]+'15',borderColor:STATUS_COLOR[st]+'40',color:STATUS_COLOR[st]}
+                  :{background:'rgba(255,255,255,0.03)',borderColor:'rgba(255,255,255,0.06)',color:'#475569'}}>
+                {st.charAt(0).toUpperCase()+st.slice(1)}
+              </button>
+            ))}
+            <span className="font-mono text-[10px] text-slate-600 self-center ml-2">{ctfs.length} result{ctfs.length!==1?'s':''}</span>
+          </div>
+          {ctfs.length===0
+            ? <div className="glass p-12 text-center font-mono text-[11px] text-slate-600">No {xStatus} challenges</div>
+            : ctfs.map((c:any)=>(
+              <CTFReviewCard
+                key={c.id} ctf={c} xStatus={xStatus}
+                onApprove={()=>reviewCTF(c.id,'approved')}
+                onReject={()=>promptReject('ctf',c.id,c.title)}
+              />
+            ))
+          }
+        </div>
+      )}
+
+      {/* ── LEARN ── */}
+      {tab==='learn' && !loading && (
+        <div className="space-y-3">
+          {/* Status filter */}
+          <div className="flex gap-2">
             {(['pending','approved','rejected'] as const).map(s=>(
               <button key={s} onClick={()=>setXStatus(s)}
                 className="px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold cursor-pointer transition-all border"
@@ -441,41 +698,72 @@ export default function AdminPage() {
               </button>
             ))}
           </div>
-          {ctfs.length===0
-            ? <div className="glass p-12 text-center font-mono text-[11px] text-slate-600">No {xStatus} challenges</div>
-            : ctfs.map(c=>(
-              <div key={c.id} className="glass p-4">
+
+          {learnPaths.length === 0
+            ? <div className="glass p-12 text-center font-mono text-[11px] text-slate-600">No {xStatus} learning paths</div>
+            : learnPaths.map((p:any)=>(
+              <div key={p.id} className="glass p-4 rounded-xl">
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div className="flex-1 min-w-0">
+                    {/* Title + badges */}
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className="text-[13px] font-semibold text-slate-200">{c.title}</span>
-                      <span className="font-mono text-[9px] px-2 py-[1px] rounded" style={{background:'rgba(255,255,255,0.06)',color:'#64748b'}}>{c.category}</span>
-                      <span className="font-mono text-[9px]" style={{color:'#a78bfa'}}>{c.difficulty}</span>
-                      <span className="font-mono text-[9px] text-accent2">{c.points}pts</span>
+                      <span className="text-[13px] font-semibold text-slate-200">{p.title}</span>
+                      <span className="font-mono text-[9px] px-2 py-[1px] rounded"
+                        style={{background:'rgba(0,170,255,0.1)',color:'#00aaff',border:'1px solid rgba(0,170,255,0.2)'}}>
+                        {p.category}
+                      </span>
+                      <span className="font-mono text-[9px] px-2 py-[1px] rounded"
+                        style={{background:'rgba(167,139,250,0.1)',color:'#a78bfa',border:'1px solid rgba(167,139,250,0.2)'}}>
+                        {p.difficulty}
+                      </span>
+                      <span className="font-mono text-[9px] text-slate-600">
+                        {(p.modules??[]).length} modules
+                      </span>
                     </div>
-                    <div className="font-mono text-[10px] text-slate-600">by {c.authorAlias} · {new Date(c.createdAt).toLocaleDateString()}</div>
-                    <div className="font-mono text-[11px] text-slate-500 mt-1 line-clamp-2">{c.description}</div>
-                    <div className="flex items-center gap-3 mt-2">
-                      {c.fileUrl && (
-                        <a href={c.fileUrl} target="_blank" rel="noopener noreferrer"
-                          className="font-mono text-[9px] text-accent2 hover:underline">
-                          📎 Download challenge file
-                        </a>
-                      )}
-                      {(c.hints??[]).length > 0 && (
-                        <span className="font-mono text-[9px] text-slate-600">{c.hints.length} hint(s)</span>
-                      )}
+
+                    {/* Meta */}
+                    <div className="font-mono text-[10px] text-slate-600 mb-1">
+                      by <span className="text-slate-400">{p.authorAlias}</span> · {new Date(p.createdAt).toLocaleDateString()}
                     </div>
+
+                    {/* Description */}
+                    {p.description && (
+                      <div className="font-mono text-[11px] text-slate-500 mb-2 line-clamp-2">{p.description}</div>
+                    )}
+
+                    {/* Module preview */}
+                    {(p.modules??[]).length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {p.modules.slice(0,5).map((m:any,i:number)=>(
+                          <span key={i} className="font-mono text-[9px] px-2 py-[1px] rounded"
+                            style={{background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.07)',color:'#64748b'}}>
+                            {m.type==='read'?'📄':m.type==='lab'?'🧪':m.type==='ctf'?'🚩':m.type==='video'?'🎬':'❓'} {m.title.slice(0,28)}{m.title.length>28?'…':''}
+                          </span>
+                        ))}
+                        {p.modules.length > 5 && (
+                          <span className="font-mono text-[9px] text-slate-700">+{p.modules.length-5} more</span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Review note if rejected */}
+                    {p.reviewNote && (
+                      <div className="mt-2 font-mono text-[10px] text-slate-600 italic">
+                        Note: {p.reviewNote}
+                      </div>
+                    )}
                   </div>
+
+                  {/* Approve / Reject buttons — only for pending */}
                   {xStatus==='pending' && (
-                    <div className="flex gap-2 shrink-0">
-                      <button onClick={()=>reviewCTF(c.id,'approved')}
-                        className="px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold cursor-pointer"
+                    <div className="flex flex-col gap-2 shrink-0">
+                      <button onClick={()=>reviewLearnPath(p.id,'approve')}
+                        className="px-4 py-1.5 rounded-lg font-mono text-[10px] font-bold cursor-pointer transition-all hover:opacity-80"
                         style={{background:'rgba(0,255,170,0.1)',border:'1px solid rgba(0,255,170,0.3)',color:'#00ffaa'}}>
                         ✓ Approve
                       </button>
-                      <button onClick={()=>reviewCTF(c.id,'rejected')}
-                        className="px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold cursor-pointer"
+                      <button onClick={()=>promptReject('learn',p.id,p.title)}
+                        className="px-4 py-1.5 rounded-lg font-mono text-[10px] font-bold cursor-pointer transition-all hover:opacity-80"
                         style={{background:'rgba(255,58,92,0.1)',border:'1px solid rgba(255,58,92,0.3)',color:'#ff3a5c'}}>
                         ✗ Reject
                       </button>
@@ -642,61 +930,6 @@ export default function AdminPage() {
             </table>
           )}
         </div>
-
-      {tab === 'paths' && (
-        <div>
-          <h2 className="font-black text-[13px] text-slate-300 mb-4">📚 Learning Path Submissions</h2>
-          {paths.length === 0 ? (
-            <div className="glass rounded-xl p-8 text-center font-mono text-[11px] text-slate-600">
-              No pending path submissions
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {paths.map((n: any) => (
-                <div key={n.id} className="glass rounded-xl p-4">
-                  <div className="flex items-start justify-between gap-4 flex-wrap">
-                    <div>
-                      <p className="font-bold text-[12px] text-slate-200">{n.title?.replace('📚 New Learning Path: ', '')}</p>
-                      <p className="font-mono text-[10px] text-slate-500 mt-1 whitespace-pre-line">{n.body}</p>
-                      <p className="font-mono text-[9px] text-slate-700 mt-2">
-                        {new Date(n.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="flex gap-2 shrink-0">
-                      <button
-                        onClick={async () => {
-                          await xcloakFetch(`/api/v1/notifications/read`, {
-                            method: 'POST',
-                            body: JSON.stringify({ id: n.id, action: 'approve' })
-                          })
-                          setMsg('✓ Path approved — notify author manually')
-                          setPaths(p => p.filter(x => x.id !== n.id))
-                        }}
-                        className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-all hover:opacity-80"
-                        style={{background:'rgba(0,255,170,0.1)',border:'1px solid rgba(0,255,170,0.3)',color:'#00ffaa'}}>
-                        ✓ Approve
-                      </button>
-                      <button
-                        onClick={async () => {
-                          await xcloakFetch(`/api/v1/notifications/read`, {
-                            method: 'POST',
-                            body: JSON.stringify({ id: n.id, action: 'reject' })
-                          })
-                          setMsg('✗ Path rejected')
-                          setPaths(p => p.filter(x => x.id !== n.id))
-                        }}
-                        className="font-mono text-[10px] font-bold px-3 py-1.5 rounded-lg cursor-pointer transition-all hover:opacity-80"
-                        style={{background:'rgba(255,58,92,0.1)',border:'1px solid rgba(255,58,92,0.3)',color:'#ff3a5c'}}>
-                        ✗ Reject
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
       )}
     </div>
   )

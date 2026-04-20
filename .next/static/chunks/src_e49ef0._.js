@@ -15,11 +15,17 @@ __turbopack_esm__({
 });
 const BASE = '/api/eso';
 async function request(method, path, body) {
+    // Read token from cookie and send as Authorization header explicitly
+    // (cookies alone are unreliable with SameSite policies)
+    const tokenMatch = typeof document !== 'undefined' ? document.cookie.match(/(?:^|; )eso_token=([^;]*)/) : null;
+    const token = tokenMatch ? decodeURIComponent(tokenMatch[1]) : null;
+    const headers = {
+        'Content-Type': 'application/json'
+    };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
     const res = await fetch(`${BASE}${path}`, {
         method,
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers,
         credentials: 'include',
         body: body ? JSON.stringify(body) : undefined
     });

@@ -857,13 +857,20 @@ function Topbar() {
     const [userOpen, setUserOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const notifRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
     const userRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
-    // Poll unread notification count every 30s
+    // Poll notifications ONLY when logged in
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (!loggedIn) {
+            // Clear stale counts when logged out
+            setUnreadCount(0);
+            setRecentNotifs([]);
+            return;
+        }
         async function fetchUnread() {
             const u = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$eso$2d$auth$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getUser"])();
             if (!u?.username) return;
             try {
                 const res = await fetch(`/api/v1/notifications?alias=${encodeURIComponent(u.username)}&limit=5`);
+                if (!res.ok) return;
                 const data = await res.json();
                 setUnreadCount(data.unread ?? 0);
                 setRecentNotifs(data.notifications ?? []);
@@ -874,7 +881,8 @@ function Topbar() {
         return ()=>clearInterval(t);
     }, [
         loggedIn
-    ]);
+    ]) // re-runs when login state changes
+    ;
     // Close dropdowns on outside click
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         function handler(e) {
@@ -899,6 +907,8 @@ function Topbar() {
     function logout() {
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$eso$2d$auth$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["clearSession"])();
         setUserOpen(false);
+        setUnreadCount(0);
+        setRecentNotifs([]);
         router.push('/login');
     }
     const tier = user?.role === 'admin' ? 'admin' : user?.tier ?? 'free';
@@ -926,7 +936,7 @@ function Topbar() {
                         children: "🛡"
                     }, void 0, false, {
                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                        lineNumber: 93,
+                        lineNumber: 95,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -940,26 +950,26 @@ function Topbar() {
                                 children: "cloak"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                                lineNumber: 99,
-                                columnNumber: 12
+                                lineNumber: 97,
+                                columnNumber: 66
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                        lineNumber: 98,
+                        lineNumber: 97,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                lineNumber: 92,
+                lineNumber: 94,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "flex-1"
             }, void 0, false, {
                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                lineNumber: 104,
+                lineNumber: 100,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -978,7 +988,7 @@ function Topbar() {
                         children: sync === 'syncing' ? '⟳' : sync === 'done' ? '✓' : '↻'
                     }, void 0, false, {
                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                        lineNumber: 110,
+                        lineNumber: 105,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1001,10 +1011,10 @@ function Topbar() {
                                         children: "🔔"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                                        lineNumber: 130,
+                                        lineNumber: 120,
                                         columnNumber: 13
                                     }, this),
-                                    unreadCount > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    loggedIn && unreadCount > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         className: "absolute -top-1 -right-1 min-w-[14px] h-[14px] rounded-full flex items-center justify-center font-mono text-[7px] font-bold",
                                         style: {
                                             background: '#ff3a5c',
@@ -1014,13 +1024,13 @@ function Topbar() {
                                         children: unreadCount > 9 ? '9+' : unreadCount
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                                        lineNumber: 133,
+                                        lineNumber: 123,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                                lineNumber: 125,
+                                lineNumber: 117,
                                 columnNumber: 11
                             }, this),
                             notifOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1039,10 +1049,10 @@ function Topbar() {
                                                 children: "Notifications"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                                                lineNumber: 145,
+                                                lineNumber: 134,
                                                 columnNumber: 17
                                             }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            loggedIn && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                 onClick: async ()=>{
                                                     const u = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$eso$2d$auth$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["getUser"])();
                                                     if (!u?.username) return;
@@ -1065,21 +1075,47 @@ function Topbar() {
                                                 children: "Mark read"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                                                lineNumber: 146,
-                                                columnNumber: 17
+                                                lineNumber: 136,
+                                                columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                                        lineNumber: 144,
+                                        lineNumber: 133,
                                         columnNumber: 15
                                     }, this),
-                                    recentNotifs.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    !loggedIn ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "px-4 py-6 text-center",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "font-mono text-[10px] text-slate-600 mb-3",
+                                                children: "Sign in to see notifications"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/layout/Topbar.tsx",
+                                                lineNumber: 146,
+                                                columnNumber: 19
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
+                                                href: "/login",
+                                                onClick: ()=>setNotifOpen(false),
+                                                className: "font-mono text-[10px] text-accent hover:underline",
+                                                children: "Sign in →"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/layout/Topbar.tsx",
+                                                lineNumber: 147,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/layout/Topbar.tsx",
+                                        lineNumber: 145,
+                                        columnNumber: 17
+                                    }, this) : recentNotifs.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "px-4 py-6 text-center font-mono text-[10px] text-slate-700",
                                         children: "No notifications yet"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                                        lineNumber: 153,
+                                        lineNumber: 151,
                                         columnNumber: 17
                                     }, this) : recentNotifs.slice(0, 4).map((n)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "flex items-start gap-3 px-4 py-3 hover:bg-white/[0.02] cursor-pointer transition-colors border-b border-white/[0.03] last:border-0",
@@ -1089,7 +1125,7 @@ function Topbar() {
                                                     children: n.type === 'cve_alert' ? '🚨' : n.type === 'ctf_solve' ? '🏆' : n.type === 'exploit_upload' ? '📦' : n.type === 'payment' ? '💳' : '📢'
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/layout/Topbar.tsx",
-                                                    lineNumber: 156,
+                                                    lineNumber: 154,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1100,7 +1136,7 @@ function Topbar() {
                                                             children: n.title
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/layout/Topbar.tsx",
-                                                            lineNumber: 160,
+                                                            lineNumber: 158,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1108,13 +1144,13 @@ function Topbar() {
                                                             children: n.body?.slice(0, 60)
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/layout/Topbar.tsx",
-                                                            lineNumber: 161,
+                                                            lineNumber: 159,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/layout/Topbar.tsx",
-                                                    lineNumber: 159,
+                                                    lineNumber: 157,
                                                     columnNumber: 19
                                                 }, this),
                                                 !n.read && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1124,13 +1160,13 @@ function Topbar() {
                                                     }
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/layout/Topbar.tsx",
-                                                    lineNumber: 163,
+                                                    lineNumber: 161,
                                                     columnNumber: 31
                                                 }, this)
                                             ]
                                         }, n.id, true, {
                                             fileName: "[project]/src/components/layout/Topbar.tsx",
-                                            lineNumber: 155,
+                                            lineNumber: 153,
                                             columnNumber: 17
                                         }, this)),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1142,24 +1178,24 @@ function Topbar() {
                                             children: "View all"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/layout/Topbar.tsx",
-                                            lineNumber: 167,
+                                            lineNumber: 166,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                                        lineNumber: 166,
+                                        lineNumber: 165,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                                lineNumber: 141,
+                                lineNumber: 131,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                        lineNumber: 124,
+                        lineNumber: 116,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -1177,12 +1213,12 @@ function Topbar() {
                             children: "💬"
                         }, void 0, false, {
                             fileName: "[project]/src/components/layout/Topbar.tsx",
-                            lineNumber: 181,
+                            lineNumber: 178,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                        lineNumber: 176,
+                        lineNumber: 175,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1206,7 +1242,7 @@ function Topbar() {
                                             children: "👤"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/layout/Topbar.tsx",
-                                            lineNumber: 192,
+                                            lineNumber: 188,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1214,7 +1250,7 @@ function Topbar() {
                                             children: (user.username ?? 'user').slice(0, 12)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/layout/Topbar.tsx",
-                                            lineNumber: 193,
+                                            lineNumber: 189,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1227,13 +1263,13 @@ function Topbar() {
                                             children: tier.toUpperCase().slice(0, 4)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/layout/Topbar.tsx",
-                                            lineNumber: 196,
+                                            lineNumber: 192,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/layout/Topbar.tsx",
-                                    lineNumber: 188,
+                                    lineNumber: 185,
                                     columnNumber: 15
                                 }, this),
                                 userOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1252,7 +1288,7 @@ function Topbar() {
                                                     children: user.username
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/layout/Topbar.tsx",
-                                                    lineNumber: 208,
+                                                    lineNumber: 202,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1260,13 +1296,13 @@ function Topbar() {
                                                     children: user.email
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/layout/Topbar.tsx",
-                                                    lineNumber: 209,
+                                                    lineNumber: 203,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/layout/Topbar.tsx",
-                                            lineNumber: 207,
+                                            lineNumber: 201,
                                             columnNumber: 19
                                         }, this),
                                         [
@@ -1314,7 +1350,7 @@ function Topbar() {
                                                         children: item.icon
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                                                        lineNumber: 221,
+                                                        lineNumber: 215,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1322,13 +1358,13 @@ function Topbar() {
                                                         children: item.label
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                                                        lineNumber: 222,
+                                                        lineNumber: 216,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, item.href, true, {
                                                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                                                lineNumber: 218,
+                                                lineNumber: 212,
                                                 columnNumber: 21
                                             }, this)),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1344,7 +1380,7 @@ function Topbar() {
                                                         children: "🚪"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                                                        lineNumber: 228,
+                                                        lineNumber: 222,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1352,24 +1388,24 @@ function Topbar() {
                                                         children: "Sign Out"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                                                        lineNumber: 229,
+                                                        lineNumber: 223,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                                                lineNumber: 226,
+                                                lineNumber: 220,
                                                 columnNumber: 21
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/layout/Topbar.tsx",
-                                            lineNumber: 225,
+                                            lineNumber: 219,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/layout/Topbar.tsx",
-                                    lineNumber: 204,
+                                    lineNumber: 199,
                                     columnNumber: 17
                                 }, this)
                             ]
@@ -1384,24 +1420,24 @@ function Topbar() {
                             children: "Sign In"
                         }, void 0, false, {
                             fileName: "[project]/src/components/layout/Topbar.tsx",
-                            lineNumber: 236,
+                            lineNumber: 230,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/components/layout/Topbar.tsx",
-                        lineNumber: 185,
+                        lineNumber: 182,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/layout/Topbar.tsx",
-                lineNumber: 107,
+                lineNumber: 102,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/layout/Topbar.tsx",
-        lineNumber: 83,
+        lineNumber: 90,
         columnNumber: 5
     }, this);
 }

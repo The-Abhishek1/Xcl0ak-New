@@ -1,21 +1,6 @@
 {
   "app": {
-    "[project]/src/app/pricing/page": [
-      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
-      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
-      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
-    ],
-    "[project]/src/app/page": [
-      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
-      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
-      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
-    ],
-    "[project]/src/app/terms/page": [
-      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
-      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
-      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
-    ],
-    "[project]/src/app/privacy/page": [
+    "[project]/src/app/admin/page": [
       "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
       "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
       "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
@@ -25,7 +10,22 @@
       "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
       "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
     ],
-    "[project]/src/app/scan/page": [
+    "[project]/src/app/admin/login/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/exploits/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/ctf/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/learn/page": [
       "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
       "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
       "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
@@ -36,6 +36,116 @@
       "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
     ],
     "[project]/src/app/audit/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/teams/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/schedules/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/register/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/scan/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/pricing/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/dashboard/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/chatroom/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/threat-map/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/cve/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/news/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/exploits/upload/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/payloads/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/dna/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/playground/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/scanner/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/osint/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/reports/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/leaderboard/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/ai/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/findings/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/attack-surface/page": [
+      "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
+      "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
+      "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"
+    ],
+    "[project]/src/app/scan-history/page": [
       "static/media/i7dPIFZifjKcF5UAWdDRYEF8RXi4EwQ-s.p.204fe9ec.woff2",
       "static/media/i7dMIFZifjKcF5UAWdDRaPpZUFWaHi6WZ3Q-s.p.e562386e.woff2",
       "static/media/8vIH7w4qzmVxm2BL9G78HEY-s.p.052a354d.woff2"

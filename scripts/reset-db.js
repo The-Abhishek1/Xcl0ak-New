@@ -16,10 +16,15 @@ const DO_STORAGE = ARGS.includes('--storage') || ARGS.includes('--full')
 const DO_SEED    = ARGS.includes('--full')
 const prisma     = new PrismaClient()
 
-// Delete in FK-safe order
+// Delete in FK-safe order (children before parents)
 const MODELS = [
+  // Learn
+  'learnCompletion','learnEnroll','learnModule','learningPath',
+  // CTF
   'cTFSolve','cTFChallenge',
+  // Exploits
   'exploitVote','comment','exploit',
+  // Misc
   'chatMessage','notification',
   'threatEvent','newsArticle','cVECache',
   'adminUser','user',
@@ -42,7 +47,6 @@ async function clearTables() {
 
 async function clearStorage() {
   console.log('\nClearing Supabase Storage...')
-  // Load env
   try { require('dotenv').config({path:'.env.local'}); require('dotenv').config({path:'.env'}) } catch{}
   const URL = process.env.NEXT_PUBLIC_SUPABASE_URL
   const KEY = process.env.SUPABASE_SERVICE_KEY

@@ -183,3 +183,55 @@ model Notification {
   @@index([userAlias, createdAt(sort: Desc)])
   @@index([userAlias, read])
 }
+
+model LearningPath {
+  id          String         @id @default(cuid())
+  title       String
+  description String
+  category    String         @default("web")
+  difficulty  String         @default("beginner")
+  authorAlias String
+  status      String         @default("pending")
+  reviewNote  String?
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  upvotes     Int            @default(0)
+  views       Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  modules     LearnModule[]
+  enrollments LearnEnroll[]
+  @@index([status])
+  @@index([category])
+}
+
+model LearnModule {
+  id          String          @id @default(cuid())
+  pathId      String
+  order       Int
+  title       String
+  type        String          @default("read")
+  content     String          @default("")
+  xpReward    Int             @default(10)
+  path        LearningPath    @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  completions LearnCompletion[]
+  @@index([pathId])
+}
+
+model LearnEnroll {
+  id         String       @id @default(cuid())
+  pathId     String
+  alias      String
+  enrolledAt DateTime     @default(now())
+  path       LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  @@unique([pathId, alias])
+}
+
+model LearnCompletion {
+  id          String      @id @default(cuid())
+  moduleId    String
+  alias       String
+  completedAt DateTime    @default(now())
+  module      LearnModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  @@unique([moduleId, alias])
+}
