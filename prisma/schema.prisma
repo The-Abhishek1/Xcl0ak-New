@@ -410,6 +410,7 @@ model CloudAccount {
   region          String         @default("us-east-1")
   lastAuditAt     DateTime?
   postureScore    Int?           // 0-100
+  scoreDetail     Json?          // full scorer breakdown
   isActive        Boolean        @default(true)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt

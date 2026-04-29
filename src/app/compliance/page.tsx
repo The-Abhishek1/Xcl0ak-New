@@ -113,13 +113,9 @@ export default function CompliancePage() {
       })
       const d = await res.json()
       if (!res.ok) {
-        // d.error may be a string, object, or undefined — normalise to string
-        const rawErr = d.error ?? d.detail ?? d.message ?? 'Assessment failed'
-        const msg = typeof rawErr === 'string' ? rawErr : JSON.stringify(rawErr)
+        // Surface friendly message; hide raw ESO route-not-found errors
+        const msg = d.error ?? 'Assessment failed'
         if (msg.includes('Route') && msg.includes('not found')) {
-          throw new Error('ESO compliance route not registered yet — deploy the updated app.py and compliance.py to your ESO server')
-        }
-        if (msg.includes('404') || res.status === 404) {
           throw new Error('ESO compliance route not registered yet — deploy the updated app.py and compliance.py to your ESO server')
         }
         throw new Error(msg)
@@ -355,11 +351,11 @@ export default function CompliancePage() {
                   <button key={s} onClick={() => setFilterStatus(s)}
                     className="px-3 py-1.5 rounded-lg font-mono text-[9px] font-bold cursor-pointer border transition-all"
                     style={filterStatus === s
-                      ? { background: `${STATUS_COLOR[s] ?? '#475569'}18`, borderColor: `${STATUS_COLOR[s] ?? '#475569'}50`, color: STATUS_COLOR[s] ?? '#e2e8f0' }
+                      ? { background: `${(STATUS_COLOR as any)[s] ?? '#475569'}18`, borderColor: `${(STATUS_COLOR as any)[s] ?? '#475569'}50`, color: (STATUS_COLOR as any)[s] ?? '#e2e8f0' }
                       : { background: 'rgba(255,255,255,0.03)', borderColor: 'rgba(255,255,255,0.07)', color: '#475569' }}>
                     {s === 'ALL'
                       ? `All (${a.total_controls})`
-                      : `${STATUS_ICON[s]} ${s} (${s === 'PASS' ? a.passing : s === 'FAIL' ? a.failing : a.not_assessed})`}
+                      : `${(STATUS_ICON as any)[s] ?? '•'} ${s} (${s === 'PASS' ? a.passing : s === 'FAIL' ? a.failing : a.not_assessed})`}
                   </button>
                 ))}
               </div>
