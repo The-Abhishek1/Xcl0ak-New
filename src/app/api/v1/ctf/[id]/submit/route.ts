@@ -50,7 +50,19 @@ export async function POST(
       broadcastRoom: 'ctf-help',
     }).catch(() => null)
 
-    // Email sent via ESO internal callback (ESO has user emails, not Prisma)
+    // Send ctf solved email via internal lookup
+    try {
+      const ESO = process.env.ESO_API_URL ?? 'http://localhost:8000'
+      const secret = process.env.INTERNAL_EMAIL_SECRET ?? 'xcloak-internal'
+      const emailRes = await fetch(`${ESO}/api/v1/admin/users/email?alias=${encodeURIComponent(userAlias)}`, {
+        headers: { 'X-Internal-Secret': secret },
+      })
+      if (emailRes.ok) {
+        const { email, username } = await emailRes.json()
+        const { sendEmail, templates } = await import('@/lib/email')
+        await sendEmail({ to: email, ...templates.ctfSolved(username, challenge.title, challenge.points) })
+      }
+    } catch {}
   }
 
   return NextResponse.json({ correct, points: correct ? challenge.points : 0 })

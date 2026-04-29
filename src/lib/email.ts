@@ -179,6 +179,17 @@ export const templates = {
     `),
   }),
 
+  ctfRejected: (username: string, challengeTitle: string, reason: string) => ({
+    subject: `CTF Challenge update: "${challengeTitle}"`,
+    html: base(`
+      <h2>Challenge Not Approved</h2>
+      <p>Your CTF challenge <strong style="color:#ff3a5c">${challengeTitle}</strong> was not approved.</p>
+      ${reason ? `<p><strong style="color:#e2e8f0">Reason:</strong> ${reason}</p>` : ''}
+      <p>You're welcome to revise and resubmit. Check our guidelines for more details.</p>
+      <a href="https://xcloak.tech/ctf" class="btn">Resubmit →</a>
+    `),
+  }),
+
   scanComplete: (username: string, target: string, findings: number) => ({
     subject: `🔍 Scan complete: ${target} — ${findings} finding${findings !== 1 ? 's' : ''}`,
     html: base(`

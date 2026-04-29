@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const ESO_BACKEND = process.env.ESO_BACKEND_URL ?? 'http://localhost:8000'
+const ESO_BACKEND = process.env.ESO_API_URL ?? 'http://localhost:8000'
 
 async function proxy(req: NextRequest, { params }: { params: Promise<{ path?: string[] }> }) {
   const { path = [] } = await params

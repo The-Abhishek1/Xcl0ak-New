@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const ESO = process.env.ESO_BACKEND_URL ?? 'http://localhost:8000'
+const ESO = process.env.ESO_API_URL ?? 'http://localhost:8000'
 
 // Proxy to ESO which has the user email in its PostgreSQL
 export async function POST(req: NextRequest) {

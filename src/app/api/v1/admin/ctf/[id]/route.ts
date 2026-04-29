@@ -7,13 +7,14 @@ type Ctx = { params: Promise<{ id: string }> }
 
 async function getUserEmail(alias: string): Promise<string | null> {
   try {
-    const res = await fetch(`${process.env.ESO_API_URL ?? 'http://localhost:8000'}/api/v1/admin/users?search=${alias}`, {
-      headers: { 'X-Internal': 'true' },
+    const ESO = process.env.ESO_API_URL ?? 'http://localhost:8000'
+    const secret = process.env.INTERNAL_EMAIL_SECRET ?? 'xcloak-internal'
+    const res = await fetch(`${ESO}/api/v1/admin/users/email?alias=${encodeURIComponent(alias)}`, {
+      headers: { 'X-Internal-Secret': secret },
     })
     if (res.ok) {
       const d = await res.json()
-      const user = (d.users ?? []).find((u: any) => u.username === alias)
-      return user?.email ?? null
+      return d.email ?? null
     }
   } catch {}
   return null
@@ -49,7 +50,12 @@ export async function POST(req: NextRequest, { params }: Ctx) {
   if (challenge.authorAlias && challenge.authorAlias !== 'anonymous') {
     const email = await getUserEmail(challenge.authorAlias)
     if (email && status === 'approved') {
-      await sendEmail({ to: email, ...templates.ctfApproved(challenge.authorAlias, challenge.title) }).catch(() => null)
+      const tpl = status === 'approved'
+        ? templates.ctfApproved(challenge.authorAlias, challenge.title)
+        : templates.ctfRejected
+          ? templates.ctfRejected(challenge.authorAlias, challenge.title, reviewNote ?? '')
+          : templates.exploitRejected(challenge.authorAlias, challenge.title, reviewNote ?? '')
+      await sendEmail({ to: email, ...tpl }).catch(() => null)
     }
   }
 

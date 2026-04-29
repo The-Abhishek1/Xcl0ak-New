@@ -29,10 +29,20 @@ const ALL_NAV = [
     { icon:'🧬', label:'DNA',      href:'/dna',             auth:'none' },
   ]},
   { section:'Tools', items:[
-    { icon:'🔭', label:'Scanner',  href:'/scanner',    auth:'none' },
-    { icon:'🕵', label:'OSINT',    href:'/osint',      auth:'none' },
-    { icon:'📊', label:'Reports',  href:'/reports',    auth:'user' },
-    { icon:'🐳', label:'Sandbox',  href:'/playground', auth:'none' },
+    // ── Public (no login) ─────────────────────────────────────────
+    { icon:'🐳', label:'Sandbox',         href:'/playground',    auth:'none' },
+    { icon:'🔭', label:'Scanner',         href:'/scanner',       auth:'none' },
+    { icon:'🕵', label:'OSINT',           href:'/osint',         auth:'none' },
+    // ── Authenticated ─────────────────────────────────────────────
+    { icon:'📊', label:'Reports',         href:'/reports',       auth:'user' },
+    { icon:'🐙', label:'GitHub SAST',     href:'/github',        auth:'user' },
+    { icon:'🤖', label:'AI Scanner',      href:'/ai-scan',       auth:'user' },
+    { icon:'📡', label:'Monitor',         href:'/monitor',       auth:'user' },
+    { icon:'☁️', label:'Cloud',           href:'/cloud',         auth:'user' },
+    { icon:'📋', label:'Compliance',      href:'/compliance',    auth:'user' },
+    { icon:'🔬', label:'API Security',    href:'/api-security',  auth:'user' },
+    { icon:'🌑', label:'Dark Web',        href:'/darkweb',       auth:'user' },
+    { icon:'🕷', label:'Auth Scan',       href:'/auth-scan',     auth:'user' },
   ]},
   { section:'Community', items:[
     { icon:'🏆', label:'CTF',         href:'/ctf',         auth:'none' },
@@ -165,7 +175,7 @@ export function MobileNav() {
                   <div style={{display:'flex',alignItems:'center',gap:'5px',padding:'3px 8px',borderRadius:'20px',background:'rgba(255,255,255,0.04)',border:'1px solid rgba(255,255,255,0.08)'}}>
                     <span style={{fontFamily:"'Space Mono',monospace",fontSize:'10px',fontWeight:700,color:TIER_COLOR[userTier]}}>{user.username}</span>
                     <span style={{fontFamily:"'Space Mono',monospace",fontSize:'8px',padding:'1px 4px',borderRadius:'4px',background:`${TIER_COLOR[userTier]}20`,color:TIER_COLOR[userTier]}}>
-                      {userTier.toUpperCase().slice(0,4)}
+                      {userTier.toUpperCase().slice(0,5)}
                     </span>
                   </div>
                 )}

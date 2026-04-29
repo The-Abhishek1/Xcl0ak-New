@@ -22,12 +22,23 @@ const SECTIONS = [
     { icon:'⬆',  label:'Upload PoC',  href:'/exploits/upload',auth:'user' },
     { icon:'📦', label:'Payloads',     href:'/payloads',       auth:'none' },
     { icon:'🧬', label:'DNA Analysis', href:'/dna',            auth:'none' },
+    
   ]},
   { label:'Tools', items:[
-    { icon:'🐳', label:'Playground',   href:'/playground',     auth:'none' },
-    { icon:'🔭', label:'Scanner',      href:'/scanner',        auth:'none' },
-    { icon:'🕵', label:'OSINT',        href:'/osint',          auth:'none' },
-    { icon:'📊', label:'Reports',      href:'/reports',        auth:'user' },
+    // ── Public tools (no login needed) ───────────────────────────
+    { icon:'🐳', label:'Playground',      href:'/playground',    auth:'none' },
+    { icon:'🔭', label:'Scanner',         href:'/scanner',       auth:'none' },
+    { icon:'🕵', label:'OSINT',           href:'/osint',         auth:'none' },
+    // ── Authenticated tools (login required) ─────────────────────
+    { icon:'📊', label:'Reports',         href:'/reports',       auth:'user' },
+    { icon:'🐙', label:'GitHub SAST',     href:'/github',        auth:'user' },
+    { icon:'🤖', label:'AI Scanner',      href:'/ai-scan',       auth:'user' },
+    { icon:'📡', label:'Monitor',         href:'/monitor',       auth:'user' },
+    { icon:'☁️', label:'Cloud Security',  href:'/cloud',         auth:'user' },
+    { icon:'📋', label:'Compliance',      href:'/compliance',    auth:'user' },
+    { icon:'🔬', label:'API Security',    href:'/api-security',  auth:'user' },
+    { icon:'🌑', label:'Dark Web',        href:'/darkweb',       auth:'user' },
+    { icon:'🕷', label:'Auth Scanner',    href:'/auth-scan',     auth:'user' },
   ]},
   { label:'Community', items:[
     { icon:'🏆', label:'CTF',          href:'/ctf',            auth:'none', badge:'NEW' },

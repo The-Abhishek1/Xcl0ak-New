@@ -166,6 +166,7 @@ const SECTIONS = [
     {
         label: 'Tools',
         items: [
+            // ── Public tools (no login needed) ───────────────────────────
             {
                 icon: '🐳',
                 label: 'Playground',
@@ -184,10 +185,59 @@ const SECTIONS = [
                 href: '/osint',
                 auth: 'none'
             },
+            // ── Authenticated tools (login required) ─────────────────────
             {
                 icon: '📊',
                 label: 'Reports',
                 href: '/reports',
+                auth: 'user'
+            },
+            {
+                icon: '🐙',
+                label: 'GitHub SAST',
+                href: '/github',
+                auth: 'user'
+            },
+            {
+                icon: '🤖',
+                label: 'AI Scanner',
+                href: '/ai-scan',
+                auth: 'user'
+            },
+            {
+                icon: '📡',
+                label: 'Monitor',
+                href: '/monitor',
+                auth: 'user'
+            },
+            {
+                icon: '☁️',
+                label: 'Cloud Security',
+                href: '/cloud',
+                auth: 'user'
+            },
+            {
+                icon: '📋',
+                label: 'Compliance',
+                href: '/compliance',
+                auth: 'user'
+            },
+            {
+                icon: '🔬',
+                label: 'API Security',
+                href: '/api-security',
+                auth: 'user'
+            },
+            {
+                icon: '🌑',
+                label: 'Dark Web',
+                href: '/darkweb',
+                auth: 'user'
+            },
+            {
+                icon: '🕷',
+                label: 'Auth Scanner',
+                href: '/auth-scan',
                 auth: 'user'
             }
         ]
@@ -403,7 +453,7 @@ function Sidebar() {
                                 children: sec.label
                             }, void 0, false, {
                                 fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                lineNumber: 124,
+                                lineNumber: 135,
                                 columnNumber: 13
                             }, this),
                             sec.items.map((item)=>{
@@ -441,7 +491,7 @@ function Sidebar() {
                                             children: item.icon
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                            lineNumber: 148,
+                                            lineNumber: 159,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -452,7 +502,7 @@ function Sidebar() {
                                             children: item.label
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                            lineNumber: 149,
+                                            lineNumber: 160,
                                             columnNumber: 19
                                         }, this),
                                         item.badge && !locked && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -467,7 +517,7 @@ function Sidebar() {
                                             children: item.badge
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                            lineNumber: 151,
+                                            lineNumber: 162,
                                             columnNumber: 21
                                         }, this),
                                         locked && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -478,25 +528,25 @@ function Sidebar() {
                                             children: access === 'locked-pro' ? '⭐' : '🔒'
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                            lineNumber: 158,
+                                            lineNumber: 169,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, item.href, true, {
                                     fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                    lineNumber: 133,
+                                    lineNumber: 144,
                                     columnNumber: 17
                                 }, this);
                             })
                         ]
                     }, sec.label, true, {
                         fileName: "[project]/src/components/layout/Sidebar.tsx",
-                        lineNumber: 123,
+                        lineNumber: 134,
                         columnNumber: 11
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/src/components/layout/Sidebar.tsx",
-                lineNumber: 121,
+                lineNumber: 132,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -531,20 +581,20 @@ function Sidebar() {
                                 children: "🔑"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                lineNumber: 181,
+                                lineNumber: 192,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 children: "Admin Panel"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                lineNumber: 182,
+                                lineNumber: 193,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/layout/Sidebar.tsx",
-                        lineNumber: 174,
+                        lineNumber: 185,
                         columnNumber: 11
                     }, this),
                     loggedIn && user ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -575,7 +625,7 @@ function Sidebar() {
                                                 children: user.username
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                                lineNumber: 191,
+                                                lineNumber: 202,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -589,13 +639,13 @@ function Sidebar() {
                                                 children: isAdmin ? '⭐ admin' : `${userTier} tier`
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                                lineNumber: 192,
+                                                lineNumber: 203,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                        lineNumber: 190,
+                                        lineNumber: 201,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -611,13 +661,13 @@ function Sidebar() {
                                         children: "out"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                        lineNumber: 196,
+                                        lineNumber: 207,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                lineNumber: 189,
+                                lineNumber: 200,
                                 columnNumber: 13
                             }, this),
                             !isAdmin && userTier === 'free' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -634,13 +684,13 @@ function Sidebar() {
                                 children: "↑ Upgrade to Pro"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                lineNumber: 201,
+                                lineNumber: 212,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/layout/Sidebar.tsx",
-                        lineNumber: 188,
+                        lineNumber: 199,
                         columnNumber: 11
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         style: {
@@ -674,7 +724,7 @@ function Sidebar() {
                                         children: "Sign In"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                        lineNumber: 209,
+                                        lineNumber: 220,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -696,13 +746,13 @@ function Sidebar() {
                                         children: "Register"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                        lineNumber: 212,
+                                        lineNumber: 223,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                lineNumber: 208,
+                                lineNumber: 219,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -722,13 +772,13 @@ function Sidebar() {
                                 children: "🔑 Admin Login"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                lineNumber: 216,
+                                lineNumber: 227,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/layout/Sidebar.tsx",
-                        lineNumber: 207,
+                        lineNumber: 218,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -750,7 +800,7 @@ function Sidebar() {
                                 children: "NVD + OTX LIVE"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                lineNumber: 224,
+                                lineNumber: 235,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -771,7 +821,7 @@ function Sidebar() {
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                        lineNumber: 226,
+                                        lineNumber: 237,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -783,31 +833,31 @@ function Sidebar() {
                                         children: "Connected"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                        lineNumber: 227,
+                                        lineNumber: 238,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/layout/Sidebar.tsx",
-                                lineNumber: 225,
+                                lineNumber: 236,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/layout/Sidebar.tsx",
-                        lineNumber: 223,
+                        lineNumber: 234,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/layout/Sidebar.tsx",
-                lineNumber: 170,
+                lineNumber: 181,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/components/layout/Sidebar.tsx",
-        lineNumber: 112,
+        lineNumber: 123,
         columnNumber: 5
     }, this);
 }
@@ -964,7 +1014,7 @@ function Topbar() {
         },
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                href: "/dashboard",
+                href: "/",
                 className: "flex items-center gap-2 shrink-0",
                 style: {
                     textDecoration: 'none'
@@ -1302,7 +1352,7 @@ function Topbar() {
                                                 color: tColor,
                                                 border: `1px solid ${tColor}30`
                                             },
-                                            children: tier.toUpperCase().slice(0, 4)
+                                            children: tier.toUpperCase().slice(0, 5)
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/layout/Topbar.tsx",
                                             lineNumber: 192,
@@ -1696,6 +1746,13 @@ const ALL_NAV = [
     {
         section: 'Tools',
         items: [
+            // ── Public (no login) ─────────────────────────────────────────
+            {
+                icon: '🐳',
+                label: 'Sandbox',
+                href: '/playground',
+                auth: 'none'
+            },
             {
                 icon: '🔭',
                 label: 'Scanner',
@@ -1708,6 +1765,7 @@ const ALL_NAV = [
                 href: '/osint',
                 auth: 'none'
             },
+            // ── Authenticated ─────────────────────────────────────────────
             {
                 icon: '📊',
                 label: 'Reports',
@@ -1715,10 +1773,52 @@ const ALL_NAV = [
                 auth: 'user'
             },
             {
-                icon: '🐳',
-                label: 'Sandbox',
-                href: '/playground',
-                auth: 'none'
+                icon: '🐙',
+                label: 'GitHub SAST',
+                href: '/github',
+                auth: 'user'
+            },
+            {
+                icon: '🤖',
+                label: 'AI Scanner',
+                href: '/ai-scan',
+                auth: 'user'
+            },
+            {
+                icon: '📡',
+                label: 'Monitor',
+                href: '/monitor',
+                auth: 'user'
+            },
+            {
+                icon: '☁️',
+                label: 'Cloud',
+                href: '/cloud',
+                auth: 'user'
+            },
+            {
+                icon: '📋',
+                label: 'Compliance',
+                href: '/compliance',
+                auth: 'user'
+            },
+            {
+                icon: '🔬',
+                label: 'API Security',
+                href: '/api-security',
+                auth: 'user'
+            },
+            {
+                icon: '🌑',
+                label: 'Dark Web',
+                href: '/darkweb',
+                auth: 'user'
+            },
+            {
+                icon: '🕷',
+                label: 'Auth Scan',
+                href: '/auth-scan',
+                auth: 'user'
             }
         ]
     },
@@ -1925,7 +2025,7 @@ function MobileNav() {
                                     children: item.icon
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                    lineNumber: 131,
+                                    lineNumber: 141,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1937,13 +2037,13 @@ function MobileNav() {
                                     children: item.label
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                    lineNumber: 132,
+                                    lineNumber: 142,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, item.href, true, {
                             fileName: "[project]/src/components/layout/MobileNav.tsx",
-                            lineNumber: 130,
+                            lineNumber: 140,
                             columnNumber: 13
                         }, this);
                     }),
@@ -1959,7 +2059,7 @@ function MobileNav() {
                                 children: "☰"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                lineNumber: 137,
+                                lineNumber: 147,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1971,19 +2071,19 @@ function MobileNav() {
                                 children: "More"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                lineNumber: 138,
+                                lineNumber: 148,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/layout/MobileNav.tsx",
-                        lineNumber: 136,
+                        lineNumber: 146,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/components/layout/MobileNav.tsx",
-                lineNumber: 126,
+                lineNumber: 136,
                 columnNumber: 7
             }, this),
             open && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2024,12 +2124,12 @@ function MobileNav() {
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                lineNumber: 155,
+                                lineNumber: 165,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/layout/MobileNav.tsx",
-                            lineNumber: 154,
+                            lineNumber: 164,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2063,13 +2163,13 @@ function MobileNav() {
                                                     children: "cloak"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                                    lineNumber: 162,
+                                                    lineNumber: 172,
                                                     columnNumber: 20
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                            lineNumber: 161,
+                                            lineNumber: 171,
                                             columnNumber: 17
                                         }, this),
                                         loggedIn && user && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2093,7 +2193,7 @@ function MobileNav() {
                                                     children: user.username
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                                    lineNumber: 166,
+                                                    lineNumber: 176,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2105,22 +2205,22 @@ function MobileNav() {
                                                         background: `${TIER_COLOR[userTier]}20`,
                                                         color: TIER_COLOR[userTier]
                                                     },
-                                                    children: userTier.toUpperCase().slice(0, 4)
+                                                    children: userTier.toUpperCase().slice(0, 5)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                                    lineNumber: 167,
+                                                    lineNumber: 177,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                            lineNumber: 165,
+                                            lineNumber: 175,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                    lineNumber: 160,
+                                    lineNumber: 170,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2136,13 +2236,13 @@ function MobileNav() {
                                     children: "✕"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                    lineNumber: 173,
+                                    lineNumber: 183,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/layout/MobileNav.tsx",
-                            lineNumber: 159,
+                            lineNumber: 169,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2167,7 +2267,7 @@ function MobileNav() {
                                                 children: sec.section
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                                lineNumber: 179,
+                                                lineNumber: 189,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2212,7 +2312,7 @@ function MobileNav() {
                                                                 children: item.badge
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                                                lineNumber: 201,
+                                                                lineNumber: 211,
                                                                 columnNumber: 29
                                                             }, this),
                                                             locked && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2225,7 +2325,7 @@ function MobileNav() {
                                                                 children: access === 'locked-pro' ? '⭐' : '🔒'
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                                                lineNumber: 207,
+                                                                lineNumber: 217,
                                                                 columnNumber: 29
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2236,7 +2336,7 @@ function MobileNav() {
                                                                 children: item.icon
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                                                lineNumber: 211,
+                                                                lineNumber: 221,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2250,25 +2350,25 @@ function MobileNav() {
                                                                 children: item.label
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                                                lineNumber: 212,
+                                                                lineNumber: 222,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, item.href, true, {
                                                         fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                                        lineNumber: 189,
+                                                        lineNumber: 199,
                                                         columnNumber: 25
                                                     }, this);
                                                 })
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                                lineNumber: 182,
+                                                lineNumber: 192,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, sec.section, true, {
                                         fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                        lineNumber: 178,
+                                        lineNumber: 188,
                                         columnNumber: 17
                                     }, this)),
                                 loggedIn && user ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2301,7 +2401,7 @@ function MobileNav() {
                                                     children: "⚙ Settings"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                                    lineNumber: 226,
+                                                    lineNumber: 236,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2325,13 +2425,13 @@ function MobileNav() {
                                                     children: "🚪 Sign Out"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                                    lineNumber: 230,
+                                                    lineNumber: 240,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                            lineNumber: 225,
+                                            lineNumber: 235,
                                             columnNumber: 19
                                         }, this),
                                         isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2351,7 +2451,7 @@ function MobileNav() {
                                             children: "🔑 Admin Panel"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                            lineNumber: 236,
+                                            lineNumber: 246,
                                             columnNumber: 21
                                         }, this),
                                         !isAdmin && userTier === 'free' && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2371,13 +2471,13 @@ function MobileNav() {
                                             children: "⭐ Upgrade to Pro"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                            lineNumber: 242,
+                                            lineNumber: 252,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                    lineNumber: 224,
+                                    lineNumber: 234,
                                     columnNumber: 17
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     style: {
@@ -2412,7 +2512,7 @@ function MobileNav() {
                                                     children: "Sign In"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                                    lineNumber: 251,
+                                                    lineNumber: 261,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -2435,13 +2535,13 @@ function MobileNav() {
                                                     children: "Register"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                                    lineNumber: 255,
+                                                    lineNumber: 265,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                            lineNumber: 250,
+                                            lineNumber: 260,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -2462,30 +2562,30 @@ function MobileNav() {
                                             children: "🔑 Admin Login"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                            lineNumber: 260,
+                                            lineNumber: 270,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/layout/MobileNav.tsx",
-                                    lineNumber: 249,
+                                    lineNumber: 259,
                                     columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/layout/MobileNav.tsx",
-                            lineNumber: 176,
+                            lineNumber: 186,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/layout/MobileNav.tsx",
-                    lineNumber: 146,
+                    lineNumber: 156,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/src/components/layout/MobileNav.tsx",
-                lineNumber: 144,
+                lineNumber: 154,
                 columnNumber: 9
             }, this)
         ]

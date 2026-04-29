@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
   )
 
   let processed = 0
-  const ESO = process.env.ESO_BACKEND_URL ?? 'http://localhost:8000'
+  const ESO = process.env.ESO_API_URL ?? 'http://localhost:8000'
 
   for (const [i, user] of users.entries()) {
     try {

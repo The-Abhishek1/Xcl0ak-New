@@ -1,11 +1,14 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
+// ── Exploits ──────────────────────────────────────────────────────────────────
 
 model Exploit {
   id           String        @id @default(cuid())
@@ -28,8 +31,7 @@ model Exploit {
   dnaRisk      Float?
   dnaPayload   String?
   fileUrl      String?
-  // Approval workflow
-  status       String        @default("pending")   // pending | approved | rejected
+  status       String        @default("pending")
   reviewNote   String?
   reviewedBy   String?
   reviewedAt   DateTime?
@@ -37,6 +39,7 @@ model Exploit {
   updatedAt    DateTime      @updatedAt
   votes        ExploitVote[]
   comments     Comment[]
+
   @@index([status])
   @@index([score(sort: Desc)])
   @@index([type])
@@ -49,6 +52,7 @@ model ExploitVote {
   userAlias String
   direction String
   exploit   Exploit @relation(fields: [exploitId], references: [id], onDelete: Cascade)
+
   @@unique([exploitId, userAlias])
 }
 
@@ -65,6 +69,8 @@ model Comment {
   replies     Comment[] @relation("Replies")
 }
 
+// ── CVE & Threat Intelligence ─────────────────────────────────────────────────
+
 model CVECache {
   id               String   @id @default(cuid())
   cveId            String   @unique
@@ -80,6 +86,7 @@ model CVECache {
   publishedAt      DateTime
   modifiedAt       DateTime
   syncedAt         DateTime @default(now())
+
   @@index([severity])
   @@index([cvssScore(sort: Desc)])
 }
@@ -97,6 +104,7 @@ model ThreatEvent {
   details    String?
   sourceUrl  String?
   createdAt  DateTime @default(now())
+
   @@index([createdAt(sort: Desc)])
 }
 
@@ -110,8 +118,11 @@ model NewsArticle {
   summary     String?
   publishedAt DateTime
   createdAt   DateTime @default(now())
+
   @@index([publishedAt(sort: Desc)])
 }
+
+// ── Users ─────────────────────────────────────────────────────────────────────
 
 model User {
   id         String   @id @default(cuid())
@@ -129,6 +140,8 @@ model AdminUser {
   createdAt    DateTime @default(now())
 }
 
+// ── CTF ───────────────────────────────────────────────────────────────────────
+
 model CTFChallenge {
   id          String     @id @default(cuid())
   title       String
@@ -140,14 +153,14 @@ model CTFChallenge {
   fileUrl     String?
   hints       String[]
   expiresAt   DateTime?
-  // Approval workflow
-  status      String     @default("pending")  // pending | approved | rejected
+  status      String     @default("pending")
   authorAlias String     @default("anonymous")
   reviewNote  String?
   reviewedBy  String?
   reviewedAt  DateTime?
   createdAt   DateTime   @default(now())
   solves      CTFSolve[]
+
   @@index([status])
 }
 
@@ -157,8 +170,11 @@ model CTFSolve {
   userAlias   String
   solvedAt    DateTime     @default(now())
   challenge   CTFChallenge @relation(fields: [challengeId], references: [id])
+
   @@unique([challengeId, userAlias])
 }
+
+// ── Chat ──────────────────────────────────────────────────────────────────────
 
 model ChatMessage {
   id        String   @id @default(cuid())
@@ -166,55 +182,63 @@ model ChatMessage {
   alias     String
   tier      String   @default("free")
   content   String
-  type      String   @default("message") // message | system | alert
+  type      String   @default("message")
   createdAt DateTime @default(now())
+
   @@index([room, createdAt(sort: Desc)])
 }
+
+// ── Notifications ─────────────────────────────────────────────────────────────
 
 model Notification {
   id        String   @id @default(cuid())
   userAlias String
-  type      String   // cve_alert | ctf_solve | exploit_upload | payment | scan_complete | system
+  type      String
   title     String
   body      String
   link      String?
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
+
   @@index([userAlias, createdAt(sort: Desc)])
   @@index([userAlias, read])
 }
 
+// ── Learning ──────────────────────────────────────────────────────────────────
+
 model LearningPath {
-  id          String         @id @default(cuid())
+  id          String          @id @default(cuid())
   title       String
   description String
-  category    String         @default("web")
-  difficulty  String         @default("beginner")
+  category    String          @default("web")
+  difficulty  String          @default("beginner")
   authorAlias String
-  status      String         @default("pending")
+  status      String          @default("pending")
   reviewNote  String?
   reviewedBy  String?
   reviewedAt  DateTime?
-  upvotes     Int            @default(0)
-  views       Int            @default(0)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  upvotes     Int             @default(0)
+  views       Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
   modules     LearnModule[]
   enrollments LearnEnroll[]
+
   @@index([status])
   @@index([category])
 }
 
 model LearnModule {
-  id          String          @id @default(cuid())
+  id          String            @id @default(cuid())
   pathId      String
   order       Int
   title       String
-  type        String          @default("read")
-  content     String          @default("")
-  xpReward    Int             @default(10)
-  path        LearningPath    @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  type        String            @default("read")
+  content     String            @default("")
+  xpReward    Int               @default(10)
+  path        LearningPath      @relation(fields: [pathId], references: [id], onDelete: Cascade)
   completions LearnCompletion[]
+
   @@index([pathId])
 }
 
@@ -224,6 +248,7 @@ model LearnEnroll {
   alias      String
   enrolledAt DateTime     @default(now())
   path       LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
+
   @@unique([pathId, alias])
 }
 
@@ -233,5 +258,224 @@ model LearnCompletion {
   alias       String
   completedAt DateTime    @default(now())
   module      LearnModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
   @@unique([moduleId, alias])
+}
+
+// ── GitHub SAST Integration ───────────────────────────────────────────────────
+
+model GitHubConnection {
+  id            String       @id @default(cuid())
+  userAlias     String       @unique
+  githubUserId  String       @unique
+  githubLogin   String
+  accessToken   String
+  avatarUrl     String?
+  webhookSecret String       @default("")
+  installedAt   DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  repos         GitHubRepo[]
+
+  @@index([userAlias])
+}
+
+model GitHubRepo {
+  id            String           @id @default(cuid())
+  connectionId  String
+  repoId        String
+  fullName      String
+  defaultBranch String           @default("main")
+  private       Boolean          @default(false)
+  language      String?
+  webhookId     String?
+  scanEnabled   Boolean          @default(true)
+  lastScannedAt DateTime?
+  connection    GitHubConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+  scans         RepoScan[]
+
+  @@unique([connectionId, repoId])
+  @@index([connectionId])
+}
+
+model RepoScan {
+  id          String     @id @default(cuid())
+  repoId      String
+  commitSha   String
+  branch      String
+  prNumber    Int?
+  status      String     @default("queued")
+  findings    Int        @default(0)
+  criticals   Int        @default(0)
+  highs       Int        @default(0)
+  result      Json?
+  error       String?
+  triggeredBy String     @default("webhook")
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime   @default(now())
+  repo        GitHubRepo @relation(fields: [repoId], references: [id], onDelete: Cascade)
+
+  @@index([repoId, createdAt(sort: Desc)])
+  @@index([status])
+}
+
+// ── AI Prompt Injection Scanner ───────────────────────────────────────────────
+
+model AiScan {
+  id           String    @id @default(cuid())
+  userAlias    String
+  targetUrl    String
+  model        String
+  systemPrompt String?
+  categories   String[]  @default([])
+  maxPrompts   Int       @default(50)
+  status       String    @default("queued")
+  findings     Int       @default(0)
+  criticals    Int       @default(0)
+  highs        Int       @default(0)
+  result       Json?
+  error        String?
+  startedAt    DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([userAlias, createdAt(sort: Desc)])
+  @@index([status])
+}
+
+// ── Continuous Attack Surface Monitoring (CASM) ───────────────────────────────
+
+model MonitoredAsset {
+  id           String          @id @default(cuid())
+  userAlias    String
+  type         String
+  target       String
+  label        String?
+  scanInterval Int             @default(24)
+  lastScannedAt DateTime?
+  isActive     Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  snapshots    AssetSnapshot[]
+  changes      AssetChange[]
+
+  @@unique([userAlias, target])
+  @@index([userAlias])
+  @@index([isActive, lastScannedAt])
+}
+
+model AssetSnapshot {
+  id         String         @id @default(cuid())
+  assetId    String
+  takenAt    DateTime       @default(now())
+  subdomains String[]       @default([])
+  openPorts  Json?
+  techs      Json?
+  cves       Json?
+  sslExpiry  DateTime?
+  httpStatus Int?
+  dnsRecords Json?
+  asset      MonitoredAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId, takenAt(sort: Desc)])
+}
+
+model AssetChange {
+  id           String         @id @default(cuid())
+  assetId      String
+  detectedAt   DateTime       @default(now())
+  changeType   String
+  severity     String         @default("medium")
+  oldValue     String?
+  newValue     String?
+  description  String
+  acknowledged Boolean        @default(false)
+  asset        MonitoredAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId, detectedAt(sort: Desc)])
+  @@index([acknowledged])
+}
+
+
+// Add these models to the BOTTOM of your prisma/schema.prisma
+
+model CloudAccount {
+  id              String         @id @default(cuid())
+  userAlias       String
+  provider        String         // "aws" | "gcp" | "azure"
+  accountId       String         // AWS account ID / GCP project ID / Azure subscription ID
+  label           String?
+  // AWS: role ARN for assume-role. GCP/Azure: encrypted credentials
+  credentials     String         // AES-256 encrypted JSON blob
+  region          String         @default("us-east-1")
+  lastAuditAt     DateTime?
+  postureScore    Int?           // 0-100
+  isActive        Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  findings        CloudFinding[]
+
+  @@unique([userAlias, provider, accountId])
+  @@index([userAlias])
+}
+
+model CloudFinding {
+  id           String       @id @default(cuid())
+  accountId    String
+  provider     String
+  service      String       // "s3" | "ec2" | "iam" | "rds" | "vpc" etc
+  resource     String       // resource ARN or ID
+  ruleId       String       // e.g. "aws-s3-public-access"
+  title        String
+  description  String
+  severity     String       // critical | high | medium | low
+  status       String       @default("open") // open | suppressed | resolved
+  remediation  String?
+  compliance   String[]     @default([]) // ["CIS-1.1", "SOC2-CC6.1"]
+  detectedAt   DateTime     @default(now())
+  resolvedAt   DateTime?
+  account      CloudAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, severity])
+  @@index([accountId, service])
+  @@index([status])
+}
+
+model DarkWebMonitor {
+  id            String             @id @default(cuid())
+  userAlias     String
+  identifier    String             // email address or domain name
+  type          String             // "email" | "domain"
+  status        String             @default("pending") // pending | active | error
+  hibpKey       String?            // encrypted HIBP API key
+  intelxKey     String?            // encrypted IntelX API key
+  lastCheckedAt DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  exposures     DarkWebExposure[]
+
+  @@unique([userAlias, identifier])
+  @@index([userAlias])
+}
+
+model DarkWebExposure {
+  id           String          @id @default(cuid())
+  monitorId    String
+  source       String          // "HaveIBeenPwned" | "Intelligence X" | "pastebin.com" | ...
+  identifier   String          // the actual email/domain that was found
+  type         String          // "email" | "domain" | "api_key" | "credential"
+  severity     String          // critical | high | medium | low
+  title        String
+  description  String
+  dataTypes    String[]        @default([])
+  url          String          @default("")
+  breachDate   String?
+  pwnCount     Int?
+  acknowledged Boolean         @default(false)
+  foundAt      DateTime        @default(now())
+  monitor      DarkWebMonitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+
+  @@index([monitorId, severity])
+  @@index([monitorId, foundAt(sort: Desc)])
+  @@index([acknowledged])
 }

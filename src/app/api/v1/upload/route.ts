@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     const prefix    = (formData.get('prefix') as string) ?? 'uploads'
 
     if (!file) return NextResponse.json({ error: 'No file provided' }, { status: 400 })
-    if (file.size > MAX_SIZE) return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 })
+    if (file.size > MAX_SIZE) return NextResponse.json({ error: 'File too large (max 10MB)' }, { status: 400 })
 
     // Sanitize filename
     const ext  = file.name.split('.').pop()?.toLowerCase() ?? 'bin'

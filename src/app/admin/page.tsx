@@ -462,7 +462,7 @@ export default function AdminPage() {
     try {
       const r = await esoFetch('/admin/payments/upi', {
         method: 'POST',
-        body: JSON.stringify(upiForm)
+        body: JSON.stringify({ user_id: upiForm.userId, tier: upiForm.tier, amount: upiForm.amount, utr_number: upiForm.utr })
       })
       if (r.ok) {
         setUpiMsg(`✓ Payment recorded — ${upiForm.userId} upgraded to ${upiForm.tier}`)

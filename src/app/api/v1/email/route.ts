@@ -28,10 +28,31 @@ export async function POST(req: NextRequest) {
       tpl = templates.welcome(username ?? to.split('@')[0])
       break
     case 'scan_complete':
-      tpl = templates.scanComplete(username, data?.target ?? 'Unknown', data?.findings ?? 0)
+      tpl = templates.scanComplete(username ?? to.split('@')[0], data?.target ?? 'Unknown', data?.findings ?? 0)
       break
     case 'password_reset':
-      tpl = templates.passwordReset(username, data?.resetLink ?? '')
+      tpl = templates.passwordReset(username ?? to.split('@')[0], data?.resetLink ?? '')
+      break
+    case 'ctf_solved':
+      tpl = templates.ctfSolved(username ?? to.split('@')[0], data?.challengeTitle ?? '', data?.points ?? 0)
+      break
+    case 'ctf_approved':
+      tpl = templates.ctfApproved(username ?? to.split('@')[0], data?.challengeTitle ?? '')
+      break
+    case 'ctf_rejected':
+      tpl = templates.ctfRejected(username ?? to.split('@')[0], data?.challengeTitle ?? '', data?.reason ?? '')
+      break
+    case 'exploit_approved':
+      tpl = templates.exploitApproved(username ?? to.split('@')[0], data?.title ?? '')
+      break
+    case 'exploit_rejected':
+      tpl = templates.exploitRejected(username ?? to.split('@')[0], data?.title ?? '', data?.reason ?? '')
+      break
+    case 'learning_path_approved':
+      tpl = templates.learningPathApproved(username ?? to.split('@')[0], data?.pathTitle ?? '')
+      break
+    case 'learning_path_rejected':
+      tpl = templates.learningPathRejected(username ?? to.split('@')[0], data?.pathTitle ?? '', data?.reason ?? '')
       break
     default:
       return NextResponse.json({ error: `Unknown event: ${event}` }, { status: 400 })
