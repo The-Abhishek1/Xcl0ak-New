@@ -91,7 +91,7 @@ export function Topbar() {
       style={{ background:'rgba(3,5,10,0.95)', backdropFilter:'blur(20px)', borderBottom:'1px solid rgba(255,255,255,0.07)' }}>
 
       {/* Logo */}
-      <Link href="/" className="flex items-center gap-2 shrink-0" style={{textDecoration:'none'}}>
+      <Link href="/dashboard" className="flex items-center gap-2 shrink-0" style={{textDecoration:'none'}}>
         <span className="w-7 h-7 rounded-md flex items-center justify-center text-sm shrink-0"
           style={{background:'linear-gradient(135deg,#00ffaa,#00aaff)'}}>🛡</span>
         <span className="font-black text-[16px] tracking-tight">X<span style={{color:'#00ffaa'}}>cloak</span></span>
@@ -191,7 +191,7 @@ export function Topbar() {
                 </span>
                 <span className="font-mono text-[8px] font-bold px-1.5 py-[1px] rounded-full"
                   style={{background:`${tColor}22`,color:tColor,border:`1px solid ${tColor}30`}}>
-                  {tier.toUpperCase().slice(0,5)}
+                  {tier.toUpperCase().slice(0,4)}
                 </span>
               </button>
 
