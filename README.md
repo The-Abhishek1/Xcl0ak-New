@@ -2,7 +2,7 @@
 
 **AI-powered cybersecurity platform** — vulnerability scanning, threat intelligence, CTF challenges, and a community exploit database. Built for security researchers, bug bounty hunters, and learners.
 
-> Live at [xcloakapp.com](https://xcloakapp.com) · Backend: [Enterprise Security Orchestrator](https://github.com/0xidiot/Enterprise-Security-Orchestrator)
+> Live at [xcloakapp.com](https://xcloak.tech) · Backend: [Enterprise Security Orchestrator](https://github.com/0xidiot/Enterprise-Security-Orchestrator)
 
 ---
 
